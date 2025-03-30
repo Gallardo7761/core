@@ -1,4 +1,4 @@
-package net.miarma.core.database;
+package net.miarma.core.common.db;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
