@@ -1,5 +1,5 @@
 package net.miarma.core.miarmacraft.entities;
 
-public class TagEntity {
+public class SuggestionTagEntity {
 
 }

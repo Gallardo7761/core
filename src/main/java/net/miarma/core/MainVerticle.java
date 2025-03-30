@@ -1,7 +1,8 @@
-package net.miarma.core.sso.verticles;
+package net.miarma.core;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import net.miarma.core.sso.verticles.AuthVerticle;
 
 public class MainVerticle extends AbstractVerticle {
 	@Override
