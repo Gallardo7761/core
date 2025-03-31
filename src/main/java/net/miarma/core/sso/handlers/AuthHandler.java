@@ -1,14 +1,18 @@
 package net.miarma.core.sso.handlers;
 
+import com.google.gson.Gson;
+
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import net.miarma.core.common.Constants;
+import net.miarma.core.common.SingleJsonResponse;
 
 public class AuthHandler {
 
     private final Vertx vertx;
-
+    private final Gson gson = new Gson();
+    
     public AuthHandler(Vertx vertx) {
         this.vertx = vertx;
     }
@@ -26,7 +30,9 @@ public class AuthHandler {
                 ctx.response().putHeader("Content-Type", "application/json")
                         .end(((JsonObject) ar.result().body()).encode());
             } else {
-                ctx.response().setStatusCode(401).end(ar.cause().getMessage());
+                ctx.response().setStatusCode(401).end(
+                	gson.toJson(SingleJsonResponse.of("Error requesting the event bus"))
+        		);
             }
         });
     }
@@ -79,13 +85,19 @@ public class AuthHandler {
 
             vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
                 if (ar.succeeded() && (Boolean) ar.result().body()) {
-                    ctx.response().setStatusCode(200).end("Valid token");
+                    ctx.response().setStatusCode(200).end(
+                    	gson.toJson(SingleJsonResponse.of("Valid token"))
+            		);
                 } else {
-                    ctx.response().setStatusCode(401).end("Invalid token");
+                    ctx.response().setStatusCode(401).end(
+                    		gson.toJson(SingleJsonResponse.of("Invalid token"))
+            		);
                 }
             });
         } else {
-            ctx.response().setStatusCode(400).end("Missing or invalid Authorization header");
+            ctx.response().setStatusCode(400).end(
+            	gson.toJson(SingleJsonResponse.of("Missing or invalid Authorization header"))
+    		);
         }
     }
 }
