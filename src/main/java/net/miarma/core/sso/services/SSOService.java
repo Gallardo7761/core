@@ -26,13 +26,13 @@ public class SSOService {
     public void login(String email, String plainPassword, Handler<AsyncResult<JsonObject>> handler) {
         getByEmail(email, ar -> {
             if (ar.failed() || ar.result() == null) {
-                handler.handle(Future.failedFuture("Credenciales inválidas"));
+                handler.handle(Future.failedFuture("Invalid credentials"));
                 return;
             }
 
             UserEntity user = ar.result();
             if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
-                handler.handle(Future.failedFuture("Credenciales inválidas"));
+                handler.handle(Future.failedFuture("Invalid credentials"));
             } else {
                 String token = JWTUtil.generateToken(user.getUser_name(), user.getUser_id());
                 JsonObject response = new JsonObject()
@@ -46,7 +46,7 @@ public class SSOService {
     public void register(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
         getByEmail(user.getEmail(), ar -> {
             if (ar.succeeded() && ar.result() != null) {
-                handler.handle(Future.failedFuture("Email ya registrado"));
+                handler.handle(Future.failedFuture("Email already exists"));
                 return;
             }
 
