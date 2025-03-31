@@ -24,20 +24,6 @@
 	 <artifactId>vertx-web</artifactId>
 	 <version>4.5.13</version>
 	</dependency>
-	
-	<!-- Vert.X Web Client -->
-	<dependency>
-	 <groupId>io.vertx</groupId>
-	 <artifactId>vertx-web-client</artifactId>
-	 <version>4.5.13</version>
-	</dependency>
-	
-	<!-- Vert.X MQTT -->
-    <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-mqtt</artifactId>
-        <version>4.4.2</version>
-    </dependency>
 
     <!-- Vert.X MariaDB/MySQL Client -->
 	<dependency>
@@ -46,39 +32,12 @@
 	    <version>4.5.13</version>
 	</dependency>
 	
-	<!-- Vert.X Auth JWT -->
-	<dependency>
-	    <groupId>io.vertx</groupId>
-	    <artifactId>vertx-auth-jwt</artifactId>
-	    <version>4.5.13</version>
-	</dependency>
-	
-	<!-- JDBC Driver -->
-	<dependency>
-	    <groupId>org.mariadb.jdbc</groupId>
-	    <artifactId>mariadb-java-client</artifactId>
-	    <version>3.5.2</version>
-	</dependency>
-	
   	<!-- Gson -->
   	<dependency>
   	 <groupId>com.google.code.gson</groupId>
   	 <artifactId>gson</artifactId>
   	 <version>2.12.1</version>
   	</dependency>
-  	
-  	<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-agroal -->	
-	<dependency>
-	    <groupId>org.jboss.logmanager</groupId>
-	    <artifactId>jboss-logmanager</artifactId>
-	    <version>3.1.1.Final</version> <!-- O la versión más reciente -->
-	</dependency>
-	
-	<dependency>
-	    <groupId>io.github.cdimascio</groupId>
-	    <artifactId>dotenv-java</artifactId>
-	    <version>3.2.0</version>
-	</dependency>
 	
 	<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
 	<dependency>
@@ -92,6 +51,19 @@
 	    <groupId>com.auth0</groupId>
 	    <artifactId>java-jwt</artifactId>
 	    <version>4.5.0</version>
+	</dependency>
+	
+	<!-- SLF4J + Logback -->
+	<dependency>
+	   <groupId>org.slf4j</groupId>
+	   <artifactId>slf4j-api</artifactId>
+	   <version>2.0.12</version>
+	</dependency>
+	
+	<dependency>
+	   <groupId>ch.qos.logback</groupId>
+	   <artifactId>logback-classic</artifactId>
+	   <version>1.4.11</version>
 	</dependency>
 	
   </dependencies>
@@ -113,7 +85,7 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>net.miarma.contaminus.server.MainVerticle</mainClass>
+                                    <mainClass>net.miarma.core.MainVerticle</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

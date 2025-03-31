@@ -1,7 +1,7 @@
 package net.miarma.core.common;
 
-import io.vertx.core.impl.logging.Logger;
-import io.vertx.core.impl.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Constants {
 	public static final String APP_NAME = "MiarmaCoreAPI";
