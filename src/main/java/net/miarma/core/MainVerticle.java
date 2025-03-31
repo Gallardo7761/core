@@ -11,6 +11,7 @@ import io.vertx.core.Launcher;
 import io.vertx.core.Promise;
 import net.miarma.core.common.ConfigManager;
 import net.miarma.core.common.Constants;
+import net.miarma.core.common.security.SecretManager;
 import net.miarma.core.sso.verticles.SSOMainVerticle;
 import net.miarma.core.util.DeploymentUtil;
 import net.miarma.core.util.MessageUtil;
@@ -27,6 +28,7 @@ public class MainVerticle extends AbstractVerticle {
 	    initializeDirectories();
 	    copyDefaultConfig();
 	    this.configManager.loadConfig();
+	    SecretManager.getOrCreateSecret();
     }
 	
 	@Override
@@ -81,4 +83,5 @@ public class MainVerticle extends AbstractVerticle {
             }
         }
     }
+    
 }

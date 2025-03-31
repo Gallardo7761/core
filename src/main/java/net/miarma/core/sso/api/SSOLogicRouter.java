@@ -4,6 +4,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
+import net.miarma.core.common.middlewares.AuthGuard;
 import net.miarma.core.sso.handlers.AuthHandler;
 
 public class SSOLogicRouter {
@@ -13,7 +14,7 @@ public class SSOLogicRouter {
 		router.route().handler(BodyHandler.create());
 		router.post(SSOEndpoints.LOGIN).handler(auth::login);
         router.post(SSOEndpoints.REGISTER).handler(auth::register);
-        router.post(SSOEndpoints.CHANGE_PASSWORD).handler(auth::changePassword);
+        router.post(SSOEndpoints.CHANGE_PASSWORD).handler(AuthGuard.check()).handler(auth::changePassword);
         router.get(SSOEndpoints.VALIDATE_TOKEN).handler(auth::validateToken);
 	}
 }

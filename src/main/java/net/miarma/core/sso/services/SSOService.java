@@ -7,7 +7,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
-import net.miarma.core.common.security.JWTUtil;
+import net.miarma.core.common.security.JWTManager;
 import net.miarma.core.common.security.PasswordHasher;
 import net.miarma.core.sso.dao.UserDAO;
 import net.miarma.core.sso.entities.UserEntity;
@@ -16,7 +16,6 @@ import net.miarma.core.util.MessageUtil;
 public class SSOService {
 
     private final UserDAO userDAO;
-
     public SSOService(Pool pool) {
         this.userDAO = new UserDAO(pool);
     }
@@ -34,7 +33,8 @@ public class SSOService {
             if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
                 handler.handle(Future.failedFuture("Invalid credentials"));
             } else {
-                String token = JWTUtil.generateToken(user.getUser_name(), user.getUser_id());
+            	JWTManager jwtManager = JWTManager.getInstance();
+                String token = jwtManager.generateToken(user);
                 JsonObject response = new JsonObject()
                     .put("token", token)
                     .put("user", JsonObject.mapFrom(user));
@@ -69,7 +69,8 @@ public class SSOService {
     }
 
     public boolean validateToken(String token) {
-        return JWTUtil.isValid(token);
+    	JWTManager jwtManager = JWTManager.getInstance();
+        return jwtManager.isValid(token);
     }
 
     /* USERS (Service lógica extra) */

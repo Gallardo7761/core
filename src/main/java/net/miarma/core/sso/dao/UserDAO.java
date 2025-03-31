@@ -24,7 +24,7 @@ public class UserDAO {
     			.build();
 		
     	db.execute(query, UserEntity.class,
-			list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list)),
+			list -> handler.handle(Future.succeededFuture(list.isEmpty() ? List.of() : list)),
 			ex -> handler.handle(Future.failedFuture(ex))
 		);
     }

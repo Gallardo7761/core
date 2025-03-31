@@ -15,7 +15,7 @@ public class ConfigManager {
         this.config = new Properties();
     }
 
-    public static ConfigManager getInstance() {
+    public static synchronized ConfigManager getInstance() {
         return INSTANCE;
     }
 
