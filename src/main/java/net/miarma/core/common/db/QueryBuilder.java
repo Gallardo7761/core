@@ -166,6 +166,35 @@ public class QueryBuilder {
 		return qb;
     }
     
+    public static <T> QueryBuilder delete(T object) {
+		if (object == null) {
+			throw new IllegalArgumentException("Object cannot be null");
+		}
+		
+		QueryBuilder qb = new QueryBuilder();
+		String table = getTableName(object.getClass());
+		qb.query.append("DELETE FROM ").append(table).append(" ");
+		qb.query.append("WHERE ");
+		StringJoiner joiner = new StringJoiner(" AND ");
+		for (Field field : object.getClass().getDeclaredFields()) {
+			field.setAccessible(true);
+			try {
+				Object fieldValue = field.get(object);
+				if (fieldValue != null) {
+					if (fieldValue instanceof String) {
+						joiner.add(field.getName() + " = '" + fieldValue + "'");
+					} else {
+						joiner.add(field.getName() + " = " + fieldValue.toString());
+					}
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+			}
+		}
+		qb.query.append(joiner).append(" ");
+		return qb;
+    }
+    
     public QueryBuilder orderBy(Optional<String> column, Optional<String> order) {
         column.ifPresent(c -> {
             sort = "ORDER BY " + c + " ";

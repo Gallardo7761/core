@@ -8,7 +8,7 @@ import net.miarma.core.sso.handlers.AuthHandler;
 
 public class SSOLogicRouter {
 	public static void mount(Router router, Vertx vertx, Pool pool) {
-		AuthHandler auth = new AuthHandler(pool);
+		AuthHandler auth = new AuthHandler(vertx);
 		
 		router.route().handler(BodyHandler.create());
 		router.post(SSOEndpoints.LOGIN).handler(auth::login);

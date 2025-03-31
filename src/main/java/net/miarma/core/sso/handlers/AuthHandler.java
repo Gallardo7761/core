@@ -1,28 +1,30 @@
 package net.miarma.core.sso.handlers;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.sqlclient.Pool;
-import net.miarma.core.sso.entities.UserEntity;
-import net.miarma.core.sso.services.AuthService;
+import net.miarma.core.common.Constants;
 
 public class AuthHandler {
 
-    private final AuthService authService;
+    private final Vertx vertx;
 
-    public AuthHandler(Pool pool) {
-        this.authService = new AuthService(pool);
+    public AuthHandler(Vertx vertx) {
+        this.vertx = vertx;
     }
 
     public void login(RoutingContext ctx) {
         JsonObject body = ctx.body().asJsonObject();
-        String email = body.getString("email");
-        String password = body.getString("password");
 
-        authService.login(email, password, ar -> {
+        JsonObject request = new JsonObject()
+                .put("action", "login")
+                .put("email", body.getString("email"))
+                .put("password", body.getString("password"));
+
+        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
                 ctx.response().putHeader("Content-Type", "application/json")
-                   .end(ar.result().encode());
+                        .end(((JsonObject) ar.result().body()).encode());
             } else {
                 ctx.response().setStatusCode(401).end(ar.cause().getMessage());
             }
@@ -31,13 +33,15 @@ public class AuthHandler {
 
     public void register(RoutingContext ctx) {
         JsonObject body = ctx.body().asJsonObject();
-        UserEntity user = new UserEntity();
-        user.setUser_name(body.getString("userName"));
-        user.setEmail(body.getString("email"));
-        user.setDisplay_name(body.getString("displayName"));
-        user.setPassword(body.getString("password"));
 
-        authService.register(user, ar -> {
+        JsonObject request = new JsonObject()
+                .put("action", "register")
+                .put("userName", body.getString("userName"))
+                .put("email", body.getString("email"))
+                .put("displayName", body.getString("displayName"))
+                .put("password", body.getString("password"));
+
+        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
                 ctx.response().setStatusCode(201).end();
             } else {
@@ -48,10 +52,13 @@ public class AuthHandler {
 
     public void changePassword(RoutingContext ctx) {
         JsonObject body = ctx.body().asJsonObject();
-        int userId = body.getInteger("userId");
-        String newPassword = body.getString("newPassword");
 
-        authService.changePassword(userId, newPassword, ar -> {
+        JsonObject request = new JsonObject()
+                .put("action", "changePassword")
+                .put("userId", body.getInteger("userId"))
+                .put("newPassword", body.getString("newPassword"));
+
+        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
                 ctx.response().setStatusCode(204).end();
             } else {
@@ -62,16 +69,23 @@ public class AuthHandler {
 
     public void validateToken(RoutingContext ctx) {
         String authHeader = ctx.request().getHeader("Authorization");
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            boolean valid = authService.validateToken(token);
-            if (valid) {
-                ctx.response().setStatusCode(200).end("Token válido");
-            } else {
-                ctx.response().setStatusCode(401).end("Token inválido");
-            }
+
+            JsonObject request = new JsonObject()
+                    .put("action", "validateToken")
+                    .put("token", token);
+
+            vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
+                if (ar.succeeded() && (Boolean) ar.result().body()) {
+                    ctx.response().setStatusCode(200).end("Valid token");
+                } else {
+                    ctx.response().setStatusCode(401).end("Invalid token");
+                }
+            });
         } else {
-            ctx.response().setStatusCode(400).end("Falta el token en el encabezado Authorization");
+            ctx.response().setStatusCode(400).end("Missing or invalid Authorization header");
         }
     }
 }

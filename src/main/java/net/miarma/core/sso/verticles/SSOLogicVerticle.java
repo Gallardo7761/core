@@ -3,7 +3,6 @@ package net.miarma.core.sso.verticles;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
 import net.miarma.core.common.ConfigManager;
 import net.miarma.core.common.db.DatabaseProvider;
