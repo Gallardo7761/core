@@ -1,7 +1,10 @@
 package net.miarma.core.sso.entities;
 
+import java.lang.reflect.Field;
+
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
+import net.miarma.core.common.APIDontReturn;
 import net.miarma.core.common.Table;
 
 @Table("users")
@@ -10,6 +13,7 @@ public class UserEntity {
     private String user_name;
     private String email;
     private String display_name;
+    @APIDontReturn
     private String password;
     private String avatar;
     private int global_status;
@@ -46,15 +50,23 @@ public class UserEntity {
     public void setRole(int role) { this.role = role; }
     
     public String encode() {
-		JsonObject json = new JsonObject();
-		json.put("user_id", user_id);
-		json.put("user_name", user_name);
-		json.put("email", email);
-		json.put("display_name", display_name);
-		json.put("password", password);
-		json.put("avatar", avatar);
-		json.put("global_status", global_status);
-		json.put("role", role);
-		return json.toString();
+        JsonObject json = new JsonObject();
+        Field[] fields = this.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(APIDontReturn.class)) {
+                continue;
+            }
+
+            field.setAccessible(true);
+            try {
+                Object value = field.get(this);
+                json.put(field.getName(), value);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return json.encode();
     }
 }
