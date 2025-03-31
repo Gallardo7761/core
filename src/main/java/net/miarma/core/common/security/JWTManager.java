@@ -30,8 +30,8 @@ public class JWTManager {
 		return instance;
 	}
     
-    public String generateToken(UserEntity user) {
-    	final long EXPIRATION_TIME_MS = 1000 * config.getIntProperty("jwt.expiration");
+    public String generateToken(UserEntity user, boolean keepLoggedIn) {
+    	final long EXPIRATION_TIME_MS = 1000 * (keepLoggedIn ? config.getIntProperty("jwt.expiration") : config.getIntProperty("jwt.expiration.short"));
     	return JWT.create()
     	        .withSubject(user.getUser_name())
     	        .withClaim("userId", user.getUser_id())
@@ -40,7 +40,6 @@ public class JWTManager {
     	        .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
     	        .sign(algorithm);
     }
-
 
     public boolean isValid(String token) {
         try {

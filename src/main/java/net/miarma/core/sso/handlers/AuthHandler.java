@@ -23,12 +23,15 @@ public class AuthHandler {
         JsonObject request = new JsonObject()
                 .put("action", "login")
                 .put("email", body.getString("email"))
-                .put("password", body.getString("password"));
+                .put("password", body.getString("password"))
+                .put("keepLoggedIn", body.getBoolean("keepLoggedIn", false));
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
                 ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
+                        .end(((JsonObject) ar.result().body())
+                        		.put("tokenTime", System.currentTimeMillis())
+                        		.encode());
             } else {
                 ctx.response().setStatusCode(401).end(
                 	gson.toJson(SingleJsonResponse.of("Error requesting the event bus"))
@@ -99,5 +102,5 @@ public class AuthHandler {
             	gson.toJson(SingleJsonResponse.of("Missing or invalid Authorization header"))
     		);
         }
-    }
+    }    
 }

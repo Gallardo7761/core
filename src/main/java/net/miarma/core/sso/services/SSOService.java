@@ -22,7 +22,7 @@ public class SSOService {
 
     /* AUTHENTICATION */
 
-    public void login(String email, String plainPassword, Handler<AsyncResult<JsonObject>> handler) {
+    public void login(String email, String plainPassword, boolean keepLoggedIn, Handler<AsyncResult<JsonObject>> handler) {
         getByEmail(email, ar -> {
             if (ar.failed() || ar.result() == null) {
                 handler.handle(Future.failedFuture("Invalid credentials"));
@@ -34,10 +34,10 @@ public class SSOService {
                 handler.handle(Future.failedFuture("Invalid credentials"));
             } else {
             	JWTManager jwtManager = JWTManager.getInstance();
-                String token = jwtManager.generateToken(user);
+                String token = jwtManager.generateToken(user, keepLoggedIn);
                 JsonObject response = new JsonObject()
                     .put("token", token)
-                    .put("user", JsonObject.mapFrom(user));
+                    .put("loggedUser", new JsonObject(user.encode()));
                 handler.handle(Future.succeededFuture(response));
             }
         });

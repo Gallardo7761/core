@@ -40,7 +40,7 @@ public class SSODataVerticle extends AbstractVerticle  {
 
 	        switch (action) {
 	            case "login":
-	                ssoService.login(body.getString("email"), body.getString("password"), ar -> {
+	                ssoService.login(body.getString("email"), body.getString("password"), body.getBoolean("keepLoggedIn"), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply(ar.result());
 	                    } else {
@@ -58,7 +58,7 @@ public class SSODataVerticle extends AbstractVerticle  {
 
 	                ssoService.register(user, ar -> {
 	                    if (ar.succeeded()) {
-	                        message.reply("Usuario registrado correctamente");
+	                        message.reply("User registered successfully");
 	                    } else {
 	                        message.fail(400, ar.cause().getMessage());
 	                    }
@@ -68,7 +68,7 @@ public class SSODataVerticle extends AbstractVerticle  {
 	            case "changePassword":
 	                ssoService.changePassword(body.getInteger("userId"), body.getString("newPassword"), ar -> {
 	                    if (ar.succeeded()) {
-	                        message.reply("Contraseña cambiada correctamente");
+	                        message.reply("Password changed successfully");
 	                    } else {
 	                        message.fail(400, ar.cause().getMessage());
 	                    }
@@ -79,7 +79,7 @@ public class SSODataVerticle extends AbstractVerticle  {
 	                boolean isValid = ssoService.validateToken(body.getString("token"));
 	                message.reply(isValid);
 	                break;
-
+	                
 	            default:
 	                message.fail(400, "Acción desconocida: " + action);
 	                break;

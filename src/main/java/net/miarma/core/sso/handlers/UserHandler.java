@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.core.common.SingleJsonResponse;
+import net.miarma.core.common.security.JWTManager;
 import net.miarma.core.sso.entities.UserEntity;
 import net.miarma.core.sso.services.SSOService;
 
@@ -32,7 +33,7 @@ public class UserHandler {
 		});
 	}
 
-	public void getById(RoutingContext ctx) {
+	public void getById(RoutingContext ctx) {	
 		ssoService.getById(ctx.pathParam("user_id"), ar -> {
 			if (ar.succeeded()) {
 				ctx.response().putHeader("Content-Type", "application/json").end(ar.result().encode().toString());
@@ -96,22 +97,34 @@ public class UserHandler {
 	}
 
 	public void getInfo(RoutingContext ctx) {
-		String userId = ctx.pathParam("user_id");
+	    String authHeader = ctx.request().getHeader("Authorization");
 
-		ssoService.getById(userId, ar -> {
-			if (ar.succeeded()) {
-				UserEntity user = ar.result();
+	    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	        ctx.response().setStatusCode(401).end(gson.toJson(SingleJsonResponse.of("Unauthorized")));
+	        return;
+	    }
 
-				JsonObject response = new JsonObject().put("user_id", user.getUser_id())
-						.put("user_name", user.getUser_name()).put("email", user.getEmail())
-						.put("avatar", user.getAvatar()).put("status", user.getGlobal_status());
+	    String token = authHeader.substring(7);
+	    int userId = JWTManager.getInstance().getUserId(token);
 
-				ctx.response().putHeader("Content-Type", "application/json").end(response.encode());
-			} else {
-				ctx.response().setStatusCode(404).end(gson.toJson(SingleJsonResponse.of("Not found")));
-			}
-		});
+	    if (userId <= 0) {
+	        ctx.response().setStatusCode(401).end(gson.toJson(SingleJsonResponse.of("Invalid token")));
+	        return;
+	    }
+
+	    ssoService.getById(String.valueOf(userId), ar -> {
+	        if (ar.failed() || ar.result() == null) {
+	            ctx.response().setStatusCode(404).end(gson.toJson(SingleJsonResponse.of("Not found")));
+	            return;
+	        }
+
+	        UserEntity user = ar.result();
+	        ctx.response()
+	            .putHeader("Content-Type", "application/json")
+	            .end(user.encode());
+	    });
 	}
+
 
 	public void exists(RoutingContext ctx) {
 		String userId = ctx.pathParam("user_id");

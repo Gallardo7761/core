@@ -13,6 +13,7 @@ public class SSODataRouter {
 		
 		router.route().handler(BodyHandler.create());
 		router.get(SSOEndpoints.USERS).handler(AuthGuard.admin()).handler(user::getAll);
+		router.get(SSOEndpoints.USER_INFO).handler(AuthGuard.check()).handler(user::getInfo);
 		router.get(SSOEndpoints.USER).handler(AuthGuard.admin()).handler(user::getById);
 		router.post(SSOEndpoints.USER).handler(user::create);
 		router.put(SSOEndpoints.USER).handler(AuthGuard.admin()).handler(user::update);
@@ -23,7 +24,6 @@ public class SSODataRouter {
 		router.put(SSOEndpoints.USER_ROLE).handler(AuthGuard.admin()).handler(user::updateRole);
 		router.get(SSOEndpoints.USER_BY_EMAIL).handler(AuthGuard.check()).handler(user::getByEmail);
 		router.get(SSOEndpoints.USER_BY_USERNAME).handler(AuthGuard.check()).handler(user::getByUserName);
-		router.get(SSOEndpoints.USER_INFO).handler(AuthGuard.check()).handler(user::getInfo);
 		router.get(SSOEndpoints.USER_EXISTS).handler(AuthGuard.check()).handler(user::exists);
 		router.get(SSOEndpoints.USER_AVATAR).handler(AuthGuard.check()).handler(user::getAvatar);
 	}
