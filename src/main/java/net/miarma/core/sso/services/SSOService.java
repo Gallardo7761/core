@@ -56,7 +56,7 @@ public class SSOService {
     }
 
     public void changePassword(int userId, String newPassword, Handler<AsyncResult<UserEntity>> handler) {
-        getById(String.valueOf(userId), ar -> {
+        getById(userId, ar -> {
             if (ar.failed() || ar.result() == null) {
                 handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
                 return;
@@ -73,7 +73,7 @@ public class SSOService {
         return jwtManager.isValid(token);
     }
 
-    /* USERS (Service lógica extra) */
+    /* USERS OPERATIONS */
 
     public void getAll(Handler<AsyncResult<List<UserEntity>>> handler) {
         userDAO.getAll(ar -> {
@@ -85,7 +85,7 @@ public class SSOService {
         });
     }
 
-    public void getById(String id, Handler<AsyncResult<UserEntity>> handler) {
+    public void getById(Integer id, Handler<AsyncResult<UserEntity>> handler) {
         userDAO.getAll(ar -> {
             if (ar.failed()) {
                 handler.handle(Future.failedFuture(ar.cause()));
@@ -93,7 +93,7 @@ public class SSOService {
             }
 
             ar.result().stream()
-                .filter(user -> user.getUser_id().equals(Integer.parseInt(id)))
+                .filter(user -> user.getUser_id().equals(id))
                 .findFirst()
                 .ifPresentOrElse(
                     user -> handler.handle(Future.succeededFuture(user)),
@@ -136,7 +136,7 @@ public class SSOService {
         });
     }
     
-    public void updateRole(String userId, String role, Handler<AsyncResult<UserEntity>> handler) {
+    public void updateRole(Integer userId, Integer role, Handler<AsyncResult<UserEntity>> handler) {
 		getById(userId, ar -> {
 			if (ar.failed() || ar.result() == null) {
 				handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
@@ -144,12 +144,12 @@ public class SSOService {
 			}
 
 			UserEntity user = ar.result();
-			user.setRole(Integer.parseInt(role));
+			user.setRole(role);
 			userDAO.update(user, handler);
 		});
 	}
     
-    public void updateStatus(String userId, String status, Handler<AsyncResult<UserEntity>> handler) {
+    public void updateStatus(Integer userId, Integer status, Handler<AsyncResult<UserEntity>> handler) {
 		getById(userId, ar -> {
 			if(ar.failed() || ar.result() == null) {
 				handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
@@ -157,28 +157,28 @@ public class SSOService {
 			}
 			
 			UserEntity user = ar.result();
-			user.setGlobal_status(Integer.parseInt(status));
+			user.setGlobal_status(status);
 			userDAO.update(user, handler);
 		});
     }
-
-    /* CRUD Básico */
+    
+    /* CRUD OPERATIONS */
 
     public void create(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
-        register(user, handler); // Reutilizas lógica para validaciones
+        register(user, handler);
     }
 
     public void update(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
         userDAO.update(user, handler);
     }
 
-    public void delete(String id, Handler<AsyncResult<UserEntity>> handler) {
+    public void delete(Integer id, Handler<AsyncResult<UserEntity>> handler) {
         getById(id, ar -> {
             if (ar.failed() || ar.result() == null) {
                 handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
                 return;
             }
-            userDAO.delete(Integer.parseInt(id), handler);
+            userDAO.delete(id, handler);
         });
     }
 }

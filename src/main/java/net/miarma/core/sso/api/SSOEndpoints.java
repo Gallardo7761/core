@@ -24,9 +24,9 @@ public class SSOEndpoints {
 	 * RUTAS DE LA API DE LOGICA 
 	 * DE NEGOCIO DEL SSO
 	 */
-    public static final String LOGIN = Constants.SSO_PREFIX + "/login"; // POST
-    public static final String LOGOUT = Constants.SSO_PREFIX + "/logout"; // POST 
-    public static final String REGISTER = Constants.SSO_PREFIX + "/register"; // POST
-    public static final String CHANGE_PASSWORD = Constants.SSO_PREFIX + "/change-password"; // POST
-    public static final String VALIDATE_TOKEN = Constants.SSO_PREFIX + "/validate-token"; // POST
+    public static final String LOGIN = Constants.AUTH_PREFIX + "/login"; // POST
+    public static final String LOGOUT = Constants.AUTH_PREFIX + "/logout"; // POST 
+    public static final String REGISTER = Constants.AUTH_PREFIX + "/register"; // POST
+    public static final String CHANGE_PASSWORD = Constants.AUTH_PREFIX + "/change-password"; // POST
+    public static final String VALIDATE_TOKEN = Constants.AUTH_PREFIX + "/validate-token"; // POST
 }

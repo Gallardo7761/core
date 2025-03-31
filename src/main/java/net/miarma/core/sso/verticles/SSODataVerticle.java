@@ -80,8 +80,114 @@ public class SSODataVerticle extends AbstractVerticle  {
 	                message.reply(isValid);
 	                break;
 	                
+	            case "getInfo":
+	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        message.reply(new JsonObject(ar.result().encode()));
+	                    } else {
+	                        message.fail(404, "User not found");
+	                    }
+	                });
+	                break;
+
+	            case "userExists":
+	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                    boolean exists = ar.succeeded() && ar.result() != null;
+	                    message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", exists));
+	                });
+	                break;
+	                
+	            case "getById":
+	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        message.reply(new JsonObject(ar.result().encode()));
+	                    } else {
+	                        message.fail(404, "User not found");
+	                    }
+	                });
+	                break;
+
+	            case "getByEmail":
+	                ssoService.getByEmail(body.getString("email"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        message.reply(new JsonObject(ar.result().encode()));
+	                    } else {
+	                        message.fail(404, "Not found");
+	                    }
+	                });
+	                break;
+
+	            case "getByUserName":
+	                ssoService.getByUserName(body.getString("userName"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        message.reply(new JsonObject(ar.result().encode()));
+	                    } else {
+	                        message.fail(404, "Not found");
+	                    }
+	                });
+	                break;
+
+	            case "getStatus":
+	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        JsonObject response = new JsonObject()
+	                            .put("user_id", ar.result().getUser_id())
+	                            .put("status", ar.result().getGlobal_status());
+	                        message.reply(response);
+	                    } else {
+	                        message.fail(404, "User not found");
+	                    }
+	                });
+	                break;
+
+	            case "getRole":
+	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        JsonObject response = new JsonObject()
+	                            .put("user_id", ar.result().getUser_id())
+	                            .put("role", ar.result().getRole());
+	                        message.reply(response);
+	                    } else {
+	                        message.fail(404, "User not found");
+	                    }
+	                });
+	                break;
+
+	            case "getAvatar":
+	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        JsonObject response = new JsonObject()
+	                            .put("user_id", ar.result().getUser_id())
+	                            .put("avatar", ar.result().getAvatar());
+	                        message.reply(response);
+	                    } else {
+	                        message.fail(404, "User not found");
+	                    }
+	                });
+	                break;
+	                
+	            case "updateStatus":
+	                ssoService.updateStatus(body.getInteger("userId"), body.getInteger("status"), ar -> {
+	                    if (ar.succeeded()) {
+	                        message.reply("Status updated successfully");
+	                    } else {
+	                        message.fail(400, ar.cause().getMessage());
+	                    }
+	                });
+	                break;
+	                
+	            case "updateRole":
+	            	ssoService.updateRole(body.getInteger("userId"), body.getInteger("role"), ar -> {
+	                    if (ar.succeeded()) {
+	                        message.reply("Role updated successfully");
+	                    } else {
+	                        message.fail(400, ar.cause().getMessage());
+	                    }
+	                });
+	                break;
+	                
 	            default:
-	                message.fail(400, "Acción desconocida: " + action);
+	                message.fail(400, "Unknown action: " + action);
 	                break;
 	        }
 	    });

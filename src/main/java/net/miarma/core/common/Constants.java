@@ -6,8 +6,11 @@ import io.vertx.core.impl.logging.LoggerFactory;
 public class Constants {
 	public static final String APP_NAME = "MiarmaCoreAPI";
 	public static final String API_PREFIX = "/api/v1";
-	public static final String SSO_PREFIX = "/auth/v1";
+	public static final String AUTH_PREFIX = "/auth/v1";
+	
     public static final String AUTH_EVENT_BUS = "auth.eventbus";
+    public static final String USER_EVENT_BUS = "user.eventbus";
+    
     public static Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
     
 	public static final Integer SSO_LOGIC_PORT = 8080;
