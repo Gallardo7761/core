@@ -13,14 +13,13 @@ public class ConfigManager {
     	String path = getBaseDir() + CONFIG_FILE_NAME;
         this.configFile = new File(path);
         this.config = new Properties();
-        loadConfig();
     }
 
     public static ConfigManager getInstance() {
         return INSTANCE;
     }
 
-    private void loadConfig() {
+    public void loadConfig() {
         try (FileInputStream fis = new FileInputStream(configFile)) {
             config.load(fis);
         } catch (IOException e) {
@@ -43,18 +42,6 @@ public class ConfigManager {
     public String getHost() {
         return this.getStringProperty("inet.host");
     }
-
-    public int getDataApiPort() {
-        return this.getIntProperty("data-api.port");
-    }
-
-    public int getLogicApiPort() {
-        return this.getIntProperty("logic-api.port");
-    }
-
-    public int getWebserverPort() {
-        return this.getIntProperty("webserver.port");
-    }
     
     public String getHomeDir() {
     	return getOS() == OSType.WINDOWS ? 
@@ -65,8 +52,8 @@ public class ConfigManager {
     
     public String getBaseDir() {
 		return getHomeDir() + 
-				(getOS() == OSType.WINDOWS ? ".contaminus/" :
-					getOS() == OSType.LINUX ? ".config/contaminus/" :
+				(getOS() == OSType.WINDOWS ? ".miarmacoreapi/" :
+					getOS() == OSType.LINUX ? ".config/miarmacoreapi/" :
 				".contaminus/");
 	}
     

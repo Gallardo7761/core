@@ -41,9 +41,9 @@
 
     <!-- Vert.X MariaDB/MySQL Client -->
 	<dependency>
-		<groupId>io.vertx</groupId>
-		<artifactId>vertx-jdbc-client</artifactId>
-		<version>4.5.13</version>
+	    <groupId>io.vertx</groupId>
+	    <artifactId>vertx-mysql-client</artifactId>
+	    <version>4.5.13</version>
 	</dependency>
 	
 	<!-- Vert.X Auth JWT -->
@@ -78,6 +78,20 @@
 	    <groupId>io.github.cdimascio</groupId>
 	    <artifactId>dotenv-java</artifactId>
 	    <version>3.2.0</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+	<dependency>
+	    <groupId>org.mindrot</groupId>
+	    <artifactId>jbcrypt</artifactId>
+	    <version>0.4</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+	<dependency>
+	    <groupId>com.auth0</groupId>
+	    <artifactId>java-jwt</artifactId>
+	    <version>4.5.0</version>
 	</dependency>
 	
   </dependencies>

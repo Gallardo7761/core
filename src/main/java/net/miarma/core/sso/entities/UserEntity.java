@@ -1,42 +1,38 @@
 package net.miarma.core.sso.entities;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
-import io.vertx.ext.auth.User;
-import io.vertx.ext.auth.authorization.Authorization;
+import io.vertx.sqlclient.Row;
+import net.miarma.core.common.Table;
 
-public class UserEntity implements User {
+@Table("users")
+public class UserEntity {
+    private Integer user_id;
+    private String user_name;
+    private String email;
+    private String display_name;
+    private String password;
+    private int global_status;
 
-	@Override
-	public JsonObject attributes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UserEntity() {}
 
-	@Override
-	public io.vertx.ext.auth.User isAuthorized(Authorization authority, Handler<AsyncResult<Boolean>> resultHandler) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UserEntity(Row row) {
+        this.user_id = row.getInteger("user_id");
+        this.user_name = row.getString("user_name");
+        this.email = row.getString("email");
+        this.display_name = row.getString("display_name");
+        this.password = row.getString("password");
+        this.global_status = row.getInteger("global_status");
+    }
 
-	@Override
-	public JsonObject principal() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setAuthProvider(AuthProvider authProvider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public io.vertx.ext.auth.User merge(io.vertx.ext.auth.User other) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+    public Integer getUser_id() { return user_id; }
+    public void setUser_id(Integer user_id) { this.user_id = user_id; }
+    public String getUser_name() { return user_name; }
+    public void setUser_name(String user_name) { this.user_name = user_name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getDisplay_name() { return display_name; }
+    public void setDisplay_name(String display_name) { this.display_name = display_name; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public int getGlobal_status() { return global_status; }
+    public void setGlobal_status(int global_status) { this.global_status = global_status; }
 }
