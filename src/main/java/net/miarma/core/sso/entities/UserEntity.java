@@ -1,14 +1,12 @@
 package net.miarma.core.sso.entities;
 
-import java.lang.reflect.Field;
-
-import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import net.miarma.core.common.APIDontReturn;
 import net.miarma.core.common.Table;
+import net.miarma.core.common.db.AbstractEntity;
 
 @Table("users")
-public class UserEntity {
+public class UserEntity extends AbstractEntity {
     private Integer user_id;
     private String user_name;
     private String email;
@@ -19,19 +17,9 @@ public class UserEntity {
     private int global_status;
     private int role;
 
-    public UserEntity() {}
-
-    public UserEntity(Row row) {
-        this.user_id = row.getInteger("user_id");
-        this.user_name = row.getString("user_name");
-        this.email = row.getString("email");
-        this.display_name = row.getString("display_name");
-        this.password = row.getString("password");
-        this.avatar = row.getString("avatar");
-        this.global_status = row.getInteger("global_status");
-        this.role = row.getInteger("role");
-    }
-
+    public UserEntity() { }
+    public UserEntity(Row row) { super(row); }
+    
     public Integer getUser_id() { return user_id; }
     public void setUser_id(Integer user_id) { this.user_id = user_id; }
     public String getUser_name() { return user_name; }
@@ -48,25 +36,4 @@ public class UserEntity {
     public void setGlobal_status(int global_status) { this.global_status = global_status; }
     public int getRole() { return role; }
     public void setRole(int role) { this.role = role; }
-    
-    public String encode() {
-        JsonObject json = new JsonObject();
-        Field[] fields = this.getClass().getDeclaredFields();
-
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(APIDontReturn.class)) {
-                continue;
-            }
-
-            field.setAccessible(true);
-            try {
-                Object value = field.get(this);
-                json.put(field.getName(), value);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return json.encode();
-    }
 }
