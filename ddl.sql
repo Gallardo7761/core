@@ -60,6 +60,7 @@ CREATE TABLE huertos_incomes (
 	concept VARCHAR(128) NOT NULL,
 	amount DECIMAL(10,2) NOT NULL,
 	type TINYINT, -- 0 = BANCO, 1 = CAJA
+	frequency TINYINT, -- 0 = SEMESTRAL, 1 = ANUAL
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (member_number) REFERENCES huertos_user_metadata(member_number) ON DELETE CASCADE
 );
@@ -83,7 +84,7 @@ CREATE TABLE huertos_balance (
 
 CREATE TABLE huertos_requests (
 	request_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-	type ENUM('alta', 'baja', 'anyadir_colaborador', 'quitar_colaborador') NOT NULL,
+	type INT NOT NULL CHECK (type IN (0,1,2,3)), -- 0 alta, 1 baja, 2 anyadir_colaborador, 3 quitar_colaborador
 	status INT NOT NULL DEFAULT 0 CHECK (status IN (0,1,2)), -- 0 pending, 1 approved, 2 rejected
 	requested_by INT UNSIGNED NOT NULL,
 	target_user_id INT UNSIGNED,
@@ -109,7 +110,7 @@ CREATE TABLE huertos_pre_users (
     member_number INT UNSIGNED,
     plot_number INT UNSIGNED,
 
-    request_type ENUM('alta', 'colaborador') NOT NULL,
+    type INT NOT NULL DEFAULT 0 CHECK (type IN (0,1,2,3)), -- 0 = LISTA_ESPERA, 1 = SOCIO, 2 = CON_INVERNADERO, 3 = COLABORADOR
     status TINYINT NOT NULL DEFAULT 1, -- 0 = inactivo, 1 = activo
     role INT NOT NULL DEFAULT 0  CHECK (role IN (0,1,2)), -- 0 = usuario, 1 = admin, 2 = dev
 
