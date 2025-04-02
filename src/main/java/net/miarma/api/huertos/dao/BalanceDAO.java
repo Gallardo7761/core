@@ -2,9 +2,8 @@ package net.miarma.api.huertos.dao;
 
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.DataAccessObject;
@@ -20,53 +19,57 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
     }
 
     @Override
-    public void getAll(Handler<AsyncResult<List<BalanceEntity>>> handler) {
-        String query = QueryBuilder
-                .select(BalanceEntity.class)
-                .build();
+    public Future<List<BalanceEntity>> getAll() {
+        Promise<List<BalanceEntity>> promise = Promise.promise();
+        String query = QueryBuilder.select(BalanceEntity.class).build();
 
         db.execute(query, BalanceEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? List.of() : list)),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? List.of() : list),
+            promise::fail
         );
-    }
-    
-    @Override
-    public void insert(BalanceEntity balance, Handler<AsyncResult<BalanceEntity>> handler) {
-        String query = QueryBuilder
-                .insert(balance)
-                .build();
 
-        db.execute(query, BalanceEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-            ex -> handler.handle(Future.failedFuture(ex))
-        );
+        return promise.future();
     }
 
     @Override
-    public void update(BalanceEntity balance, Handler<AsyncResult<BalanceEntity>> handler) {
-        String query = QueryBuilder
-                .update(balance)
-                .build();
+    public Future<BalanceEntity> insert(BalanceEntity balance) {
+        Promise<BalanceEntity> promise = Promise.promise();
+        String query = QueryBuilder.insert(balance).build();
 
         db.execute(query, BalanceEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+            promise::fail
         );
+
+        return promise.future();
     }
 
     @Override
-    public void delete(Integer id, Handler<AsyncResult<BalanceEntity>> handler) {
+    public Future<BalanceEntity> update(BalanceEntity balance) {
+        Promise<BalanceEntity> promise = Promise.promise();
+        String query = QueryBuilder.update(balance).build();
+
+        db.execute(query, BalanceEntity.class,
+            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+            promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<BalanceEntity> delete(Integer id) {
+        Promise<BalanceEntity> promise = Promise.promise();
         BalanceEntity balance = new BalanceEntity();
         balance.setId(id);
 
-        String query = QueryBuilder
-                .delete(balance)
-                .build();
+        String query = QueryBuilder.delete(balance).build();
 
         db.execute(query, BalanceEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+            promise::fail
         );
+
+        return promise.future();
     }
 }

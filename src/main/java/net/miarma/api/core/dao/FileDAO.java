@@ -2,15 +2,13 @@ package net.miarma.api.core.dao;
 
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.core.entities.FileEntity;
-
 
 public class FileDAO implements DataAccessObject<FileEntity> {
 
@@ -21,53 +19,57 @@ public class FileDAO implements DataAccessObject<FileEntity> {
     }
 
     @Override
-    public void getAll(Handler<AsyncResult<List<FileEntity>>> handler) {
-        String query = QueryBuilder
-                .select(FileEntity.class)
-                .build();
+    public Future<List<FileEntity>> getAll() {
+        Promise<List<FileEntity>> promise = Promise.promise();
+        String query = QueryBuilder.select(FileEntity.class).build();
 
         db.execute(query, FileEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? List.of() : list)),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? List.of() : list),
+            promise::fail
         );
+
+        return promise.future();
     }
 
     @Override
-    public void insert(FileEntity file, Handler<AsyncResult<FileEntity>> handler) {
-        String query = QueryBuilder
-                .insert(file)
-                .build();
+    public Future<FileEntity> insert(FileEntity file) {
+        Promise<FileEntity> promise = Promise.promise();
+        String query = QueryBuilder.insert(file).build();
 
         db.execute(query, FileEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+            promise::fail
         );
+
+        return promise.future();
     }
 
     @Override
-    public void update(FileEntity file, Handler<AsyncResult<FileEntity>> handler) {
-        String query = QueryBuilder
-                .update(file)
-                .build();
+    public Future<FileEntity> update(FileEntity file) {
+        Promise<FileEntity> promise = Promise.promise();
+        String query = QueryBuilder.update(file).build();
 
         db.execute(query, FileEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+            promise::fail
         );
+
+        return promise.future();
     }
 
     @Override
-    public void delete(Integer id, Handler<AsyncResult<FileEntity>> handler) {
+    public Future<FileEntity> delete(Integer id) {
+        Promise<FileEntity> promise = Promise.promise();
         FileEntity file = new FileEntity();
         file.setFile_id(id);
 
-        String query = QueryBuilder
-                .delete(file)
-                .build();
+        String query = QueryBuilder.delete(file).build();
 
         db.execute(query, FileEntity.class,
-            list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-            ex -> handler.handle(Future.failedFuture(ex))
+            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+            promise::fail
         );
+
+        return promise.future();
     }
 }

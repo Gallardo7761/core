@@ -6,9 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants.CoreFileContext;
@@ -17,128 +15,72 @@ import net.miarma.api.core.entities.FileEntity;
 import net.miarma.api.util.MessageUtil;
 
 public class FileService {
-	
-	private final FileDAO fileDAO;
-	
-	public FileService(Pool pool) {
-		this.fileDAO = new FileDAO(pool);
-	}
-	
-	public void getAll(Handler<AsyncResult<List<FileEntity>>> handler) {
-		fileDAO.getAll(ar -> {
-			if (ar.failed()) {
-                handler.handle(Future.failedFuture(ar.cause()));
-                return;
-            }
-            handler.handle(Future.succeededFuture(ar.result()));
-		});
-	}
-	
-	public void getById(Integer id, Handler<AsyncResult<FileEntity>> handler) {
-		fileDAO.getAll(ar -> {
-			if (ar.failed()) {
-                handler.handle(Future.failedFuture(ar.cause()));
-                return;
-            }
 
-            ar.result().stream()
+    private final FileDAO fileDAO;
+
+    public FileService(Pool pool) {
+        this.fileDAO = new FileDAO(pool);
+    }
+
+    public Future<List<FileEntity>> getAll() {
+        return fileDAO.getAll();
+    }
+
+    public Future<FileEntity> getById(Integer id) {
+        return fileDAO.getAll().map(files ->
+            files.stream()
                 .filter(file -> file.getFile_id().equals(id))
                 .findFirst()
-                .ifPresentOrElse(
-                    user -> handler.handle(Future.succeededFuture(user)),
-                    () -> handler.handle(Future.failedFuture(MessageUtil.notFound("File", "in the storage")))
-                );
-		});
-	}
-	
-	public void getUserFiles(Integer userId, Handler<AsyncResult<List<FileEntity>>> handler) {
-		fileDAO.getAll(ar -> {
-			if (ar.failed()) {
-				handler.handle(Future.failedFuture(ar.cause()));
-				return;
-			}
+                .orElse(null)
+        ).compose(file -> {
+            if (file == null) {
+                return Future.failedFuture(MessageUtil.notFound("File", "in the storage"));
+            }
+            return Future.succeededFuture(file);
+        });
+    }
 
-			List<FileEntity> files = ar.result().stream()
-				.filter(file -> file.getUploaded_by().equals(userId))
-				.toList();
+    public Future<List<FileEntity>> getUserFiles(Integer userId) {
+        return fileDAO.getAll().map(files ->
+            files.stream()
+                .filter(file -> file.getUploaded_by().equals(userId))
+                .toList()
+        );
+    }
 
-			handler.handle(Future.succeededFuture(files));
-		});
-	}
-	
-	public void create(FileEntity file, Handler<AsyncResult<FileEntity>> handler) {
-		fileDAO.insert(file, ar -> {
-			if (ar.failed()) {
-				handler.handle(Future.failedFuture(ar.cause()));
-				return;
-			}
-			handler.handle(Future.succeededFuture(ar.result()));
-		});
-	}
-	
-	public void create(JsonObject body, Handler<AsyncResult<FileEntity>> handler) {
-		byte[] fileBinary = body.getBinary("file");
-		Path filePath = Paths.get(body.getString("file_path"));
-		
-		// Save file to disk
-		try {
-			Files.write(filePath, fileBinary);
-		} catch (IOException e) {
-			handler.handle(Future.failedFuture(e));
-			return;
-		}
-		
-		FileEntity file = new FileEntity();
-		file.setFile_name(body.getString("file_name"));
-		file.setFile_path(body.getString("file_path"));
-		file.setMime_type(body.getString("mime_type"));		
-		file.setUploaded_by(body.getInteger("uploaded_by"));
-		file.setContext(CoreFileContext.fromInt(body.getInteger("context")));
-		
-		fileDAO.insert(file, ar -> {
-			if (ar.failed()) {
-				handler.handle(Future.failedFuture(ar.cause()));
-				return;
-			}
-			handler.handle(Future.succeededFuture(ar.result()));
-		});		
-	}
-	
-	public void downloadFile(Integer fileId, Handler<AsyncResult<FileEntity>> handler) {
-		fileDAO.getAll(ar -> {
-			if (ar.failed()) {
-				handler.handle(Future.failedFuture(ar.cause()));
-				return;
-			}
+    public Future<FileEntity> create(FileEntity file) {
+        return fileDAO.insert(file);
+    }
 
-			ar.result().stream()
-				.filter(file -> file.getFile_id().equals(fileId))
-				.findFirst()
-				.ifPresentOrElse(
-					file -> handler.handle(Future.succeededFuture(file)),
-					() -> handler.handle(Future.failedFuture(MessageUtil.notFound("File", "in the storage")))
-				);
-		});
-	}
-	
-	public void update(FileEntity file, Handler<AsyncResult<FileEntity>> handler) {
-		fileDAO.update(file, ar -> {
-			if (ar.failed()) {
-				handler.handle(Future.failedFuture(ar.cause()));
-				return;
-			}
-			handler.handle(Future.succeededFuture(ar.result()));
-		});
-	}
-	
-	public void delete(Integer fileId, Handler<AsyncResult<Void>> handler) {
-		fileDAO.delete(fileId, ar -> {
-			if (ar.failed()) {
-				handler.handle(Future.failedFuture(ar.cause()));
-				return;
-			}
-			handler.handle(Future.succeededFuture());
-		});
-	}
-	
+    public Future<FileEntity> create(JsonObject body) {
+        byte[] fileBinary = body.getBinary("file");
+        Path filePath = Paths.get(body.getString("file_path"));
+
+        try {
+            Files.write(filePath, fileBinary);
+        } catch (IOException e) {
+            return Future.failedFuture(e);
+        }
+
+        FileEntity file = new FileEntity();
+        file.setFile_name(body.getString("file_name"));
+        file.setFile_path(body.getString("file_path"));
+        file.setMime_type(body.getString("mime_type"));
+        file.setUploaded_by(body.getInteger("uploaded_by"));
+        file.setContext(CoreFileContext.fromInt(body.getInteger("context")));
+
+        return fileDAO.insert(file);
+    }
+
+    public Future<FileEntity> downloadFile(Integer fileId) {
+        return getById(fileId);
+    }
+
+    public Future<FileEntity> update(FileEntity file) {
+        return fileDAO.update(file);
+    }
+
+    public Future<Void> delete(Integer fileId) {
+        return fileDAO.delete(fileId).mapEmpty();
+    }
 }

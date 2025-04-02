@@ -2,9 +2,7 @@ package net.miarma.api.core.services;
 
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
@@ -18,209 +16,154 @@ import net.miarma.api.util.MessageUtil;
 public class UserService {
 
     private final UserDAO userDAO;
+
     public UserService(Pool pool) {
         this.userDAO = new UserDAO(pool);
     }
 
     /* AUTHENTICATION */
 
-    public void login(String email, String plainPassword, boolean keepLoggedIn, Handler<AsyncResult<JsonObject>> handler) {
-        getByEmail(email, ar -> {
-            if (ar.failed() || ar.result() == null) {
-                handler.handle(Future.failedFuture("Invalid credentials"));
-                return;
+    public Future<JsonObject> login(String email, String plainPassword, boolean keepLoggedIn) {
+        return getByEmail(email).compose(user -> {
+            if (user == null || user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
+                return Future.failedFuture("Invalid credentials");
             }
 
-            UserEntity user = ar.result();
-                        
-            if (user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
-				handler.handle(Future.failedFuture("User is not active or banned"));
-				return;
-			}
-            
             if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
-                handler.handle(Future.failedFuture("Invalid credentials"));
-                return;
+                return Future.failedFuture("Invalid credentials");
             }
-            
+
             JWTManager jwtManager = JWTManager.getInstance();
             String token = jwtManager.generateToken(user, keepLoggedIn);
+
             JsonObject response = new JsonObject()
                 .put("token", token)
                 .put("loggedUser", new JsonObject(user.encode()));
-            handler.handle(Future.succeededFuture(response));
+
+            return Future.succeededFuture(response);
         });
     }
-    
-    public void login(String userName, String plainPassword, Handler<AsyncResult<JsonObject>> handler) {
-		getByUserName(userName, ar -> {
-			if (ar.failed() || ar.result() == null) {
-				handler.handle(Future.failedFuture("Invalid credentials"));
-				return;
-			}
 
-			UserEntity user = ar.result();
-						
-			if (user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
-				handler.handle(Future.failedFuture("User is not active or banned"));
-				return;
-			}
-			
-			if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
-				handler.handle(Future.failedFuture("Invalid credentials"));
-				return;
-			}
-			
-			JWTManager jwtManager = JWTManager.getInstance();
-			String token = jwtManager.generateToken(user, false);
-			JsonObject response = new JsonObject()
-					.put("token", token)
-					.put("loggedUser", new JsonObject(user.encode()));
-			handler.handle(Future.succeededFuture(response));
-		});
-	}
+    public Future<JsonObject> login(String userName, String plainPassword) {
+        return getByUserName(userName).compose(user -> {
+            if (user == null || user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
+                return Future.failedFuture("Invalid credentials");
+            }
 
-    public void register(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
-        getByEmail(user.getEmail(), ar -> {
-            if (ar.succeeded() && ar.result() != null) {
-                handler.handle(Future.failedFuture("Email already exists"));
-                return;
+            if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
+                return Future.failedFuture("Invalid credentials");
+            }
+
+            JWTManager jwtManager = JWTManager.getInstance();
+            String token = jwtManager.generateToken(user, false);
+
+            JsonObject response = new JsonObject()
+                .put("token", token)
+                .put("loggedUser", new JsonObject(user.encode()));
+
+            return Future.succeededFuture(response);
+        });
+    }
+
+    public Future<UserEntity> register(UserEntity user) {
+        return getByEmail(user.getEmail()).compose(existing -> {
+            if (existing != null) {
+                return Future.failedFuture("Email already exists");
             }
 
             user.setPassword(PasswordHasher.hash(user.getPassword()));
             user.setRole(CoreUserRole.USER);
             user.setGlobal_status(CoreUserGlobalStatus.ACTIVE);
-            userDAO.insert(user, handler);
+
+            return userDAO.insert(user);
         });
     }
 
-    public void changePassword(int userId, String newPassword, Handler<AsyncResult<UserEntity>> handler) {
-        getById(userId, ar -> {
-            if (ar.failed() || ar.result() == null) {
-                handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
-                return;
+    public Future<UserEntity> changePassword(int userId, String newPassword) {
+        return getById(userId).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(MessageUtil.notFound("User", "in the database"));
             }
 
-            UserEntity user = ar.result();
             user.setPassword(PasswordHasher.hash(newPassword));
-            userDAO.update(user, handler);
+            return userDAO.update(user);
         });
     }
 
     public boolean validateToken(String token) {
-    	JWTManager jwtManager = JWTManager.getInstance();
+        JWTManager jwtManager = JWTManager.getInstance();
         return jwtManager.isValid(token);
     }
 
     /* USERS OPERATIONS */
 
-    public void getAll(Handler<AsyncResult<List<UserEntity>>> handler) {
-        userDAO.getAll(ar -> {
-            if (ar.failed()) {
-                handler.handle(Future.failedFuture(ar.cause()));
-                return;
-            }
-            handler.handle(Future.succeededFuture(ar.result()));
-        });
+    public Future<List<UserEntity>> getAll() {
+        return userDAO.getAll();
     }
 
-    public void getById(Integer id, Handler<AsyncResult<UserEntity>> handler) {
-        userDAO.getAll(ar -> {
-            if (ar.failed()) {
-                handler.handle(Future.failedFuture(ar.cause()));
-                return;
-            }
-
-            ar.result().stream()
+    public Future<UserEntity> getById(Integer id) {
+        return userDAO.getAll().map(users ->
+            users.stream()
                 .filter(user -> user.getUser_id().equals(id))
                 .findFirst()
-                .ifPresentOrElse(
-                    user -> handler.handle(Future.succeededFuture(user)),
-                    () -> handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")))
-                );
-        });
+                .orElse(null)
+        );
     }
 
-    public void getByEmail(String email, Handler<AsyncResult<UserEntity>> handler) {
-        userDAO.getAll(ar -> {
-            if (ar.failed()) {
-                handler.handle(Future.failedFuture(ar.cause()));
-                return;
-            }
-
-            ar.result().stream()
+    public Future<UserEntity> getByEmail(String email) {
+        return userDAO.getAll().map(users ->
+            users.stream()
                 .filter(user -> email.equals(user.getEmail()))
                 .findFirst()
-                .ifPresentOrElse(
-                    user -> handler.handle(Future.succeededFuture(user)),
-                    () -> handler.handle(Future.succeededFuture(null))
-                );
-        });
+                .orElse(null)
+        );
     }
 
-    public void getByUserName(String userName, Handler<AsyncResult<UserEntity>> handler) {
-        userDAO.getAll(ar -> {
-            if (ar.failed()) {
-                handler.handle(Future.failedFuture(ar.cause()));
-                return;
-            }
-
-            ar.result().stream()
+    public Future<UserEntity> getByUserName(String userName) {
+        return userDAO.getAll().map(users ->
+            users.stream()
                 .filter(user -> userName.equals(user.getUser_name()))
                 .findFirst()
-                .ifPresentOrElse(
-                    user -> handler.handle(Future.succeededFuture(user)),
-                    () -> handler.handle(Future.succeededFuture(null))
-                );
+                .orElse(null)
+        );
+    }
+
+    public Future<UserEntity> updateRole(Integer userId, CoreUserRole role) {
+        return getById(userId).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(MessageUtil.notFound("User", "in the database"));
+            }
+            user.setRole(role);
+            return userDAO.update(user);
         });
     }
-    
-    public void updateRole(Integer userId, CoreUserRole role, Handler<AsyncResult<UserEntity>> handler) {
-		getById(userId, ar -> {
-			if (ar.failed() || ar.result() == null) {
-				handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
-				return;
-			}
 
-			UserEntity user = ar.result();
-			user.setRole(role);
-			userDAO.update(user, handler);
-		});
-	}
-    
-    public void updateStatus(Integer userId, CoreUserGlobalStatus status, Handler<AsyncResult<UserEntity>> handler) {
-		getById(userId, ar -> {
-			if(ar.failed() || ar.result() == null) {
-				handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
-				return;
-			}
-			
-			UserEntity user = ar.result();
-			user.setGlobal_status(status);
-			userDAO.update(user, handler);
-		});
+    public Future<UserEntity> updateStatus(Integer userId, CoreUserGlobalStatus status) {
+        return getById(userId).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(MessageUtil.notFound("User", "in the database"));
+            }
+            user.setGlobal_status(status);
+            return userDAO.update(user);
+        });
     }
-    
+
     /* CRUD OPERATIONS */
 
-    public void create(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
-        register(user, handler);
+    public Future<UserEntity> create(UserEntity user) {
+        return register(user);
     }
 
-    public void update(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
-        userDAO.update(user, handler);
+    public Future<UserEntity> update(UserEntity user) {
+        return userDAO.update(user);
     }
 
-    public void delete(Integer id, Handler<AsyncResult<UserEntity>> handler) {
-        getById(id, ar -> {
-            if (ar.failed() || ar.result() == null) {
-                handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
-                return;
+    public Future<UserEntity> delete(Integer id) {
+        return getById(id).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(MessageUtil.notFound("User", "in the database"));
             }
-            userDAO.delete(id, handler);
+            return userDAO.delete(id);
         });
     }
-    
-    /* FILE OPERATIONS */
-    
 }

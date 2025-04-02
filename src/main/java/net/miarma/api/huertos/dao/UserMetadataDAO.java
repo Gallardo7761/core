@@ -2,9 +2,8 @@ package net.miarma.api.huertos.dao;
 
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.DataAccessObject;
@@ -20,52 +19,57 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 	}
 
 	@Override
-	public void getAll(Handler<AsyncResult<List<UserMetadataEntity>>> handler) {
-		String query = QueryBuilder
-				.select(UserMetadataEntity.class)
-				.build();
-		
+	public Future<List<UserMetadataEntity>> getAll() {
+		Promise<List<UserMetadataEntity>> promise = Promise.promise();
+		String query = QueryBuilder.select(UserMetadataEntity.class).build();
+
 		db.execute(query, UserMetadataEntity.class,
-			list -> handler.handle(Future.succeededFuture(list.isEmpty() ? List.of() : list)),
-			ex -> handler.handle(Future.failedFuture(ex))
+			list -> promise.complete(list.isEmpty() ? List.of() : list),
+			promise::fail
 		);
+
+		return promise.future();
 	}
 
 	@Override
-	public void insert(UserMetadataEntity user, Handler<AsyncResult<UserMetadataEntity>> handler) {
-		String query = QueryBuilder
-				.insert(user)
-				.build();
-		
+	public Future<UserMetadataEntity> insert(UserMetadataEntity user) {
+		Promise<UserMetadataEntity> promise = Promise.promise();
+		String query = QueryBuilder.insert(user).build();
+
 		db.execute(query, UserMetadataEntity.class,
-			list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-			ex -> handler.handle(Future.failedFuture(ex))
+			list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+			promise::fail
 		);
+
+		return promise.future();
 	}
 
 	@Override
-	public void update(UserMetadataEntity user, Handler<AsyncResult<UserMetadataEntity>> handler) {
-		String query = QueryBuilder
-				.update(user)
-				.build();
-		
+	public Future<UserMetadataEntity> update(UserMetadataEntity user) {
+		Promise<UserMetadataEntity> promise = Promise.promise();
+		String query = QueryBuilder.update(user).build();
+
 		db.execute(query, UserMetadataEntity.class,
-			list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-			ex -> handler.handle(Future.failedFuture(ex))
+			list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+			promise::fail
 		);
+
+		return promise.future();
 	}
 
 	@Override
-	public void delete(Integer id, Handler<AsyncResult<UserMetadataEntity>> handler) {
-		String query = QueryBuilder
-				.delete(UserMetadataEntity.class)
-				.build();	
-		
+	public Future<UserMetadataEntity> delete(Integer id) {
+		Promise<UserMetadataEntity> promise = Promise.promise();
+		UserMetadataEntity user = new UserMetadataEntity();
+		user.setUser_id(id);
+
+		String query = QueryBuilder.delete(user).build();
+
 		db.execute(query, UserMetadataEntity.class,
-			list -> handler.handle(Future.succeededFuture(list.isEmpty() ? null : list.get(0))),
-			ex -> handler.handle(Future.failedFuture(ex))
+			list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+			promise::fail
 		);
+
+		return promise.future();
 	}
-	
-	
 }

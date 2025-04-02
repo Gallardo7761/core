@@ -15,219 +15,128 @@ import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.FileService;
 import net.miarma.api.core.services.UserService;
 
-public class CoreDataVerticle extends AbstractVerticle  {
-	private ConfigManager configManager;
-	private UserService userService;
-	private FileService fileService;
-	
-	
-	@Override 
-	public void start(Promise<Void> startPromise) {
-		configManager = ConfigManager.getInstance();
-		Pool pool = DatabaseProvider.createPool(vertx, configManager);
-		userService = new UserService(pool);
-		fileService = new FileService(pool);
-		Router router = Router.router(vertx);
-		CoreDataRouter.mount(router, vertx, pool);
-		registerAuthConsumer();
-				
-		vertx.createHttpServer()
-			.requestHandler(router)
-			.listen(configManager.getIntProperty("sso.data.port"), res -> {
-				if (res.succeeded()) startPromise.complete();
+@SuppressWarnings("unused")
+public class CoreDataVerticle extends AbstractVerticle {
+    private ConfigManager configManager;
+    private UserService userService;
+    private FileService fileService;
+
+    @Override
+    public void start(Promise<Void> startPromise) {
+        configManager = ConfigManager.getInstance();
+        Pool pool = DatabaseProvider.createPool(vertx, configManager);
+        userService = new UserService(pool);
+        fileService = new FileService(pool);
+        Router router = Router.router(vertx);
+        CoreDataRouter.mount(router, vertx, pool);
+        registerAuthConsumer();
+
+        vertx.createHttpServer()
+            .requestHandler(router)
+            .listen(configManager.getIntProperty("sso.data.port"), res -> {
+                if (res.succeeded()) startPromise.complete();
                 else startPromise.fail(res.cause());
-			});
-	}
-	
-	private void registerAuthConsumer() {
-	    vertx.eventBus().consumer(Constants.AUTH_EVENT_BUS, message -> {
-	        JsonObject body = (JsonObject) message.body();
-	        String action = body.getString("action");
+            });
+    }
 
-	        switch (action) {
-	            case "login":
-	                userService.login(body.getString("email"), body.getString("password"), body.getBoolean("keepLoggedIn"), ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply(ar.result());
-	                    } else {
-	                        message.fail(401, ar.cause().getMessage());
-	                    }
-	                });
-	                break;
+    private void registerAuthConsumer() {
+        vertx.eventBus().consumer(Constants.AUTH_EVENT_BUS, message -> {
+            JsonObject body = (JsonObject) message.body();
+            String action = body.getString("action");
 
-	            case "register":
-	                UserEntity user = new UserEntity();
-	                user.setUser_name(body.getString("userName"));
-	                user.setEmail(body.getString("email"));
-	                user.setDisplay_name(body.getString("displayName"));
-	                user.setPassword(body.getString("password"));
+            switch (action) {
+                case "login" -> userService.login(body.getString("email"), body.getString("password"), body.getBoolean("keepLoggedIn"))
+                    .onSuccess(message::reply)
+                    .onFailure(err -> message.fail(401, err.getMessage()));
 
-	                userService.register(user, ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply("User registered successfully");
-	                    } else {
-	                        message.fail(400, ar.cause().getMessage());
-	                    }
-	                });
-	                break;
+                case "register" -> {
+                    UserEntity user = new UserEntity();
+                    user.setUser_name(body.getString("userName"));
+                    user.setEmail(body.getString("email"));
+                    user.setDisplay_name(body.getString("displayName"));
+                    user.setPassword(body.getString("password"));
 
-	            case "changePassword":
-	                userService.changePassword(body.getInteger("userId"), body.getString("newPassword"), ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply("Password changed successfully");
-	                    } else {
-	                        message.fail(400, ar.cause().getMessage());
-	                    }
-	                });
-	                break;
+                    userService.register(user)
+                        .onSuccess(res -> message.reply("User registered successfully"))
+                        .onFailure(err -> message.fail(400, err.getMessage()));
+                }
 
-	            case "validateToken":
-	                boolean isValid = userService.validateToken(body.getString("token"));
-	                message.reply(isValid);
-	                break;
-	                
-	            case "getInfo":
-	                userService.getById(body.getInteger("userId"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        message.reply(new JsonObject(ar.result().encode()));
-	                    } else {
-	                        message.fail(404, "User not found");
-	                    }
-	                });
-	                break;
+                case "changePassword" -> userService.changePassword(body.getInteger("userId"), body.getString("newPassword"))
+                    .onSuccess(res -> message.reply("Password changed successfully"))
+                    .onFailure(err -> message.fail(400, err.getMessage()));
 
-	            case "userExists":
-	                userService.getById(body.getInteger("userId"), ar -> {
-	                    boolean exists = ar.succeeded() && ar.result() != null;
-	                    message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", exists));
-	                });
-	                break;
-	                
-	            case "getById":
-	                userService.getById(body.getInteger("userId"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        message.reply(new JsonObject(ar.result().encode()));
-	                    } else {
-	                        message.fail(404, "User not found");
-	                    }
-	                });
-	                break;
+                case "validateToken" -> {
+                    boolean isValid = userService.validateToken(body.getString("token"));
+                    message.reply(isValid);
+                }
 
-	            case "getByEmail":
-	                userService.getByEmail(body.getString("email"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        message.reply(new JsonObject(ar.result().encode()));
-	                    } else {
-	                        message.fail(404, "Not found");
-	                    }
-	                });
-	                break;
+                case "getInfo", "getById" -> userService.getById(body.getInteger("userId"))
+                    .onSuccess(user -> message.reply(new JsonObject(user.encode())))
+                    .onFailure(err -> message.fail(404, "User not found"));
 
-	            case "getByUserName":
-	                userService.getByUserName(body.getString("userName"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        message.reply(new JsonObject(ar.result().encode()));
-	                    } else {
-	                        message.fail(404, "Not found");
-	                    }
-	                });
-	                break;
+                case "userExists" -> userService.getById(body.getInteger("userId"))
+                    .onSuccess(user -> message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", user != null)))
+                    .onFailure(err -> message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", false)));
 
-	            case "getStatus":
-	                userService.getById(body.getInteger("userId"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        JsonObject response = new JsonObject()
-	                            .put("user_id", ar.result().getUser_id())
-	                            .put("status", ar.result().getGlobal_status());
-	                        message.reply(response);
-	                    } else {
-	                        message.fail(404, "User not found");
-	                    }
-	                });
-	                break;
+                case "getByEmail" -> userService.getByEmail(body.getString("email"))
+                    .onSuccess(user -> message.reply(new JsonObject(user.encode())))
+                    .onFailure(err -> message.fail(404, "Not found"));
 
-	            case "getRole":
-	                userService.getById(body.getInteger("userId"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        JsonObject response = new JsonObject()
-	                            .put("user_id", ar.result().getUser_id())
-	                            .put("role", ar.result().getRole());
-	                        message.reply(response);
-	                    } else {
-	                        message.fail(404, "User not found");
-	                    }
-	                });
-	                break;
+                case "getByUserName" -> userService.getByUserName(body.getString("userName"))
+                    .onSuccess(user -> message.reply(new JsonObject(user.encode())))
+                    .onFailure(err -> message.fail(404, "Not found"));
 
-	            case "getAvatar":
-	                userService.getById(body.getInteger("userId"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        JsonObject response = new JsonObject()
-	                            .put("user_id", ar.result().getUser_id())
-	                            .put("avatar", ar.result().getAvatar());
-	                        message.reply(response);
-	                    } else {
-	                        message.fail(404, "User not found");
-	                    }
-	                });
-	                break;
-	                
-	            case "updateStatus":
-	                userService.updateStatus(body.getInteger("userId"), 
-	                		CoreUserGlobalStatus.fromInt(body.getInteger("status")), ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply("Status updated successfully");
-	                    } else {
-	                        message.fail(400, ar.cause().getMessage());
-	                    }
-	                });
-	                break;
-	                
-	            case "updateRole":
-	            	userService.updateRole(body.getInteger("userId"), 
-	            			CoreUserRole.fromInt(body.getInteger("role")), ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply("Role updated successfully");
-	                    } else {
-	                        message.fail(400, ar.cause().getMessage());
-	                    }
-	                });
-	                break;
-	                
-	            case "getUserFiles":
-	                fileService.getUserFiles(body.getInteger("userId"), ar -> {
-	                    if (ar.succeeded() && ar.result() != null) {
-	                        message.reply(Constants.GSON.toJson(ar.result(), ar.result().getClass()));
-	                    } else {
-	                        message.fail(404, "The user has no files");
-	                    }
-	                });
-	                break;
-	                
-	            case "uploadFile":
-	                fileService.create(body, ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply("File uploaded successfully");
-	                    } else {
-	                        message.fail(400, ar.cause().getMessage());
-	                    }
-	                });
-	                break;
-	                
-	            case "downloadFile":
-	            	fileService.downloadFile(body.getInteger("fileId"), ar -> {
-	                    if (ar.succeeded()) {
-	                        message.reply(ar.result());
-	                    } else {
-	                        message.fail(404, "File not found");
-	                    }
-	                });               	            		                
-	                break;
-	                
-	            default:
-	                message.fail(400, "Unknown action: " + action);
-	                break;
-	        }
-	    });
-	}
+                case "getStatus" -> userService.getById(body.getInteger("userId"))
+                    .onSuccess(user -> {
+                        JsonObject response = new JsonObject()
+                            .put("user_id", user.getUser_id())
+                            .put("status", user.getGlobal_status());
+                        message.reply(response);
+                    })
+                    .onFailure(err -> message.fail(404, "User not found"));
+
+                case "getRole" -> userService.getById(body.getInteger("userId"))
+                    .onSuccess(user -> {
+                        JsonObject response = new JsonObject()
+                            .put("user_id", user.getUser_id())
+                            .put("role", user.getRole());
+                        message.reply(response);
+                    })
+                    .onFailure(err -> message.fail(404, "User not found"));
+
+                case "getAvatar" -> userService.getById(body.getInteger("userId"))
+                    .onSuccess(user -> {
+                        JsonObject response = new JsonObject()
+                            .put("user_id", user.getUser_id())
+                            .put("avatar", user.getAvatar());
+                        message.reply(response);
+                    })
+                    .onFailure(err -> message.fail(404, "User not found"));
+
+                case "updateStatus" -> userService.updateStatus(body.getInteger("userId"),
+                        CoreUserGlobalStatus.fromInt(body.getInteger("status")))
+                    .onSuccess(res -> message.reply("Status updated successfully"))
+                    .onFailure(err -> message.fail(400, err.getMessage()));
+
+                case "updateRole" -> userService.updateRole(body.getInteger("userId"),
+                        CoreUserRole.fromInt(body.getInteger("role")))
+                    .onSuccess(res -> message.reply("Role updated successfully"))
+                    .onFailure(err -> message.fail(400, err.getMessage()));
+
+                case "getUserFiles" -> fileService.getUserFiles(body.getInteger("userId"))
+                    .onSuccess(files -> message.reply(Constants.GSON.toJson(files, files.getClass())))
+                    .onFailure(err -> message.fail(404, "The user has no files"));
+
+                case "uploadFile" -> fileService.create(body)
+                    .onSuccess(res -> message.reply("File uploaded successfully"))
+                    .onFailure(err -> message.fail(400, err.getMessage()));
+
+                case "downloadFile" -> fileService.downloadFile(body.getInteger("fileId"))
+                    .onSuccess(message::reply)
+                    .onFailure(err -> message.fail(404, "File not found"));
+
+                default -> message.fail(400, "Unknown action: " + action);
+            }
+        });
+    }
 }
