@@ -3,7 +3,7 @@ package net.miarma.api.core.entities;
 import java.time.LocalDateTime;
 
 import net.miarma.api.common.Constants.CoreFileContext;
-import net.miarma.api.common.Table;
+import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
 @Table("files")

@@ -5,6 +5,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.MainVerticle;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
@@ -12,17 +13,21 @@ import net.miarma.api.common.Constants.CoreUserRole;
 import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.core.api.CoreDataRouter;
 import net.miarma.api.core.entities.UserEntity;
-import net.miarma.api.core.services.CoreService;
+import net.miarma.api.core.services.FileService;
+import net.miarma.api.core.services.UserService;
 
 public class CoreDataVerticle extends AbstractVerticle  {
-	ConfigManager configManager;
-	CoreService ssoService;
+	private ConfigManager configManager;
+	private UserService userService;
+	private FileService fileService;
+	
 	
 	@Override 
 	public void start(Promise<Void> startPromise) {
 		configManager = ConfigManager.getInstance();
 		Pool pool = DatabaseProvider.createPool(vertx, configManager);
-		ssoService = new CoreService(pool);
+		userService = new UserService(pool);
+		fileService = new FileService(pool);
 		Router router = Router.router(vertx);
 		CoreDataRouter.mount(router, vertx, pool);
 		registerAuthConsumer();
@@ -42,7 +47,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 
 	        switch (action) {
 	            case "login":
-	                ssoService.login(body.getString("email"), body.getString("password"), body.getBoolean("keepLoggedIn"), ar -> {
+	                userService.login(body.getString("email"), body.getString("password"), body.getBoolean("keepLoggedIn"), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply(ar.result());
 	                    } else {
@@ -58,7 +63,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                user.setDisplay_name(body.getString("displayName"));
 	                user.setPassword(body.getString("password"));
 
-	                ssoService.register(user, ar -> {
+	                userService.register(user, ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply("User registered successfully");
 	                    } else {
@@ -68,7 +73,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "changePassword":
-	                ssoService.changePassword(body.getInteger("userId"), body.getString("newPassword"), ar -> {
+	                userService.changePassword(body.getInteger("userId"), body.getString("newPassword"), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply("Password changed successfully");
 	                    } else {
@@ -78,12 +83,12 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "validateToken":
-	                boolean isValid = ssoService.validateToken(body.getString("token"));
+	                boolean isValid = userService.validateToken(body.getString("token"));
 	                message.reply(isValid);
 	                break;
 	                
 	            case "getInfo":
-	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                userService.getById(body.getInteger("userId"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        message.reply(new JsonObject(ar.result().encode()));
 	                    } else {
@@ -93,14 +98,14 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "userExists":
-	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                userService.getById(body.getInteger("userId"), ar -> {
 	                    boolean exists = ar.succeeded() && ar.result() != null;
 	                    message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", exists));
 	                });
 	                break;
 	                
 	            case "getById":
-	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                userService.getById(body.getInteger("userId"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        message.reply(new JsonObject(ar.result().encode()));
 	                    } else {
@@ -110,7 +115,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "getByEmail":
-	                ssoService.getByEmail(body.getString("email"), ar -> {
+	                userService.getByEmail(body.getString("email"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        message.reply(new JsonObject(ar.result().encode()));
 	                    } else {
@@ -120,7 +125,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "getByUserName":
-	                ssoService.getByUserName(body.getString("userName"), ar -> {
+	                userService.getByUserName(body.getString("userName"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        message.reply(new JsonObject(ar.result().encode()));
 	                    } else {
@@ -130,7 +135,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "getStatus":
-	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                userService.getById(body.getInteger("userId"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        JsonObject response = new JsonObject()
 	                            .put("user_id", ar.result().getUser_id())
@@ -143,7 +148,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "getRole":
-	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                userService.getById(body.getInteger("userId"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        JsonObject response = new JsonObject()
 	                            .put("user_id", ar.result().getUser_id())
@@ -156,7 +161,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 
 	            case "getAvatar":
-	                ssoService.getById(body.getInteger("userId"), ar -> {
+	                userService.getById(body.getInteger("userId"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
 	                        JsonObject response = new JsonObject()
 	                            .put("user_id", ar.result().getUser_id())
@@ -169,7 +174,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 	                
 	            case "updateStatus":
-	                ssoService.updateStatus(body.getInteger("userId"), 
+	                userService.updateStatus(body.getInteger("userId"), 
 	                		CoreUserGlobalStatus.fromInt(body.getInteger("status")), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply("Status updated successfully");
@@ -180,7 +185,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                break;
 	                
 	            case "updateRole":
-	            	ssoService.updateRole(body.getInteger("userId"), 
+	            	userService.updateRole(body.getInteger("userId"), 
 	            			CoreUserRole.fromInt(body.getInteger("role")), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply("Role updated successfully");
@@ -188,6 +193,36 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	                        message.fail(400, ar.cause().getMessage());
 	                    }
 	                });
+	                break;
+	                
+	            case "getUserFiles":
+	                fileService.getUserFiles(body.getInteger("userId"), ar -> {
+	                    if (ar.succeeded() && ar.result() != null) {
+	                        message.reply(MainVerticle.GSON.toJson(ar.result(), ar.result().getClass()));
+	                    } else {
+	                        message.fail(404, "The user has no files");
+	                    }
+	                });
+	                break;
+	                
+	            case "uploadFile":
+	                fileService.create(body, ar -> {
+	                    if (ar.succeeded()) {
+	                        message.reply("File uploaded successfully");
+	                    } else {
+	                        message.fail(400, ar.cause().getMessage());
+	                    }
+	                });
+	                break;
+	                
+	            case "downloadFile":
+	            	fileService.downloadFile(body.getInteger("fileId"), ar -> {
+	                    if (ar.succeeded()) {
+	                        message.reply(ar.result());
+	                    } else {
+	                        message.fail(404, "File not found");
+	                    }
+	                });               	            		                
 	                break;
 	                
 	            default:

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.Table;
+import net.miarma.api.common.annotations.Table;
 
 public class QueryBuilder {
     private StringBuilder query;

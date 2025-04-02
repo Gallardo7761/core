@@ -1,5 +1,5 @@
 package net.miarma.api.huertos.entities;
-import net.miarma.api.common.Table;
+import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
 @Table("v_incomes_with_full_names")

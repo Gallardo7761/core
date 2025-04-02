@@ -2,9 +2,9 @@ package net.miarma.api.huertos.entities;
 
 import java.time.LocalDateTime;
 
-import net.miarma.api.common.Table;
 import net.miarma.api.common.Constants.HuertosRequestStatus;
 import net.miarma.api.common.Constants.HuertosRequestType;
+import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
 @Table("huertos_requests")

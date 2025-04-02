@@ -23,7 +23,7 @@ public class Constants {
 	public static final Integer HUERTOS_LOGIC_PORT = 8120;
 	public static final Integer HUERTOS_DATA_PORT = 8121;
     
-	public enum CoreUserRole {
+	public enum CoreUserRole implements ValuableEnum {
 	    USER(0),
 	    ADMIN(1);
 
@@ -33,6 +33,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }
@@ -46,7 +47,7 @@ public class Constants {
 	}
 
 	
-	public enum CoreUserGlobalStatus {
+	public enum CoreUserGlobalStatus implements ValuableEnum {
 	    INACTIVE(0),
 	    ACTIVE(1);
 
@@ -56,6 +57,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }
@@ -68,7 +70,7 @@ public class Constants {
 	    }
 	}
 	
-	public enum CoreFileContext {
+	public enum CoreFileContext implements ValuableEnum {
 		CORE(0),
 		HUERTOS(1),
 		MMC(2);
@@ -79,6 +81,7 @@ public class Constants {
 			this.value = value;
 		}
 		
+		@Override
 		public int getValue() {
 			return value;
 		}
@@ -92,7 +95,7 @@ public class Constants {
 	}
 
 	
-	public enum HuertosUserRole {
+	public enum HuertosUserRole implements ValuableEnum {
 	    USER(0),
 	    ADMIN(1),
 	    DEV(2);
@@ -103,6 +106,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }
@@ -115,7 +119,7 @@ public class Constants {
 	    }
 	}
 	
-	public enum HuertosUserType {
+	public enum HuertosUserType implements ValuableEnum {
 		WAIT_LIST(0),
 		MEMBER(1),
 		WITH_GREENHOUSE(2),
@@ -127,6 +131,7 @@ public class Constants {
 			this.value = value;
 		}
 		
+		@Override
 		public int getValue() {
 			return value;
 		}
@@ -140,7 +145,7 @@ public class Constants {
 	}
 
 	
-	public enum HuertosUserStatus {
+	public enum HuertosUserStatus implements ValuableEnum {
 	    INACTIVE(0),
 	    ACTIVE(1);
 
@@ -150,6 +155,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }
@@ -163,7 +169,7 @@ public class Constants {
 	}
 
 	
-	public enum HuertosRequestStatus {
+	public enum HuertosRequestStatus implements ValuableEnum {
 	    PENDING(0),
 	    APPROVED(1),
 	    REJECTED(2);
@@ -174,6 +180,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }
@@ -186,7 +193,7 @@ public class Constants {
 	    }
 	}
 	
-	public enum HuertosPaymentType {
+	public enum HuertosPaymentType implements ValuableEnum {
 		BANK(0),
 		CASH(1);
 		
@@ -196,6 +203,7 @@ public class Constants {
 			this.value = value;
 		}
 		
+		@Override
 		public int getValue() {
 			return value;
 		}
@@ -208,7 +216,7 @@ public class Constants {
 		}
 	}
 	
-	public enum HuertosRequestType {
+	public enum HuertosRequestType implements ValuableEnum {
 		REGISTER(0),
 		UNREGISTER(1),
 		ADD_COLLABORATOR(2),
@@ -220,6 +228,7 @@ public class Constants {
 			this.value = value;
 		}
 		
+		@Override
 		public int getValue() {
 			return value;
 		}
@@ -232,7 +241,7 @@ public class Constants {
 		}
 	}
 	
-	public enum HuertosAnnouncePriority {
+	public enum HuertosAnnouncePriority implements ValuableEnum {
 		LOW(0),
 		MEDIUM(1),
 		HIGH(2);
@@ -243,6 +252,7 @@ public class Constants {
 			this.value = value;
 		}
 		
+		@Override
 		public int getValue() {
 			return value;
 		}
@@ -255,7 +265,7 @@ public class Constants {
 		}
 	}
 	
-	public enum HuertosPaymentFrequency {
+	public enum HuertosPaymentFrequency implements ValuableEnum {
 		BIYEARLY(0),
 		YEARLY(1);
 		
@@ -265,6 +275,7 @@ public class Constants {
 			this.value = value;
 		}
 		
+		@Override
 		public int getValue() {
 			return value;
 		}
@@ -278,7 +289,7 @@ public class Constants {
 	}
 
 	
-	public enum MMCUserRole {
+	public enum MMCUserRole implements ValuableEnum {
 	    PLAYER(0);
 
 	    private final int value;
@@ -287,6 +298,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }
@@ -300,7 +312,7 @@ public class Constants {
 	}
 
 	
-	public enum MMCUserStatus {
+	public enum MMCUserStatus implements ValuableEnum {
 	    INACTIVE(0),
 	    ACTIVE(1);
 
@@ -310,6 +322,7 @@ public class Constants {
 	        this.value = value;
 	    }
 
+	    @Override
 	    public int getValue() {
 	        return value;
 	    }

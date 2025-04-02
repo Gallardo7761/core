@@ -3,8 +3,8 @@ package net.miarma.api.huertos.entities;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import net.miarma.api.common.Table;
 import net.miarma.api.common.Constants.HuertosPaymentType;
+import net.miarma.api.common.annotations.Table;
 
 @Table("huertos_expenses")
 public class ExpenseEntity {

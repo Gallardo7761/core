@@ -15,10 +15,10 @@ import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.util.MessageUtil;
 
-public class CoreService {
+public class UserService {
 
     private final UserDAO userDAO;
-    public CoreService(Pool pool) {
+    public UserService(Pool pool) {
         this.userDAO = new UserDAO(pool);
     }
 
@@ -51,6 +51,34 @@ public class CoreService {
             handler.handle(Future.succeededFuture(response));
         });
     }
+    
+    public void login(String userName, String plainPassword, Handler<AsyncResult<JsonObject>> handler) {
+		getByUserName(userName, ar -> {
+			if (ar.failed() || ar.result() == null) {
+				handler.handle(Future.failedFuture("Invalid credentials"));
+				return;
+			}
+
+			UserEntity user = ar.result();
+						
+			if (user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
+				handler.handle(Future.failedFuture("User is not active or banned"));
+				return;
+			}
+			
+			if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
+				handler.handle(Future.failedFuture("Invalid credentials"));
+				return;
+			}
+			
+			JWTManager jwtManager = JWTManager.getInstance();
+			String token = jwtManager.generateToken(user, false);
+			JsonObject response = new JsonObject()
+					.put("token", token)
+					.put("loggedUser", new JsonObject(user.encode()));
+			handler.handle(Future.succeededFuture(response));
+		});
+	}
 
     public void register(UserEntity user, Handler<AsyncResult<UserEntity>> handler) {
         getByEmail(user.getEmail(), ar -> {
@@ -192,4 +220,7 @@ public class CoreService {
             userDAO.delete(id, handler);
         });
     }
+    
+    /* FILE OPERATIONS */
+    
 }

@@ -2,31 +2,27 @@ package net.miarma.api;
 
 import java.time.LocalDateTime;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import net.miarma.api.common.LocalDateTimeAdapter;
-import net.miarma.api.common.db.QueryBuilder;
+import net.miarma.api.common.VertxJacksonConfig;
+import net.miarma.api.common.Constants.CoreUserGlobalStatus;
+import net.miarma.api.common.Constants.CoreUserRole;
 import net.miarma.api.core.entities.UserEntity;
 
 public class Test {
 	public static void main(String[] args) {
-		Gson gson = new GsonBuilder()
-				.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-				.create();
 		
 		UserEntity user = new UserEntity();
-        user.setUser_id(1);
-        user.setUser_name("miarma");
-        user.setEmail("miarma@sevilla.es");
-        user.setDisplay_name("El Miarma");
-        user.setCreated_at(LocalDateTime.now());
-        user.setUpdated_at(LocalDateTime.now());
+		user.setUser_id(1);
+        user.setUser_name("gallardo7761");
+        user.setEmail("jomaamga@outlook.es");
+        user.setDisplay_name("Jose");
+        user.setPassword("$2a$12$.Vfpjx5YLXqnYwr5XUDRIOFVwm6fPNwZmn0cmRdXDArAeM3EhmwkO");
+        user.setGlobal_status(CoreUserGlobalStatus.ACTIVE);
+        user.setRole(CoreUserRole.ADMIN);
+        user.setCreated_at(LocalDateTime.parse("2025-04-02T20:10:26"));
+        user.setUpdated_at(LocalDateTime.parse("2025-04-02T20:18:24"));
 		
-        String query = QueryBuilder
-    			.select(UserEntity.class)
-    			.build();
+        VertxJacksonConfig.configure();
         
-		System.out.println(query);
+		System.out.println(user.encode());
 	}
 }

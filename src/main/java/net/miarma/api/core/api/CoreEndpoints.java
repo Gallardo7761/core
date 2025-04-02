@@ -20,6 +20,13 @@ public class CoreEndpoints {
 	public static final String USER_AVATAR = Constants.CORE_PREFIX + "/users/:user_id/avatar"; // GET, PUT
 	public static final String USER_INFO = Constants.CORE_PREFIX + "/users/me"; // GET
 	
+	// Archivos
+	public static final String FILES = Constants.CORE_PREFIX + "/files"; // GET, POST
+	public static final String FILE = Constants.CORE_PREFIX + "/files/:file_id"; // GET, PUT, DELETE
+	public static final String FILE_UPLOAD = Constants.CORE_PREFIX + "/files/upload"; // POST
+	public static final String FILE_DOWNLOAD = Constants.CORE_PREFIX + "/files/:file_id/download"; // GET
+	public static final String USER_FILES = Constants.CORE_PREFIX + "/files/myfiles"; // GET
+	
 	/*
 	 * RUTAS DE LA API DE LOGICA 
 	 * DE NEGOCIO DEL SSO

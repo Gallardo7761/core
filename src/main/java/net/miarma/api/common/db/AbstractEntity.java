@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
-import net.miarma.api.common.APIDontReturn;
+import net.miarma.api.common.ValuableEnum;
+import net.miarma.api.common.annotations.APIDontReturn;
 
 public class AbstractEntity {
 	
@@ -63,31 +64,28 @@ public class AbstractEntity {
         }
     }
 
-
     public String encode() {
         JsonObject json = new JsonObject();
-        Field[] fields = this.getClass().getDeclaredFields();
+        Class<?> clazz = this.getClass();
 
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(APIDontReturn.class)) continue;
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(APIDontReturn.class)) continue;
 
-            field.setAccessible(true);
-            try {
-                Object value = field.get(this);
-                if (value instanceof Enum<?>) {
-                    try {
-                        var method = value.getClass().getMethod("getValue");
-                        Object enumValue = method.invoke(value);
-                        json.put(field.getName(), enumValue);
-                    } catch (Exception e) {
-                        json.put(field.getName(), ((Enum<?>) value).name());
+                field.setAccessible(true);
+                try {
+                    Object value = field.get(this);
+
+                    if (value instanceof ValuableEnum ve) {
+                        json.put(field.getName(), ve.getValue());
+                    } else {
+                        json.put(field.getName(), value);
                     }
-                } else {
-                    json.put(field.getName(), value);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
             }
+            clazz = clazz.getSuperclass();
         }
 
         return json.encode();
