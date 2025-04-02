@@ -3,7 +3,6 @@ package net.miarma.api.core.handlers;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import net.miarma.api.MainVerticle;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.common.security.JWTManager;
@@ -33,7 +32,7 @@ public class UserLogicHandler {
                         		.encode());
             } else {
                 ctx.response().setStatusCode(401).end(
-            		MainVerticle.GSON.toJson(SingleJsonResponse.of("The user is inactive or banned"))
+            		Constants.GSON.toJson(SingleJsonResponse.of("The user is inactive or banned"))
         		);
             }
         });
@@ -88,17 +87,17 @@ public class UserLogicHandler {
             vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
                 if (ar.succeeded() && (Boolean) ar.result().body()) {
                     ctx.response().setStatusCode(200).end(
-                    	MainVerticle.GSON.toJson(SingleJsonResponse.of("Valid token"))
+                    	Constants.GSON.toJson(SingleJsonResponse.of("Valid token"))
             		);
                 } else {
                     ctx.response().setStatusCode(401).end(
-                    		MainVerticle.GSON.toJson(SingleJsonResponse.of("Invalid token"))
+                    		Constants.GSON.toJson(SingleJsonResponse.of("Invalid token"))
             		);
                 }
             });
         } else {
             ctx.response().setStatusCode(400).end(
-            	MainVerticle.GSON.toJson(SingleJsonResponse.of("Missing or invalid Authorization header"))
+            	Constants.GSON.toJson(SingleJsonResponse.of("Missing or invalid Authorization header"))
     		);
         }
     }   
@@ -107,7 +106,7 @@ public class UserLogicHandler {
         String authHeader = ctx.request().getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
+            ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
             return;
         }
 
@@ -115,7 +114,7 @@ public class UserLogicHandler {
         int userId = JWTManager.getInstance().getUserId(token);
 
         if (userId <= 0) {
-            ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Invalid token")));
+            ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Invalid token")));
             return;
         }
 
@@ -131,7 +130,7 @@ public class UserLogicHandler {
             } else {
                 ctx.response()
                         .setStatusCode(404)
-                        .end(MainVerticle.GSON.toJson(SingleJsonResponse.of("User not found")));
+                        .end(Constants.GSON.toJson(SingleJsonResponse.of("User not found")));
             }
         });
     }
@@ -151,7 +150,7 @@ public class UserLogicHandler {
             } else {
                 ctx.response()
                         .setStatusCode(500)
-                        .end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Error checking existence")));
+                        .end(Constants.GSON.toJson(SingleJsonResponse.of("Error checking existence")));
             }
         });
     }
@@ -168,7 +167,7 @@ public class UserLogicHandler {
                 ctx.response().putHeader("Content-Type", "application/json")
                         .end(((JsonObject) ar.result().body()).encode());
             } else {
-                ctx.response().setStatusCode(404).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Not found")));
+                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
             }
         });
     }
@@ -185,7 +184,7 @@ public class UserLogicHandler {
                 ctx.response().putHeader("Content-Type", "application/json")
                         .end(((JsonObject) ar.result().body()).encode());
             } else {
-                ctx.response().setStatusCode(404).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Not found")));
+                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
             }
         });
     }
@@ -202,7 +201,7 @@ public class UserLogicHandler {
                 ctx.response().putHeader("Content-Type", "application/json")
                         .end(((JsonObject) ar.result().body()).encode());
             } else {
-                ctx.response().setStatusCode(404).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Not found")));
+                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
             }
         });
     }
@@ -219,7 +218,7 @@ public class UserLogicHandler {
                 ctx.response().putHeader("Content-Type", "application/json")
                         .end(((JsonObject) ar.result().body()).encode());
             } else {
-                ctx.response().setStatusCode(404).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Not found")));
+                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
             }
         });
     }
@@ -236,7 +235,7 @@ public class UserLogicHandler {
                 ctx.response().putHeader("Content-Type", "application/json")
                         .end(((JsonObject) ar.result().body()).encode());
             } else {
-                ctx.response().setStatusCode(404).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Not found")));
+                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
             }
         });
     }

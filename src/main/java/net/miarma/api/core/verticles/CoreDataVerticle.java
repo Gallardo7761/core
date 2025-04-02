@@ -5,7 +5,6 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.MainVerticle;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
@@ -198,7 +197,7 @@ public class CoreDataVerticle extends AbstractVerticle  {
 	            case "getUserFiles":
 	                fileService.getUserFiles(body.getInteger("userId"), ar -> {
 	                    if (ar.succeeded() && ar.result() != null) {
-	                        message.reply(MainVerticle.GSON.toJson(ar.result(), ar.result().getClass()));
+	                        message.reply(Constants.GSON.toJson(ar.result(), ar.result().getClass()));
 	                    } else {
 	                        message.fail(404, "The user has no files");
 	                    }

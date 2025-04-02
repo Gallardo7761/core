@@ -9,7 +9,7 @@ import io.vertx.sqlclient.Row;
 import net.miarma.api.common.ValuableEnum;
 import net.miarma.api.common.annotations.APIDontReturn;
 
-public class AbstractEntity {
+public abstract class AbstractEntity {
 	
 	public AbstractEntity() {}
 

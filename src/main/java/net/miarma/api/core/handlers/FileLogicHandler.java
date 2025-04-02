@@ -3,7 +3,6 @@ package net.miarma.api.core.handlers;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import net.miarma.api.MainVerticle;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.common.security.JWTManager;
@@ -20,7 +19,7 @@ public class FileLogicHandler {
 		String authHeader = ctx.request().getHeader("Authorization");
 		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
+            ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
             return;
         }
 
@@ -28,7 +27,7 @@ public class FileLogicHandler {
         int userId = JWTManager.getInstance().getUserId(token);
         
         if (userId <= 0) {
-            ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Invalid token")));
+            ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Invalid token")));
             return;
         }
         
@@ -44,7 +43,7 @@ public class FileLogicHandler {
             } else {
                 ctx.response()
                         .setStatusCode(404)
-                        .end(MainVerticle.GSON.toJson(SingleJsonResponse.of("The user has no files")));
+                        .end(Constants.GSON.toJson(SingleJsonResponse.of("The user has no files")));
             }
         });
     }
@@ -53,7 +52,7 @@ public class FileLogicHandler {
 		String authHeader = ctx.request().getHeader("Authorization");
 		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
+			ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
 			return;
 		}
 
@@ -61,7 +60,7 @@ public class FileLogicHandler {
 		int userId = JWTManager.getInstance().getUserId(token);
 		
 		if (userId <= 0) {
-			ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Invalid token")));
+			ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Invalid token")));
 			return;
 		}
 		
@@ -78,7 +77,7 @@ public class FileLogicHandler {
 			} else {
 				ctx.response()
 						.setStatusCode(404)
-						.end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Error uploading file")));
+						.end(Constants.GSON.toJson(SingleJsonResponse.of("Error uploading file")));
 			}
 		});
 	}
@@ -87,7 +86,7 @@ public class FileLogicHandler {
 		String authHeader = ctx.request().getHeader("Authorization");
 		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
+			ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
 			return;
 		}
 		
@@ -95,7 +94,7 @@ public class FileLogicHandler {
 		int userId = JWTManager.getInstance().getUserId(token);
 		
 		if (userId <= 0) {
-			ctx.response().setStatusCode(401).end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Invalid token")));
+			ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Invalid token")));
 			return;
 		}
 		
@@ -114,7 +113,7 @@ public class FileLogicHandler {
 			} else {
 				ctx.response()
 						.setStatusCode(404)
-						.end(MainVerticle.GSON.toJson(SingleJsonResponse.of("Error downloading file")));
+						.end(Constants.GSON.toJson(SingleJsonResponse.of("Error downloading file")));
 			}
 		});
     }

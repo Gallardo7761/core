@@ -1,5 +1,7 @@
 package net.miarma.api.huertos.entities;
 
+import java.time.LocalDateTime;
+
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
@@ -13,9 +15,9 @@ public class UserMetadataEntity extends AbstractEntity {
 	private Integer plot_number;
 	private String dni;
 	private Integer phone;
-	private Long created_at;
-	private Long assigned_at;
-	private Long deactivated_at;
+	private LocalDateTime created_at;
+	private LocalDateTime assigned_at;
+	private LocalDateTime deactivated_at;
 	private String notes;
 	private HuertosUserType type;
 	private HuertosUserStatus status;
@@ -51,22 +53,22 @@ public class UserMetadataEntity extends AbstractEntity {
 	public void setPhone(Integer phone) {
 		this.phone = phone;
 	}
-	public Long getCreated_at() {
+	public LocalDateTime getCreated_at() {
 		return created_at;
 	}
-	public void setCreated_at(Long created_at) {
+	public void setCreated_at(LocalDateTime created_at) {
 		this.created_at = created_at;
 	}
-	public Long getAssigned_at() {
+	public LocalDateTime getAssigned_at() {
 		return assigned_at;
 	}
-	public void setAssigned_at(Long assigned_at) {
+	public void setAssigned_at(LocalDateTime assigned_at) {
 		this.assigned_at = assigned_at;
 	}
-	public Long getDeactivated_at() {
+	public LocalDateTime getDeactivated_at() {
 		return deactivated_at;
 	}
-	public void setDeactivated_at(Long deactivated_at) {
+	public void setDeactivated_at(LocalDateTime deactivated_at) {
 		this.deactivated_at = deactivated_at;
 	}
 	public String getNotes() {

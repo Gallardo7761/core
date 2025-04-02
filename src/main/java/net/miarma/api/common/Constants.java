@@ -1,7 +1,12 @@
 package net.miarma.api.common;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Constants {
 	public static final String APP_NAME = "MiarmaCoreAPI";
@@ -22,6 +27,12 @@ public class Constants {
 	public static final Integer MMC_DATA_PORT = 8101;
 	public static final Integer HUERTOS_LOGIC_PORT = 8120;
 	public static final Integer HUERTOS_DATA_PORT = 8121;
+	
+	public static final Gson GSON = new GsonBuilder()
+			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+			.registerTypeHierarchyAdapter(ValuableEnum.class, new ValuableEnumTypeAdapter())
+			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
+			.create();
     
 	public enum CoreUserRole implements ValuableEnum {
 	    USER(0),
@@ -334,7 +345,6 @@ public class Constants {
 	        throw new IllegalArgumentException("Invalid MMCUserStatus value: " + i);
 	    }
 	}
-
 	
 	private Constants() {
         throw new AssertionError("Utility class cannot be instantiated.");

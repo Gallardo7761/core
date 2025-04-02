@@ -7,11 +7,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.db.DatabaseManager;
-import net.miarma.api.common.db.IDataAccessObject;
+import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 
-public class UserMetadataDAO implements IDataAccessObject<UserMetadataEntity> {
+public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 	
 	private final DatabaseManager db;
 	

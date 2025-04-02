@@ -5,19 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Launcher;
 import io.vertx.core.Promise;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.LocalDateTimeAdapter;
-import net.miarma.api.common.ValuableEnum;
-import net.miarma.api.common.ValuableEnumTypeAdapter;
 import net.miarma.api.common.VertxJacksonConfig;
 import net.miarma.api.common.security.SecretManager;
 import net.miarma.api.core.verticles.CoreMainVerticle;
@@ -26,10 +19,6 @@ import net.miarma.api.util.MessageUtil;
 
 public class MainVerticle extends AbstractVerticle {
 	private ConfigManager configManager;
-	public static final Gson GSON = new GsonBuilder()
-			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-			.registerTypeHierarchyAdapter(ValuableEnum.class, new ValuableEnumTypeAdapter())
-			.create();
 	
 	public static void main(String[] args) {
 		Launcher.executeCommand("run", MainVerticle.class.getName());
