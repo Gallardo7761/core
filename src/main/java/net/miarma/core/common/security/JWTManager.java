@@ -32,10 +32,11 @@ public class JWTManager {
     
     public String generateToken(UserEntity user, boolean keepLoggedIn) {
     	final long EXPIRATION_TIME_MS = 1000 * (keepLoggedIn ? config.getIntProperty("jwt.expiration") : config.getIntProperty("jwt.expiration.short"));
+    	System.out.println(user.getRole());
     	return JWT.create()
     	        .withSubject(user.getUser_name())
     	        .withClaim("userId", user.getUser_id())
-    	        .withClaim("isAdmin", user.getRole() == Constants.SSOUserRole.ADMIN.getValue())
+    	        .withClaim("isAdmin", user.getRole() == Constants.SSOUserRole.ADMIN)
     	        .withIssuedAt(new Date())
     	        .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
     	        .sign(algorithm);
@@ -53,6 +54,7 @@ public class JWTManager {
     public boolean isAdmin(String token) {
 		try {
 			DecodedJWT jwt = verifier.verify(token);
+			System.out.println(jwt.getClaims());
 			return jwt.getClaim("isAdmin").asBoolean();
 		} catch (Exception e) {
 			return false;

@@ -7,6 +7,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
+import net.miarma.core.common.Constants.SSOUserGlobalStatus;
+import net.miarma.core.common.Constants.SSOUserRole;
 import net.miarma.core.common.security.JWTManager;
 import net.miarma.core.common.security.PasswordHasher;
 import net.miarma.core.sso.dao.UserDAO;
@@ -30,16 +32,23 @@ public class SSOService {
             }
 
             UserEntity user = ar.result();
+            
+            if (user.getGlobal_status() != SSOUserGlobalStatus.ACTIVE) {
+				handler.handle(Future.failedFuture("User is not active or banned"));
+				return;
+			}
+            
             if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
                 handler.handle(Future.failedFuture("Invalid credentials"));
-            } else {
-            	JWTManager jwtManager = JWTManager.getInstance();
-                String token = jwtManager.generateToken(user, keepLoggedIn);
-                JsonObject response = new JsonObject()
-                    .put("token", token)
-                    .put("loggedUser", new JsonObject(user.encode()));
-                handler.handle(Future.succeededFuture(response));
+                return;
             }
+            
+            JWTManager jwtManager = JWTManager.getInstance();
+            String token = jwtManager.generateToken(user, keepLoggedIn);
+            JsonObject response = new JsonObject()
+                .put("token", token)
+                .put("loggedUser", new JsonObject(user.encode()));
+            handler.handle(Future.succeededFuture(response));
         });
     }
 
@@ -51,6 +60,8 @@ public class SSOService {
             }
 
             user.setPassword(PasswordHasher.hash(user.getPassword()));
+            user.setRole(SSOUserRole.USER);
+            user.setGlobal_status(SSOUserGlobalStatus.ACTIVE);
             userDAO.insert(user, handler);
         });
     }
@@ -136,7 +147,7 @@ public class SSOService {
         });
     }
     
-    public void updateRole(Integer userId, Integer role, Handler<AsyncResult<UserEntity>> handler) {
+    public void updateRole(Integer userId, SSOUserRole role, Handler<AsyncResult<UserEntity>> handler) {
 		getById(userId, ar -> {
 			if (ar.failed() || ar.result() == null) {
 				handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));
@@ -149,7 +160,7 @@ public class SSOService {
 		});
 	}
     
-    public void updateStatus(Integer userId, Integer status, Handler<AsyncResult<UserEntity>> handler) {
+    public void updateStatus(Integer userId, SSOUserGlobalStatus status, Handler<AsyncResult<UserEntity>> handler) {
 		getById(userId, ar -> {
 			if(ar.failed() || ar.result() == null) {
 				handler.handle(Future.failedFuture(MessageUtil.notFound("User", "in the database")));

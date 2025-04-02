@@ -1,3 +1,5 @@
+USE miarma;
+
 -- MIARMACRAFT
 DROP TABLE IF EXISTS miarmacraft_suggestion_votes;
 DROP TABLE IF EXISTS miarmacraft_suggestion_tags;
@@ -26,7 +28,9 @@ CREATE TABLE users (
     email VARCHAR(64) UNIQUE,
     display_name VARCHAR(128) NOT NULL,
     password VARCHAR(256) NOT NULL,
+    avatar VARCHAR(128) DEFAULT NULL,
     global_status TINYINT NOT NULL DEFAULT 1, -- 0 = inactivo, 1 = activo
+    role INT NOT NULL DEFAULT 0  CHECK (role IN (0,1)), -- 0 = usuario, 1 = admin
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -34,7 +38,7 @@ CREATE TABLE users (
 /*
  * HUERTOS 
  */
-CREATE TABLE huertos_users (
+CREATE TABLE huertos_user_metadata (
 	user_id INT UNSIGNED PRIMARY KEY,
 	member_number INT NOT NULL UNIQUE,
 	plot_number INT NOT NULL,
@@ -57,7 +61,7 @@ CREATE TABLE huertos_incomes (
 	amount DECIMAL(10,2) NOT NULL,
 	type TINYINT, -- 0 = BANCO, 1 = CAJA
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (member_number) REFERENCES huertos_users(member_number) ON DELETE CASCADE
+	FOREIGN KEY (member_number) REFERENCES huertos_user_metadata(member_number) ON DELETE CASCADE
 );
 
 CREATE TABLE huertos_expenses (
@@ -127,7 +131,7 @@ CREATE TABLE huertos_announces (
 /*
  * MIARMACRAFT 
  */
-CREATE TABLE miarmacraft_users (
+CREATE TABLE miarmacraft_user_metadata (
 	user_id INT UNSIGNED PRIMARY KEY,
 	role INT NOT NULL DEFAULT 0, -- 0 = jugador, más roles añadibles
 	status TINYINT DEFAULT 1, -- 0 = inactivo, 1 = activo
@@ -169,3 +173,13 @@ CREATE TABLE miarmacraft_suggestion_votes (
     FOREIGN KEY (suggestion_id) REFERENCES miarmacraft_suggestions(suggestion_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+/*
+ * VISTAS
+ * */
+
+CREATE OR REPLACE VIEW v_incomes_with_full_names AS
+	SELECT i.income_id, i.member_number, u.display_name, i.concept, i.amount, i.type, i.created_at
+	FROM huertos_incomes i
+	JOIN huertos_user_metadata hum ON i.member_number = hum.member_number
+	JOIN users u ON hum.user_id = u.user_id;

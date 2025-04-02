@@ -7,6 +7,8 @@ import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
 import net.miarma.core.common.ConfigManager;
 import net.miarma.core.common.Constants;
+import net.miarma.core.common.Constants.SSOUserGlobalStatus;
+import net.miarma.core.common.Constants.SSOUserRole;
 import net.miarma.core.common.db.DatabaseProvider;
 import net.miarma.core.sso.api.SSODataRouter;
 import net.miarma.core.sso.entities.UserEntity;
@@ -167,7 +169,8 @@ public class SSODataVerticle extends AbstractVerticle  {
 	                break;
 	                
 	            case "updateStatus":
-	                ssoService.updateStatus(body.getInteger("userId"), body.getInteger("status"), ar -> {
+	                ssoService.updateStatus(body.getInteger("userId"), 
+	                		SSOUserGlobalStatus.fromInt(body.getInteger("status")), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply("Status updated successfully");
 	                    } else {
@@ -177,7 +180,8 @@ public class SSODataVerticle extends AbstractVerticle  {
 	                break;
 	                
 	            case "updateRole":
-	            	ssoService.updateRole(body.getInteger("userId"), body.getInteger("role"), ar -> {
+	            	ssoService.updateRole(body.getInteger("userId"), 
+	            			SSOUserRole.fromInt(body.getInteger("role")), ar -> {
 	                    if (ar.succeeded()) {
 	                        message.reply("Role updated successfully");
 	                    } else {

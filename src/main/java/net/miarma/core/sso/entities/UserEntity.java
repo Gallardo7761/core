@@ -2,6 +2,8 @@ package net.miarma.core.sso.entities;
 
 import io.vertx.sqlclient.Row;
 import net.miarma.core.common.APIDontReturn;
+import net.miarma.core.common.Constants.SSOUserGlobalStatus;
+import net.miarma.core.common.Constants.SSOUserRole;
 import net.miarma.core.common.Table;
 import net.miarma.core.common.db.AbstractEntity;
 
@@ -14,8 +16,8 @@ public class UserEntity extends AbstractEntity {
     @APIDontReturn
     private String password;
     private String avatar;
-    private int global_status;
-    private int role;
+    private SSOUserGlobalStatus global_status;
+    private SSOUserRole role;
 
     public UserEntity() { }
     public UserEntity(Row row) { super(row); }
@@ -32,8 +34,8 @@ public class UserEntity extends AbstractEntity {
     public void setPassword(String password) { this.password = password; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
-    public int getGlobal_status() { return global_status; }
-    public void setGlobal_status(int global_status) { this.global_status = global_status; }
-    public int getRole() { return role; }
-    public void setRole(int role) { this.role = role; }
+    public SSOUserGlobalStatus getGlobal_status() { return global_status; }
+    public void setGlobal_status(SSOUserGlobalStatus global_status) { this.global_status = global_status; }
+    public SSOUserRole getRole() { return role; }
+    public void setRole(SSOUserRole role) { this.role = role; }
 }

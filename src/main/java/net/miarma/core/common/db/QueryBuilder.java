@@ -14,16 +14,16 @@ public class QueryBuilder {
     private String sort;
     private String order;
     private String limit;
-    
+
     public QueryBuilder() {
         this.query = new StringBuilder();
     }
-    
+
     private static <T> String getTableName(Class<T> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("Class cannot be null");
         }
-        
+
         if (clazz.isAnnotationPresent(Table.class)) {
             Table annotation = clazz.getAnnotation(Table.class);
             return annotation.value();
@@ -34,7 +34,19 @@ public class QueryBuilder {
     public String getQuery() {
         return query.toString();
     }
-    
+
+    private static Object extractValue(Object fieldValue) {
+        if (fieldValue instanceof Enum<?>) {
+            try {
+                var method = fieldValue.getClass().getMethod("getValue");
+                return method.invoke(fieldValue);
+            } catch (Exception e) {
+                return ((Enum<?>) fieldValue).name(); // fallback
+            }
+        }
+        return fieldValue;
+    }
+
     public static <T> QueryBuilder select(Class<T> clazz, String... columns) {
         if (clazz == null) {
             throw new IllegalArgumentException("Class cannot be null");
@@ -44,7 +56,7 @@ public class QueryBuilder {
         String tableName = getTableName(clazz);
 
         qb.query.append("SELECT ");
-        
+
         if (columns.length == 0) {
             qb.query.append("* ");
         } else {
@@ -60,7 +72,7 @@ public class QueryBuilder {
         qb.query.append("FROM ").append(tableName).append(" ");
         return qb;
     }
-    
+
     public static <T> QueryBuilder where(QueryBuilder qb, T object) {
         if (qb == null || object == null) {
             throw new IllegalArgumentException("QueryBuilder and object cannot be null");
@@ -72,8 +84,9 @@ public class QueryBuilder {
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             try {
-                Object value = field.get(object);
-                if (value != null) {
+                Object fieldValue = field.get(object);
+                if (fieldValue != null) {
+                    Object value = extractValue(fieldValue);
                     if (value instanceof String) {
                         conditions.add(field.getName() + " = '" + value + "'");
                     } else {
@@ -88,10 +101,10 @@ public class QueryBuilder {
         if (!conditions.isEmpty()) {
             qb.query.append("WHERE ").append(String.join(" AND ", conditions)).append(" ");
         }
-        
+
         return qb;
     }
-    
+
     public static <T> QueryBuilder select(T object, String... columns) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
@@ -106,95 +119,98 @@ public class QueryBuilder {
             throw new IllegalArgumentException("Object cannot be null");
         }
 
-		QueryBuilder qb = new QueryBuilder();
-		String table = getTableName(object.getClass());
-		qb.query.append("INSERT INTO ").append(table).append(" ");
-		qb.query.append("(");
-		StringJoiner columns = new StringJoiner(", ");
-		StringJoiner values = new StringJoiner(", ");
-		for (Field field : object.getClass().getDeclaredFields()) {
-			field.setAccessible(true);
-			try {
-				columns.add(field.getName());
-				Object fieldValue = field.get(object);
-				if (fieldValue != null) {
-					if (fieldValue instanceof String) {
-						values.add("'" + fieldValue + "'");
-					} else {
-						values.add(fieldValue.toString());
-					}
-				} else {
-					values.add("NULL");
-				}
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
-			}
-		}
-		qb.query.append(columns).append(") ");
-		qb.query.append("VALUES (").append(values).append(") ");
-		return qb;
+        QueryBuilder qb = new QueryBuilder();
+        String table = getTableName(object.getClass());
+        qb.query.append("INSERT INTO ").append(table).append(" ");
+        qb.query.append("(");
+        StringJoiner columns = new StringJoiner(", ");
+        StringJoiner values = new StringJoiner(", ");
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                columns.add(field.getName());
+                Object fieldValue = field.get(object);
+                if (fieldValue != null) {
+                    Object value = extractValue(fieldValue);
+                    if (value instanceof String) {
+                        values.add("'" + value + "'");
+                    } else {
+                        values.add(value.toString());
+                    }
+                } else {
+                    values.add("NULL");
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+            }
+        }
+        qb.query.append(columns).append(") ");
+        qb.query.append("VALUES (").append(values).append(") ");
+        return qb;
     }
-    
+
     public static <T> QueryBuilder update(T object) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
 
-		QueryBuilder qb = new QueryBuilder();
-		String table = getTableName(object.getClass());
-		qb.query.append("UPDATE ").append(table).append(" ");
-		qb.query.append("SET ");
-		StringJoiner joiner = new StringJoiner(", ");
-		for (Field field : object.getClass().getDeclaredFields()) {
-			field.setAccessible(true);
-			try {
-				Object fieldValue = field.get(object);
-				if (fieldValue != null) {
-					if (fieldValue instanceof String) {
-						joiner.add(field.getName() + " = '" + fieldValue + "'");
-					} else {
-						joiner.add(field.getName() + " = " + fieldValue.toString());
-					}
-				} else {
-					joiner.add(field.getName() + " = NULL");
-				}
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
-			}
-		}
-		qb.query.append(joiner).append(" ");
-		return qb;
+        QueryBuilder qb = new QueryBuilder();
+        String table = getTableName(object.getClass());
+        qb.query.append("UPDATE ").append(table).append(" ");
+        qb.query.append("SET ");
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object fieldValue = field.get(object);
+                if (fieldValue != null) {
+                    Object value = extractValue(fieldValue);
+                    if (value instanceof String) {
+                        joiner.add(field.getName() + " = '" + value + "'");
+                    } else {
+                        joiner.add(field.getName() + " = " + value.toString());
+                    }
+                } else {
+                    joiner.add(field.getName() + " = NULL");
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+            }
+        }
+        qb.query.append(joiner).append(" ");
+        return qb;
     }
-    
+
     public static <T> QueryBuilder delete(T object) {
-		if (object == null) {
-			throw new IllegalArgumentException("Object cannot be null");
-		}
-		
-		QueryBuilder qb = new QueryBuilder();
-		String table = getTableName(object.getClass());
-		qb.query.append("DELETE FROM ").append(table).append(" ");
-		qb.query.append("WHERE ");
-		StringJoiner joiner = new StringJoiner(" AND ");
-		for (Field field : object.getClass().getDeclaredFields()) {
-			field.setAccessible(true);
-			try {
-				Object fieldValue = field.get(object);
-				if (fieldValue != null) {
-					if (fieldValue instanceof String) {
-						joiner.add(field.getName() + " = '" + fieldValue + "'");
-					} else {
-						joiner.add(field.getName() + " = " + fieldValue.toString());
-					}
-				}
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
-			}
-		}
-		qb.query.append(joiner).append(" ");
-		return qb;
+        if (object == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+
+        QueryBuilder qb = new QueryBuilder();
+        String table = getTableName(object.getClass());
+        qb.query.append("DELETE FROM ").append(table).append(" ");
+        qb.query.append("WHERE ");
+        StringJoiner joiner = new StringJoiner(" AND ");
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object fieldValue = field.get(object);
+                if (fieldValue != null) {
+                    Object value = extractValue(fieldValue);
+                    if (value instanceof String) {
+                        joiner.add(field.getName() + " = '" + value + "'");
+                    } else {
+                        joiner.add(field.getName() + " = " + value.toString());
+                    }
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+            }
+        }
+        qb.query.append(joiner).append(" ");
+        return qb;
     }
-    
+
     public QueryBuilder orderBy(Optional<String> column, Optional<String> order) {
         column.ifPresent(c -> {
             sort = "ORDER BY " + c + " ";
@@ -204,21 +220,21 @@ public class QueryBuilder {
         });
         return this;
     }
-    
+
     public QueryBuilder limit(Optional<Integer> limitParam) {
-    	limitParam.ifPresent(param -> limit = "LIMIT " + param + " ");
+        limitParam.ifPresent(param -> limit = "LIMIT " + param + " ");
         return this;
     }
 
     public String build() {
         if (order != null && !order.isEmpty()) {
-        	query.append(order);
+            query.append(order);
         }
         if (sort != null && !sort.isEmpty()) {
-        	query.append(sort);
+            query.append(sort);
         }
         if (limit != null && !limit.isEmpty()) {
-        	query.append(limit);
+            query.append(limit);
         }
         return query.toString().trim() + ";";
     }

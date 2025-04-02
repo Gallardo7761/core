@@ -19,24 +19,44 @@ public class AbstractEntity {
         for (Field field : fields) {
             try {
                 field.setAccessible(true);
-                Object value = switch (field.getType().getSimpleName()) {
-                    case "Integer" -> row.getInteger(field.getName());
-                    case "String" -> row.getString(field.getName());
-                    case "Double" -> row.getDouble(field.getName());
-                    case "Long" -> row.getLong(field.getName());
-                    case "Boolean" -> row.getBoolean(field.getName());
-                    case "int" -> row.getInteger(field.getName());
-                    case "double" -> row.getDouble(field.getName());
-                    case "long" -> row.getLong(field.getName());
-                    case "boolean" -> row.getBoolean(field.getName());
-                    default -> null;
-                };
+                Class<?> type = field.getType();
+                String name = field.getName();
+
+                Object value;
+                if (type.isEnum()) {
+                    Integer intValue = row.getInteger(name);
+                    if (intValue != null) {
+                        try {
+                            var method = type.getMethod("fromInt", int.class);
+                            value = method.invoke(null, intValue);
+                        } catch (Exception e) {
+                            value = null;
+                        }
+                    } else {
+                        value = null;
+                    }
+                } else {
+                    value = switch (type.getSimpleName()) {
+                        case "Integer" -> row.getInteger(name);
+                        case "String" -> row.getString(name);
+                        case "Double" -> row.getDouble(name);
+                        case "Long" -> row.getLong(name);
+                        case "Boolean" -> row.getBoolean(name);
+                        case "int" -> row.getInteger(name);
+                        case "double" -> row.getDouble(name);
+                        case "long" -> row.getLong(name);
+                        case "boolean" -> row.getBoolean(name);
+                        default -> null;
+                    };
+                }
+
                 field.set(this, value);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
 
     public String encode() {
         JsonObject json = new JsonObject();
@@ -48,7 +68,17 @@ public class AbstractEntity {
             field.setAccessible(true);
             try {
                 Object value = field.get(this);
-                json.put(field.getName(), value);
+                if (value instanceof Enum<?>) {
+                    try {
+                        var method = value.getClass().getMethod("getValue");
+                        Object enumValue = method.invoke(value);
+                        json.put(field.getName(), enumValue);
+                    } catch (Exception e) {
+                        json.put(field.getName(), ((Enum<?>) value).name());
+                    }
+                } else {
+                    json.put(field.getName(), value);
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -56,4 +86,5 @@ public class AbstractEntity {
 
         return json.encode();
     }
+
 }

@@ -35,7 +35,7 @@ public class LogicHandler {
                         		.encode());
             } else {
                 ctx.response().setStatusCode(401).end(
-                	gson.toJson(SingleJsonResponse.of("Error requesting the event bus"))
+                	gson.toJson(SingleJsonResponse.of("The user is inactive or banned"))
         		);
             }
         });
