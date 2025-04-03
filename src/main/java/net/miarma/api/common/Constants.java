@@ -18,6 +18,8 @@ public class Constants {
 	
     public static final String AUTH_EVENT_BUS = "auth.eventbus";
     public static final String CORE_EVENT_BUS = "core.eventbus";
+    public static final String HUERTOS_EVENT_BUS = "huertos.eventbus";
+    public static final String MMC_EVENT_BUS = "mmc.eventbus";
     
     public static Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
     

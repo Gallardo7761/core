@@ -1,5 +1,5 @@
 package net.miarma.api.huertos.handlers;
 
-public class RequestHandler {
+public class BalanceDataHandler {
 
 }

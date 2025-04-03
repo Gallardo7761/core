@@ -29,7 +29,7 @@ public class CoreDataVerticle extends AbstractVerticle {
         fileService = new FileService(pool);
         Router router = Router.router(vertx);
         CoreDataRouter.mount(router, vertx, pool);
-        registerAuthConsumer();
+        registerLogicVerticleConsumer();
 
         vertx.createHttpServer()
             .requestHandler(router)
@@ -39,7 +39,7 @@ public class CoreDataVerticle extends AbstractVerticle {
             });
     }
 
-    private void registerAuthConsumer() {
+    private void registerLogicVerticleConsumer() {
         vertx.eventBus().consumer(Constants.AUTH_EVENT_BUS, message -> {
             JsonObject body = (JsonObject) message.body();
             String action = body.getString("action");
