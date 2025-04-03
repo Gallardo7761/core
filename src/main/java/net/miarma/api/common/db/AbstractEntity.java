@@ -2,7 +2,6 @@ package net.miarma.api.common.db;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
@@ -38,9 +37,7 @@ public abstract class AbstractEntity {
                     } else {
                         value = null;
                     }
-                } else if(type.isInstance(LocalDateTime.class)) {
-					value = row.getLocalDateTime(name);
-				} else {
+                } else {
                     value = switch (type.getSimpleName()) {
                         case "Integer" -> row.getInteger(name);
                         case "String" -> row.getString(name);

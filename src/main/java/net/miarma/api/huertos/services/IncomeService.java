@@ -28,6 +28,23 @@ public class IncomeService {
 			return Future.succeededFuture(income);
 		});
 	}
+	
+	public Future<List<IncomeEntity>> getUserPayments(Integer memberNumber) {
+		return getAll().compose(incomes -> {
+			List<IncomeEntity> userPayments = incomes.stream()
+				.filter(i -> i.getMember_number().equals(memberNumber))
+				.toList();
+			return Future.succeededFuture(userPayments);
+		});
+	}
+	
+	public Future<Boolean> hasPaid(Integer memberNumber) {
+		return getUserPayments(memberNumber).compose(incomes -> {
+			boolean hasPaid = incomes.stream()
+				.anyMatch(IncomeEntity::isPaid);
+			return Future.succeededFuture(hasPaid);
+		});
+	}
 
 	public Future<IncomeEntity> create(IncomeEntity income) {
 		return incomeDAO.insert(income);

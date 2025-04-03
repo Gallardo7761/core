@@ -2,6 +2,7 @@ package net.miarma.api.huertos.entities;
 
 import java.time.LocalDateTime;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
@@ -22,6 +23,15 @@ public class UserMetadataEntity extends AbstractEntity {
 	private HuertosUserType type;
 	private HuertosUserStatus status;
 	private HuertosUserRole role;
+		
+	
+	public UserMetadataEntity() {
+		super();
+	}
+	
+	public UserMetadataEntity(Row row) {
+	    super(row);
+	}
 	
 	public Integer getUser_id() {
 		return user_id;

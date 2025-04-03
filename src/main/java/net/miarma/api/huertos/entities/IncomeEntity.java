@@ -61,7 +61,15 @@ public class IncomeEntity extends AbstractEntity {
 		this.created_at = created_at;
 	}
 	
-	
+	public boolean isPaid() {
+		if(frequency == HuertosPaymentFrequency.BIYEARLY) {
+			return (System.currentTimeMillis() - created_at) > 6 * 30 * 24 * 60 * 60 * 1000;
+		} else if(frequency == HuertosPaymentFrequency.YEARLY) {
+			return (System.currentTimeMillis() - created_at) > 12 * 30 * 24 * 60 * 60 * 1000;
+		} else {
+			return false;
+		}
+	}
 	
 	
 }

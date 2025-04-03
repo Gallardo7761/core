@@ -29,16 +29,17 @@ public class MemberService {
         this.userService = new UserService(pool);
     }
     
-    public Future<JsonObject> login(String emailOrUserName, String password) {
-        return userService.login(emailOrUserName, password).compose(json -> {
+    public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {
+        return userService.login(emailOrUserName, password, keepLoggedIn).compose(json -> {
             JsonObject loggedUserJson = json.getJsonObject("loggedUser");
             UserEntity user = Constants.GSON.fromJson(loggedUserJson.encode(), UserEntity.class);
-
+            
             return userMetadataDAO.getAll().map(metadataList -> {
                 UserMetadataEntity metadata = metadataList.stream()
                     .filter(meta -> meta.getUser_id().equals(user.getUser_id()))
                     .findFirst()
                     .orElse(null);
+
 
                 MemberEntity member = new MemberEntity(user, metadata);
 

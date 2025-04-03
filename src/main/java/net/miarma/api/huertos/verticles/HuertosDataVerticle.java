@@ -66,13 +66,53 @@ public class HuertosDataVerticle extends AbstractVerticle {
             
             switch (action) {
             	case "login" -> {
-            		String emailOrUserName = body.getString("email") != null ? 
-							body.getString("email") : body.getString("userName");
+            		String emailOrUserName = body.getString("emailOrUserName");
             		String password = body.getString("password");
+            		boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
             		
-            		memberService.login(emailOrUserName, password)
+            		memberService.login(emailOrUserName, password, keepLoggedIn)
 	            		.onSuccess(res -> message.reply(res))
 	            		.onFailure(err -> message.fail(401, err.getMessage()));
+            	}
+            	
+            	case "getByMemberNumber" -> {
+					Integer memberNumber = body.getInteger("memberNumber");
+					
+					memberService.getByMemberNumber(memberNumber)
+	            		.onSuccess(res -> message.reply(res))
+	            		.onFailure(err -> message.fail(404, err.getMessage()));
+				}
+            	
+            	case "getByPlotNumber" -> {
+					Integer plotNumber = body.getInteger("plotNumber");
+					
+					memberService.getByPlotNumber(plotNumber)
+	            		.onSuccess(res -> message.reply(res))
+	            		.onFailure(err -> message.fail(404, err.getMessage()));
+            	}
+            	
+            	case "getByDNI" -> {
+					String dni = body.getString("dni");
+					
+					memberService.getByDni(dni)
+						.onSuccess(res -> message.reply(res))
+						.onFailure(err -> message.fail(404, err.getMessage()));
+            	}
+            	
+            	case "getUserPayments" -> {
+					Integer memberNumber = body.getInteger("memberNumber");
+					
+					incomeService.getUserPayments(memberNumber)
+						.onSuccess(res -> message.reply(res))
+						.onFailure(err -> message.fail(404, err.getMessage()));
+            	}
+            	
+            	case "hasPaid" -> {
+            		Integer memberNumber = body.getInteger("memberNumber");
+            		
+            		incomeService.hasPaid(memberNumber)
+						.onSuccess(res -> message.reply(res))
+						.onFailure(err -> message.fail(404, err.getMessage()));
             	}
             
             	default -> message.fail(400, "Unknown action: " + action);

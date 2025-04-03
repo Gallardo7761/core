@@ -24,7 +24,7 @@ public class UserService {
     /* AUTHENTICATION */
 
     public Future<JsonObject> login(String emailOrUsername, String plainPassword, boolean keepLoggedIn) {
-        return getByEmail(emailOrUsername).compose(user -> {
+    	return getByEmail(emailOrUsername).compose(user -> {
             if (user == null) {
                 return getByUserName(emailOrUsername);
             }
@@ -40,27 +40,6 @@ public class UserService {
 
             JWTManager jwtManager = JWTManager.getInstance();
             String token = jwtManager.generateToken(user, keepLoggedIn);
-
-            JsonObject response = new JsonObject()
-                .put("token", token)
-                .put("loggedUser", new JsonObject(user.encode()));
-
-            return Future.succeededFuture(response);
-        });
-    }
-
-    public Future<JsonObject> login(String userName, String plainPassword) {
-        return getByUserName(userName).compose(user -> {
-            if (user == null || user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
-                return Future.failedFuture("Invalid credentials");
-            }
-
-            if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
-                return Future.failedFuture("Invalid credentials");
-            }
-
-            JWTManager jwtManager = JWTManager.getInstance();
-            String token = jwtManager.generateToken(user, false);
 
             JsonObject response = new JsonObject()
                 .put("token", token)
@@ -116,12 +95,12 @@ public class UserService {
     }
 
     public Future<UserEntity> getByEmail(String email) {
-        return userDAO.getAll().map(users ->
-            users.stream()
-                .filter(user -> email.equals(user.getEmail()))
-                .findFirst()
-                .orElse(null)
-        );
+    	return userDAO.getAll().map(users -> {
+    	    return users.stream()
+    	        .filter(user -> email.equals(user.getEmail()))
+    	        .findFirst()
+    	        .orElse(null);
+    	});
     }
 
     public Future<UserEntity> getByUserName(String userName) {
