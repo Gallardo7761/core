@@ -225,6 +225,11 @@ public class QueryBuilder {
         limitParam.ifPresent(param -> limit = "LIMIT " + param + " ");
         return this;
     }
+    
+    public QueryBuilder offset(Optional<Integer> offsetParam) {
+		offsetParam.ifPresent(param -> limit += "OFFSET " + param + " ");
+		return this;
+	}
 
     public String build() {
         if (order != null && !order.isEmpty()) {

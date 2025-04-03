@@ -10,6 +10,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants.CoreFileContext;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.core.dao.FileDAO;
 import net.miarma.api.core.entities.FileEntity;
 import net.miarma.api.util.MessageUtil;
@@ -22,8 +23,8 @@ public class FileService {
         this.fileDAO = new FileDAO(pool);
     }
 
-    public Future<List<FileEntity>> getAll() {
-        return fileDAO.getAll();
+    public Future<List<FileEntity>> getAll(QueryFilters filters) {
+        return fileDAO.getAll(filters);
     }
 
     public Future<FileEntity> getById(Integer id) {

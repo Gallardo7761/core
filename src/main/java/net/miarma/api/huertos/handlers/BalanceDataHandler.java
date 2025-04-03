@@ -3,6 +3,7 @@ package net.miarma.api.huertos.handlers;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.huertos.entities.BalanceEntity;
 import net.miarma.api.huertos.services.BalanceService;
 
@@ -14,7 +15,7 @@ public class BalanceDataHandler {
 		this.balanceService = new BalanceService(pool);
 	}
 	
-	public void getBalance(RoutingContext ctx) {
+	public void getBalance(RoutingContext ctx) {	
 		balanceService.getBalance().onSuccess(balance -> {
 			ctx.response().putHeader("Content-Type", "application/json").end(balance.encode());
 		}).onFailure(err -> {

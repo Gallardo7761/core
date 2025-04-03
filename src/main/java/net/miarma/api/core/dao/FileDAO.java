@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.db.DatabaseManager;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.core.entities.FileEntity;
@@ -20,8 +21,17 @@ public class FileDAO implements DataAccessObject<FileEntity> {
 
     @Override
     public Future<List<FileEntity>> getAll() {
+        return getAll(new QueryFilters());
+    }
+    
+    public Future<List<FileEntity>> getAll(QueryFilters filters) {
         Promise<List<FileEntity>> promise = Promise.promise();
-        String query = QueryBuilder.select(FileEntity.class).build();
+        String query = QueryBuilder
+        		.select(FileEntity.class)
+        		.orderBy(filters.getSort(), filters.getOrder())
+        		.limit(filters.getLimit())
+        		.offset(filters.getOffset())
+        		.build();
 
         db.execute(query, FileEntity.class,
             list -> promise.complete(list.isEmpty() ? List.of() : list),

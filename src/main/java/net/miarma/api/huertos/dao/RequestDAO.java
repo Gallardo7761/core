@@ -5,8 +5,9 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.db.DatabaseManager;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.db.DataAccessObject;
+import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.huertos.entities.RequestEntity;
 
@@ -20,8 +21,17 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
 
     @Override
     public Future<List<RequestEntity>> getAll() {
+        return getAll(new QueryFilters());
+    }
+    
+    public Future<List<RequestEntity>> getAll(QueryFilters filters) {
         Promise<List<RequestEntity>> promise = Promise.promise();
-        String query = QueryBuilder.select(RequestEntity.class).build();
+        String query = QueryBuilder
+        		.select(RequestEntity.class)
+        		.orderBy(filters.getSort(), filters.getOrder())
+        		.limit(filters.getLimit())
+        		.offset(filters.getOffset())
+        		.build();
 
         db.execute(query, RequestEntity.class,
             list -> promise.complete(list.isEmpty() ? List.of() : list),

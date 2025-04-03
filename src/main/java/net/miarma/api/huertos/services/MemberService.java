@@ -8,6 +8,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
+import net.miarma.api.common.Constants.HuertosUserType;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
@@ -107,6 +108,20 @@ public class MemberService {
 				.filter(member -> member.getMetadata().getPhone().equals(phone))
 				.findFirst()
 				.orElse(null));
+	}
+	
+	public Future<List<MemberEntity>> getWaitlist() {
+		return getAll().map(list -> list.stream()
+				.filter(member -> member.getMetadata().getType().equals(HuertosUserType.WAIT_LIST))
+				.toList());
+	}
+	
+	public Future<Integer> getLastMemberNumber() {
+		return getAll().map(list -> list.stream()
+				.filter(member -> member.getMetadata().getType().equals(HuertosUserType.MEMBER))
+				.map(member -> member.getMetadata().getMember_number())
+				.max(Integer::compareTo)
+				.orElse(0));
 	}
 	
 	public Future<MemberEntity> updateRole(Integer userId, CoreUserRole role) {

@@ -139,4 +139,38 @@ public class MemberLogicHandler {
 		});
 		
 	}
+	
+	public void getWaitlist(RoutingContext ctx) {
+		JsonObject request = new JsonObject()
+				.put("action", "getWaitlist");
+		
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) {
+				ctx.response().putHeader("Content-Type", "application/json")
+						.end(((JsonObject) ar.result().body()).encode());
+			} else {
+				ctx.response().setStatusCode(404).end(
+					Constants.GSON.toJson(SingleJsonResponse.of("Waitlist not found"))
+				);
+			}
+		});
+		
+	}
+	
+	public void getLastMemberNumber(RoutingContext ctx) {
+		JsonObject request = new JsonObject()
+				.put("action", "getLastMemberNumber");
+		
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) {
+				ctx.response().putHeader("Content-Type", "application/json")
+						.end(((JsonObject) ar.result().body()).encode());
+			} else {
+				ctx.response().setStatusCode(404).end(
+					Constants.GSON.toJson(SingleJsonResponse.of("Last member number not found"))
+				);
+			}
+		});
+		
+	}
 }

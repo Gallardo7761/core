@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.core.entities.FileEntity;
 import net.miarma.api.core.services.FileService;
@@ -19,7 +20,9 @@ public class FileDataHandler {
     }
 
     public void getAll(RoutingContext ctx) {
-        fileService.getAll().onSuccess(files -> {
+    	QueryFilters filters = QueryFilters.from(ctx);
+    	
+        fileService.getAll(filters).onSuccess(files -> {
             String result = files.stream()
                 .map(u -> Constants.GSON.toJson(u, FileEntity.class))
                 .collect(Collectors.joining(", ", "[", "]"));

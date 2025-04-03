@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.huertos.dao.RequestDAO;
 import net.miarma.api.huertos.entities.RequestEntity;
 
@@ -15,12 +16,12 @@ public class RequestService {
 		this.requestDAO = new RequestDAO(pool);
 	}
 
-	public Future<List<RequestEntity>> getAll() {
-		return requestDAO.getAll();
+	public Future<List<RequestEntity>> getAll(QueryFilters filters) {
+		return requestDAO.getAll(filters);
 	}
 
 	public Future<RequestEntity> getById(Integer id) {
-		return getAll().compose(requests -> {
+		return requestDAO.getAll().compose(requests -> {
 			RequestEntity request = requests.stream()
 				.filter(r -> r.getRequest_id().equals(id))
 				.findFirst()

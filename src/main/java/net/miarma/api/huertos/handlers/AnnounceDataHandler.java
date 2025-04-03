@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.huertos.entities.AnnounceEntity;
 import net.miarma.api.huertos.services.AnnounceService;
@@ -18,7 +19,9 @@ public class AnnounceDataHandler {
 	}
 	
 	public void getAll(RoutingContext ctx) {
-		announceService.getAll().onSuccess(announces -> {
+		QueryFilters filters = QueryFilters.from(ctx);
+		
+		announceService.getAll(filters).onSuccess(announces -> {
 			String result = announces.stream()
 					.map(a -> Constants.GSON.toJson(a, AnnounceEntity.class))
 					.collect(Collectors.joining(", ", "[", "]"));

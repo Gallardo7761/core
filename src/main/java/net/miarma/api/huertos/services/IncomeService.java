@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
 
@@ -15,12 +16,12 @@ public class IncomeService {
 		this.incomeDAO = new IncomeDAO(pool);
 	}
 
-	public Future<List<IncomeEntity>> getAll() {
-		return incomeDAO.getAll();
+	public Future<List<IncomeEntity>> getAll(QueryFilters filters) {
+		return incomeDAO.getAll(filters);
 	}
 
 	public Future<IncomeEntity> getById(Integer id) {
-		return getAll().compose(incomes -> {
+		return incomeDAO.getAll().compose(incomes -> {
 			IncomeEntity income = incomes.stream()
 				.filter(i -> i.getIncome_id().equals(id))
 				.findFirst()
@@ -30,7 +31,7 @@ public class IncomeService {
 	}
 	
 	public Future<List<IncomeEntity>> getUserPayments(Integer memberNumber) {
-		return getAll().compose(incomes -> {
+		return incomeDAO.getAll().compose(incomes -> {
 			List<IncomeEntity> userPayments = incomes.stream()
 				.filter(i -> i.getMember_number().equals(memberNumber))
 				.toList();

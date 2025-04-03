@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.huertos.dao.PreUserDAO;
 import net.miarma.api.huertos.entities.PreUserEntity;
 
@@ -15,12 +16,12 @@ public class PreUserService {
 		this.preUserDAO = new PreUserDAO(pool);
 	}
 
-	public Future<List<PreUserEntity>> getAll() {
-		return preUserDAO.getAll();
+	public Future<List<PreUserEntity>> getAll(QueryFilters filters) {
+		return preUserDAO.getAll(filters);
 	}
 
 	public Future<PreUserEntity> getById(Integer id) {
-		return getAll().compose(preUsers -> {
+		return preUserDAO.getAll().compose(preUsers -> {
 			PreUserEntity preUser = preUsers.stream()
 				.filter(p -> p.getPre_user_id().equals(id))
 				.findFirst()

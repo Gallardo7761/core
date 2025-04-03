@@ -112,6 +112,22 @@ public class HuertosDataVerticle extends AbstractVerticle {
 						})
 						.onFailure(err -> message.fail(404, err.getMessage()));
 				}
+				
+				case "getWaitlist" -> {
+					memberService.getWaitlist()
+						.onSuccess(res -> {
+							message.reply(new JsonObject().put("waitlist", Constants.GSON.toJson(res)));
+						})
+						.onFailure(err -> message.fail(404, err.getMessage()));
+				}
+				
+				case "getLastMemberNumber" -> {
+					memberService.getLastMemberNumber()
+						.onSuccess(res -> {
+							message.reply(new JsonObject().put("lastMemberNumber", res));
+						})
+						.onFailure(err -> message.fail(404, err.getMessage()));
+				}
 
 				default -> message.fail(400, "Unknown action: " + action);
 			}
