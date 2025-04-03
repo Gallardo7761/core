@@ -23,8 +23,13 @@ public class UserService {
 
     /* AUTHENTICATION */
 
-    public Future<JsonObject> login(String email, String plainPassword, boolean keepLoggedIn) {
-        return getByEmail(email).compose(user -> {
+    public Future<JsonObject> login(String emailOrUsername, String plainPassword, boolean keepLoggedIn) {
+        return getByEmail(emailOrUsername).compose(user -> {
+            if (user == null) {
+                return getByUserName(emailOrUsername);
+            }
+            return Future.succeededFuture(user);
+        }).compose(user -> {
             if (user == null || user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
                 return Future.failedFuture("Invalid credentials");
             }
