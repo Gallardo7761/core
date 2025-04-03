@@ -14,6 +14,7 @@ import net.miarma.api.core.api.CoreDataRouter;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.FileService;
 import net.miarma.api.core.services.UserService;
+import net.miarma.api.util.RouterUtil;
 
 @SuppressWarnings("unused")
 public class CoreDataVerticle extends AbstractVerticle {
@@ -28,6 +29,7 @@ public class CoreDataVerticle extends AbstractVerticle {
         userService = new UserService(pool);
         fileService = new FileService(pool);
         Router router = Router.router(vertx);
+        RouterUtil.attachLogger(router);
         CoreDataRouter.mount(router, vertx, pool);
         registerLogicVerticleConsumer();
 

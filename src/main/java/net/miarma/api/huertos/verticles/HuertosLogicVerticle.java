@@ -7,6 +7,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.huertos.api.HuertosLogicRouter;
+import net.miarma.api.util.RouterUtil;
 
 public class HuertosLogicVerticle extends AbstractVerticle{
 	private ConfigManager configManager;
@@ -16,6 +17,7 @@ public class HuertosLogicVerticle extends AbstractVerticle{
 		configManager = ConfigManager.getInstance();
 		Pool pool = DatabaseProvider.createPool(vertx, configManager);
 		Router router = Router.router(vertx);
+		RouterUtil.attachLogger(router);
 		HuertosLogicRouter.mount(router, vertx, pool);
 		
 		vertx.createHttpServer()

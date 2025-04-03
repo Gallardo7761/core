@@ -7,6 +7,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.core.api.CoreLogicRouter;
+import net.miarma.api.util.RouterUtil;
 
 public class CoreLogicVerticle extends AbstractVerticle {
 	ConfigManager configManager;
@@ -16,6 +17,7 @@ public class CoreLogicVerticle extends AbstractVerticle {
 		configManager = ConfigManager.getInstance();
 		Pool pool = DatabaseProvider.createPool(vertx, configManager);
 		Router router = Router.router(vertx);
+		RouterUtil.attachLogger(router);
 		CoreLogicRouter.mount(router, vertx, pool);
 				
 		vertx.createHttpServer()

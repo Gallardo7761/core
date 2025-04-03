@@ -11,6 +11,7 @@ import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.huertos.api.HuertosDataRouter;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
+import net.miarma.api.util.RouterUtil;
 
 public class HuertosDataVerticle extends AbstractVerticle {
 	
@@ -27,6 +28,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
         incomeService = new IncomeService(pool);
         
         Router router = Router.router(vertx);
+        RouterUtil.attachLogger(router);
         HuertosDataRouter.mount(router, vertx, pool);
         registerLogicVerticleConsumer();
 
