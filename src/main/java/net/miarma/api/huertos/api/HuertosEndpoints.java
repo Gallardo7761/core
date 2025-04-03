@@ -14,6 +14,7 @@ public class HuertosEndpoints {
 	public static final String USER_BY_DNI = Constants.HUERTOS_PREFIX + "/users/dni/:dni";
 	public static final String USER_PAYMENTS = Constants.HUERTOS_PREFIX + "/users/:member_number/incomes";
 	public static final String USER_HAS_PAID = Constants.HUERTOS_PREFIX + "/users/:member_number/haspaid";
+	public static final String USER_WAITLIST = Constants.HUERTOS_PREFIX + "/users/waitlist";
 	
 	// ingresos -> GET, POST, PUT, DELETE
 	public static final String INCOMES = Constants.HUERTOS_PREFIX + "/incomes";

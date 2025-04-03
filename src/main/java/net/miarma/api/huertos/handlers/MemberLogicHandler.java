@@ -41,7 +41,7 @@ public class MemberLogicHandler {
 	}
 	
 	public void getByMemberNumber(RoutingContext ctx) {
-		String memberNumber = ctx.request().getParam("member_number");
+		Integer memberNumber = Integer.parseInt(ctx.request().getParam("member_number"));
 		
 		JsonObject request = new JsonObject()
 				.put("action", "getByMemberNumber")
@@ -61,7 +61,7 @@ public class MemberLogicHandler {
 	}
 	
 	public void getByPlotNumber(RoutingContext ctx) {
-		String plotNumber = ctx.request().getParam("plot_number");
+		Integer plotNumber = Integer.parseInt(ctx.request().getParam("plot_number"));
 		
 		JsonObject request = new JsonObject()
 				.put("action", "getByPlotNumber")
@@ -80,7 +80,7 @@ public class MemberLogicHandler {
 		
 	}
 	
-	public void getByDNI(RoutingContext ctx) {
+	public void getByDni(RoutingContext ctx) {
 		String dni = ctx.request().getParam("dni");
 		
 		JsonObject request = new JsonObject()
@@ -101,7 +101,7 @@ public class MemberLogicHandler {
 	}
 	
 	public void getUserPayments(RoutingContext ctx) {
-		String memberNumber = ctx.request().getParam("member_number");
+		Integer memberNumber = Integer.parseInt(ctx.request().getParam("member_number"));
 		
 		JsonObject request = new JsonObject()
 				.put("action", "getUserPayments")
@@ -121,7 +121,7 @@ public class MemberLogicHandler {
 	}
 	
 	public void hasPaid(RoutingContext ctx) {
-		String memberNumber = ctx.request().getParam("member_number");
+		Integer memberNumber = Integer.parseInt(ctx.request().getParam("member_number"));
 		
 		JsonObject request = new JsonObject()
 				.put("action", "hasPaid")
