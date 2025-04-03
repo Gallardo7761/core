@@ -26,8 +26,6 @@ public class CoreLogicRouter {
 		router.put(CoreEndpoints.USER_STATUS).handler(AuthGuard.admin()).handler(hUserLogic::updateStatus);
 		router.get(CoreEndpoints.USER_ROLE).handler(AuthGuard.check()).handler(hUserLogic::getRole);
 		router.put(CoreEndpoints.USER_ROLE).handler(AuthGuard.admin()).handler(hUserLogic::updateRole);
-		router.get(CoreEndpoints.USER_BY_EMAIL).handler(AuthGuard.check()).handler(hUserLogic::getByEmail);
-		router.get(CoreEndpoints.USER_BY_USERNAME).handler(AuthGuard.check()).handler(hUserLogic::getByUserName);
 		router.get(CoreEndpoints.USER_AVATAR).handler(AuthGuard.check()).handler(hUserLogic::getAvatar);
 		
 		router.get(CoreEndpoints.FILE_DOWNLOAD).handler(AuthGuard.check()).handler(hFileLogic::downloadFile);

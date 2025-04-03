@@ -1,12 +1,15 @@
 package net.miarma.api.huertos.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.db.DatabaseManager;
+import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.db.DataAccessObject;
+import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 
@@ -20,8 +23,18 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 
 	@Override
 	public Future<List<UserMetadataEntity>> getAll() {
+		return getAll(new QueryParams(Map.of(), new QueryFilters()));
+	}
+	
+	public Future<List<UserMetadataEntity>> getAll(QueryParams params) {
 		Promise<List<UserMetadataEntity>> promise = Promise.promise();
-		String query = QueryBuilder.select(UserMetadataEntity.class).build();
+		String query = QueryBuilder
+				.select(UserMetadataEntity.class)
+				.where(params.getFilters())
+				.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+				.limit(params.getQueryFilters().getLimit())
+				.offset(params.getQueryFilters().getOffset())
+				.build();
 
 		db.execute(query, UserMetadataEntity.class,
 			list -> promise.complete(list.isEmpty() ? List.of() : list),

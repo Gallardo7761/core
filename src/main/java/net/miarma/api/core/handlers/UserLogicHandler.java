@@ -155,40 +155,6 @@ public class UserLogicHandler {
         });
     }
 
-    public void getByEmail(RoutingContext ctx) {
-        String email = ctx.pathParam("email");
-
-        JsonObject request = new JsonObject()
-                .put("action", "getByEmail")
-                .put("email", email);
-
-        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
-            if (ar.succeeded()) {
-                ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
-            } else {
-                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
-            }
-        });
-    }
-
-    public void getByUserName(RoutingContext ctx) {
-        String username = ctx.pathParam("user_name");
-
-        JsonObject request = new JsonObject()
-                .put("action", "getByUserName")
-                .put("userName", username);
-
-        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
-            if (ar.succeeded()) {
-                ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
-            } else {
-                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
-            }
-        });
-    }
-
     public void getStatus(RoutingContext ctx) {
         String userId = ctx.pathParam("user_id");
 

@@ -3,6 +3,7 @@ package net.miarma.api.common.db;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 
@@ -104,6 +105,33 @@ public class QueryBuilder {
 
         return qb;
     }
+    
+    public QueryBuilder where(Map<String, String> filters) {
+        if (filters == null || filters.isEmpty()) {
+            return this;
+        }
+
+        List<String> conditions = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            // Detectar si es número o texto (rudimentario, pero efectivo)
+            if (value.matches("-?\\d+(\\.\\d+)?")) {
+                conditions.add(key + " = " + value);
+            } else {
+                conditions.add(key + " = '" + value + "'");
+            }
+        }
+
+        if (!conditions.isEmpty()) {
+            query.append("WHERE ").append(String.join(" AND ", conditions)).append(" ");
+        }
+
+        return this;
+    }
+
 
     public static <T> QueryBuilder select(T object, String... columns) {
         if (object == null) {

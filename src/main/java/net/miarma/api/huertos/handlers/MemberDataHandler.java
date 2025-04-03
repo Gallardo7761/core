@@ -3,6 +3,7 @@ package net.miarma.api.huertos.handlers;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.services.MemberService;
@@ -16,7 +17,9 @@ public class MemberDataHandler {
 	}
 	
 	public void getAll(RoutingContext ctx) {
-		memberService.getAll().onSuccess(members -> {
+		QueryParams params = QueryParams.from(ctx);
+		
+		memberService.getAll(params).onSuccess(members -> {
 			ctx.response()
 			    .putHeader("Content-Type", "application/json")
 			    .setStatusCode(200).end(Constants.GSON.toJson(members));

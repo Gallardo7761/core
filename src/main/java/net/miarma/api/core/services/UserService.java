@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
-import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
@@ -82,8 +82,8 @@ public class UserService {
 
     /* USERS OPERATIONS */
 
-    public Future<List<UserEntity>> getAll(QueryFilters filters) {
-        return userDAO.getAll(filters);
+    public Future<List<UserEntity>> getAll(QueryParams params) {
+        return userDAO.getAll(params);
     }
 
     public Future<UserEntity> getById(Integer id) {

@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.huertos.entities.IncomeEntity;
 import net.miarma.api.huertos.services.IncomeService;
@@ -19,9 +19,9 @@ public class IncomeDataHandler {
 	}
 	
 	public void getAll(RoutingContext ctx) {
-		QueryFilters filters = QueryFilters.from(ctx);
+		QueryParams params= QueryParams.from(ctx);
 		
-		incomeService.getAll(filters).onSuccess(incomes -> {
+		incomeService.getAll(params).onSuccess(incomes -> {
 				String result = incomes.stream()
 						.map(e -> Constants.GSON.toJson(e, IncomeEntity.class))
 						.collect(Collectors.joining(", ", "[", "]"));

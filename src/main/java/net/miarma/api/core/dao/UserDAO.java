@@ -1,11 +1,13 @@
 package net.miarma.api.core.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
@@ -21,17 +23,18 @@ public class UserDAO implements DataAccessObject<UserEntity> {
     
     @Override
 	public Future<List<UserEntity>> getAll() {
-    	return getAll(new QueryFilters());
+    	return getAll(new QueryParams(Map.of(), new QueryFilters()));
 	}
 
-    public Future<List<UserEntity>> getAll(QueryFilters filters) {
+    public Future<List<UserEntity>> getAll(QueryParams params) {
         Promise<List<UserEntity>> promise = Promise.promise();
         String query = QueryBuilder
         		.select(UserEntity.class)
-        		.orderBy(filters.getSort(), filters.getOrder())
-        		.limit(filters.getLimit())
-        		.offset(filters.getOffset())
-        		.build();
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, UserEntity.class,
             list -> promise.complete(list.isEmpty() ? List.of() : list),

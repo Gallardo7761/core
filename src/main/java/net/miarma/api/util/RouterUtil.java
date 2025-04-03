@@ -13,21 +13,26 @@ public class RouterUtil {
 
                 String method = ctx.request().method().name();
                 String path = ctx.normalizedPath();
+                String query = ctx.request().query();
                 int status = ctx.response().getStatusCode();
 
                 String statusMessage = getStatusMessage(status);
                 String color = getColorCode(status);
                 String emoji = getEmoji(status);
-
                 String reset = "\u001B[0m";
-                String log = String.format("%s %s %-20s - %s%d %s %-18s ⏱ %dms%s",
+
+                String formattedQuery = (query != null && !query.isEmpty()) ? "?" + query : "";
+
+                String log = String.format(
+                        "%s [%s%d %s%s] %s %s%s (⏱ %dms%s)",
                         emoji,
-                        method,
-                        path,
                         color,
                         status,
-                        reset,
                         statusMessage,
+                        reset,
+                        method,
+                        path,
+                        formattedQuery,
                         duration,
                         reset
                 );

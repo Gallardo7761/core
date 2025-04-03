@@ -1,14 +1,17 @@
 package net.miarma.api.huertos.services;
 
 import java.util.List;
+import java.util.Map;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
@@ -52,8 +55,15 @@ public class MemberService {
     }
 
     public Future<List<MemberEntity>> getAll() {
-        return userDAO.getAll().compose(userList ->
-            userMetadataDAO.getAll().map(metadataList ->
+		return getAll(new QueryParams(Map.of(), new QueryFilters()));
+	}
+    
+    public Future<List<MemberEntity>> getAll(QueryParams params) {
+    	QueryParams userParams = QueryParams.filterForEntity(params, UserEntity.class);
+    	QueryParams metadataParams = QueryParams.filterForEntity(params, UserMetadataEntity.class);
+    	
+        return userDAO.getAll(userParams).compose(userList ->
+            userMetadataDAO.getAll(metadataParams).map(metadataList ->
                 userList.stream()
                     .map(user -> {
                         UserMetadataEntity metadata = metadataList.stream()

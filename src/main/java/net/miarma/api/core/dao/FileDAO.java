@@ -1,13 +1,15 @@
 package net.miarma.api.core.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.db.DataAccessObject;
+import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.core.entities.FileEntity;
 
@@ -21,17 +23,18 @@ public class FileDAO implements DataAccessObject<FileEntity> {
 
     @Override
     public Future<List<FileEntity>> getAll() {
-        return getAll(new QueryFilters());
+        return getAll(new QueryParams(Map.of(), new QueryFilters()));
     }
     
-    public Future<List<FileEntity>> getAll(QueryFilters filters) {
+    public Future<List<FileEntity>> getAll(QueryParams params) {
         Promise<List<FileEntity>> promise = Promise.promise();
         String query = QueryBuilder
         		.select(FileEntity.class)
-        		.orderBy(filters.getSort(), filters.getOrder())
-        		.limit(filters.getLimit())
-        		.offset(filters.getOffset())
-        		.build();
+        		.where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, FileEntity.class,
             list -> promise.complete(list.isEmpty() ? List.of() : list),

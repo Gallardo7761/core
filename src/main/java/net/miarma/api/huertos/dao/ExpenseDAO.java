@@ -1,13 +1,15 @@
 package net.miarma.api.huertos.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.db.DataAccessObject;
+import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.huertos.entities.ExpenseEntity;
 
@@ -21,17 +23,18 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
 
     @Override
     public Future<List<ExpenseEntity>> getAll() {
-        return getAll(new QueryFilters());
+        return getAll(new QueryParams(Map.of(), new QueryFilters()));
     }
     
-    public Future<List<ExpenseEntity>> getAll(QueryFilters filters) {
+    public Future<List<ExpenseEntity>> getAll(QueryParams params) {
         Promise<List<ExpenseEntity>> promise = Promise.promise();
         String query = QueryBuilder
         		.select(ExpenseEntity.class)
-        		.orderBy(filters.getSort(), filters.getOrder())
-        		.limit(filters.getLimit())
-        		.offset(filters.getOffset())
-        		.build();
+        		.where(params.getFilters())
+				.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+				.limit(params.getQueryFilters().getLimit())
+				.offset(params.getQueryFilters().getOffset())
+				.build();
 
         db.execute(query, ExpenseEntity.class,
             list -> promise.complete(list.isEmpty() ? List.of() : list),

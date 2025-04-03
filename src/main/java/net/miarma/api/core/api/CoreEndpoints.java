@@ -14,8 +14,6 @@ public class CoreEndpoints {
 	public static final String USER = Constants.CORE_PREFIX + "/users/:user_id"; // GET, PUT, DELETE
 	public static final String USER_STATUS = Constants.CORE_PREFIX + "/users/:user_id/status"; // GET, PUT
 	public static final String USER_ROLE = Constants.CORE_PREFIX + "/users/:user_id/role"; // GET, PUT
-	public static final String USER_BY_EMAIL = Constants.CORE_PREFIX + "/users/email/:email"; // GET
-	public static final String USER_BY_USERNAME = Constants.CORE_PREFIX + "/users/username/:user_name"; // GET
 	public static final String USER_EXISTS = Constants.CORE_PREFIX + "/users/:user_id/exists"; // GET
 	public static final String USER_AVATAR = Constants.CORE_PREFIX + "/users/:user_id/avatar"; // GET, PUT
 	public static final String USER_INFO = Constants.CORE_PREFIX + "/users/me"; // GET

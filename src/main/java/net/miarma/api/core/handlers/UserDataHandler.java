@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
@@ -20,9 +20,9 @@ public class UserDataHandler {
     }
 
     public void getAll(RoutingContext ctx) {
-    	QueryFilters filters = QueryFilters.from(ctx);
+    	QueryParams params = QueryParams.from(ctx);
     	
-        userService.getAll(filters).onSuccess(users -> {
+        userService.getAll(params).onSuccess(users -> {
             String result = users.stream()
                 .map(u -> Constants.GSON.toJson(u, UserEntity.class))
                 .collect(Collectors.joining(", ", "[", "]"));

@@ -3,7 +3,7 @@ package net.miarma.api.huertos.handlers;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.SingleJsonResponse;
 import net.miarma.api.huertos.entities.PreUserEntity;
 import net.miarma.api.huertos.services.PreUserService;
@@ -17,9 +17,9 @@ public class PreUserDataHandler {
 	}
 	
 	public void getAll(RoutingContext ctx) {
-		QueryFilters filters = QueryFilters.from(ctx);
+		QueryParams params = QueryParams.from(ctx);
 		
-		preUserService.getAll(filters).onSuccess(preUsers -> {
+		preUserService.getAll(params).onSuccess(preUsers -> {
 			ctx.response()
 			    .putHeader("Content-Type", "application/json")
 			    .setStatusCode(200).end(Constants.GSON.toJson(preUsers));

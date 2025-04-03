@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
 
@@ -16,8 +16,8 @@ public class IncomeService {
 		this.incomeDAO = new IncomeDAO(pool);
 	}
 
-	public Future<List<IncomeEntity>> getAll(QueryFilters filters) {
-		return incomeDAO.getAll(filters);
+	public Future<List<IncomeEntity>> getAll(QueryParams params) {
+		return incomeDAO.getAll(params);
 	}
 
 	public Future<IncomeEntity> getById(Integer id) {

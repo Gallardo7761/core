@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryFilters;
+import net.miarma.api.common.QueryParams;
 import net.miarma.api.huertos.dao.AnnounceDAO;
 import net.miarma.api.huertos.entities.AnnounceEntity;
 
@@ -16,8 +16,8 @@ public class AnnounceService {
 		this.announceDAO = new AnnounceDAO(pool);
 	}
 	
-	public Future<List<AnnounceEntity>> getAll(QueryFilters filters) {
-		return announceDAO.getAll(filters);
+	public Future<List<AnnounceEntity>> getAll(QueryParams params) {
+		return announceDAO.getAll(params);
 	}
 	
 	public Future<AnnounceEntity> getById(Integer id) {
