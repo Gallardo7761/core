@@ -5,9 +5,10 @@ import java.time.LocalDateTime;
 
 import net.miarma.api.common.Constants.HuertosPaymentType;
 import net.miarma.api.common.annotations.Table;
+import net.miarma.api.common.db.AbstractEntity;
 
 @Table("huertos_expenses")
-public class ExpenseEntity {
+public class ExpenseEntity extends AbstractEntity{
 	private Integer expense_id;
 	private String concept;
 	private BigDecimal amount;

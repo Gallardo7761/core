@@ -44,7 +44,7 @@ public class MemberService {
 
                 return new JsonObject()
                     .put("token", json.getString("token"))
-                    .put("loggedUser", new JsonObject(member.encode()));
+                    .mergeIn(new JsonObject(Constants.GSON.toJson(member)));
             });
         });
     }

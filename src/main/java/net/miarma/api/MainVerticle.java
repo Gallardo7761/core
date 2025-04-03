@@ -14,6 +14,7 @@ import net.miarma.api.common.Constants;
 import net.miarma.api.common.VertxJacksonConfig;
 import net.miarma.api.common.security.SecretManager;
 import net.miarma.api.core.verticles.CoreMainVerticle;
+import net.miarma.api.huertos.verticles.HuertosMainVerticle;
 import net.miarma.api.util.DeploymentUtil;
 import net.miarma.api.util.MessageUtil;
 
@@ -60,6 +61,16 @@ public class MainVerticle extends AbstractVerticle {
             			DeploymentUtil.failMessage(CoreMainVerticle.class, result.cause()));
             }
         });
+		
+		vertx.deployVerticle(new HuertosMainVerticle(), result -> {
+			if (result.succeeded()) {
+				Constants.LOGGER.info(
+						DeploymentUtil.successMessage(HuertosMainVerticle.class));
+			} else {
+				Constants.LOGGER.error(
+						DeploymentUtil.failMessage(HuertosMainVerticle.class, result.cause()));
+			}
+		});
 	}
 	
 	private void initializeDirectories() {        

@@ -65,6 +65,16 @@ public class HuertosDataVerticle extends AbstractVerticle {
             String action = body.getString("action");
             
             switch (action) {
+            	case "login" -> {
+            		String emailOrUserName = body.getString("email") != null ? 
+							body.getString("email") : body.getString("userName");
+            		String password = body.getString("password");
+            		
+            		memberService.login(emailOrUserName, password)
+	            		.onSuccess(res -> message.reply(res))
+	            		.onFailure(err -> message.fail(401, err.getMessage()));
+            	}
+            
             	default -> message.fail(400, "Unknown action: " + action);
             }
 		});

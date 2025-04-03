@@ -3,6 +3,9 @@ package net.miarma.api.huertos.api;
 import net.miarma.api.common.Constants;
 
 public class HuertosEndpoints {
+	// auth
+	public static final String LOGIN = Constants.HUERTOS_PREFIX + "/login";
+	
 	// socios -> GET, POST, PUT, DELETE
 	public static final String USERS = Constants.HUERTOS_PREFIX + "/users";
 	public static final String USER = Constants.HUERTOS_PREFIX + "/users/:user_id";
@@ -31,7 +34,7 @@ public class HuertosEndpoints {
 	public static final String REQUESTS = Constants.HUERTOS_PREFIX + "/requests";
 	public static final String REQUEST = Constants.HUERTOS_PREFIX + "/requests/:request_id";
 
-	// documentacion -> GET, POST, PUT, DELETE
-	public static final String UPLOAD = Constants.HUERTOS_PREFIX + "/upload";
-	
+	// pre-socios -> GET, POST, PUT, DELETE
+	public static final String PRE_USERS = Constants.HUERTOS_PREFIX + "/pre_users";
+	public static final String PRE_USER = Constants.HUERTOS_PREFIX + "/pre_users/:pre_user_id";	
 }
