@@ -1,5 +1,6 @@
 package net.miarma.api.huertos.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.vertx.core.Future;
@@ -9,7 +10,9 @@ import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryParams;
+import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
@@ -32,6 +35,26 @@ public class MemberService {
         this.memberDAO = new MemberDAO(pool);
         this.userMetadataDAO = new UserMetadataDAO(pool);
         this.userService = new UserService(pool);
+    }
+    
+    public Future<Void> resetPasswordsToEncryptedDni() {
+        return memberDAO.getAll().compose(members -> {
+            List<Future<UserEntity>> updates = new ArrayList<>();
+            
+            for (MemberEntity member : members) {
+                String dni = member.getDni();
+                if (dni != null && !dni.isBlank()) {
+                    String hashed = PasswordHasher.hash(dni);
+                    member.setPassword(hashed);
+                    UserEntity user = UserEntity.fromMemberEntity(member);
+                    user.setUser_id(member.getUser_id());
+                    System.out.println(QueryBuilder.update(user).build());
+                    updates.add(userDAO.update(user));
+                }
+            }
+
+            return Future.all(updates).mapEmpty();
+        });
     }
 
     public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {

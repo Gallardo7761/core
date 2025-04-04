@@ -188,40 +188,50 @@ public class QueryBuilder {
 
         QueryBuilder qb = new QueryBuilder();
         String table = getTableName(object.getClass());
-        qb.query.append("UPDATE ").append(table).append(" ");
-        qb.query.append("SET ");
-        StringJoiner joiner = new StringJoiner(", ");
+        qb.query.append("UPDATE ").append(table).append(" SET ");
+
+        StringJoiner setJoiner = new StringJoiner(", ");
+        StringJoiner whereJoiner = new StringJoiner(" AND ");
+
+        Field idField = null;
+
         for (Field field : object.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
                 Object fieldValue = field.get(object);
-                if (fieldValue != null) {
-                    Object value = extractValue(fieldValue);
-                    if (value instanceof String) {
-                        joiner.add(field.getName() + " = '" + value + "'");
-                    } else {
-                        joiner.add(field.getName() + " = " + value.toString());
-                    }
-                } else {
-                    joiner.add(field.getName() + " = NULL");
+                if (fieldValue == null) continue;
+
+                String fieldName = field.getName();
+                Object value = extractValue(fieldValue);
+
+                if (fieldName.endsWith("_id")) {
+                    idField = field;
+                    whereJoiner.add(fieldName + " = " + (value instanceof String ? "'" + value + "'" : value));
+                    continue;
                 }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
+
+                setJoiner.add(fieldName + " = " + (value instanceof String ? "'" + value + "'" : value));
+            } catch (Exception e) {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
             }
         }
-        qb.query.append(joiner).append(" RETURNING * ");
+
+        if (idField == null) {
+            throw new IllegalArgumentException("No ID field (ending with _id) found for WHERE clause");
+        }
+
+        qb.query.append(setJoiner).append(" WHERE ").append(whereJoiner);
         return qb;
     }
 
+
     public static <T> QueryBuilder delete(T object) {
-        if (object == null) {
-            throw new IllegalArgumentException("Object cannot be null");
-        }
+        if (object == null) throw new IllegalArgumentException("Object cannot be null");
 
         QueryBuilder qb = new QueryBuilder();
         String table = getTableName(object.getClass());
-        qb.query.append("DELETE FROM ").append(table).append(" ");
-        qb.query.append("WHERE ");
+        qb.query.append("DELETE FROM ").append(table).append(" WHERE ");
+
         StringJoiner joiner = new StringJoiner(" AND ");
         for (Field field : object.getClass().getDeclaredFields()) {
             field.setAccessible(true);
@@ -229,17 +239,14 @@ public class QueryBuilder {
                 Object fieldValue = field.get(object);
                 if (fieldValue != null) {
                     Object value = extractValue(fieldValue);
-                    if (value instanceof String) {
-                        joiner.add(field.getName() + " = '" + value + "'");
-                    } else {
-                        joiner.add(field.getName() + " = " + value.toString());
-                    }
+                    joiner.add(field.getName() + " = " + (value instanceof String ? "'" + value + "'" : value.toString()));
                 }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
+            } catch (Exception e) {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
             }
         }
-        qb.query.append(joiner).append(" RETURNING * ");
+
+        qb.query.append(joiner).append(" ");
         return qb;
     }
 
