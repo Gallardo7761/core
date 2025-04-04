@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import net.miarma.api.common.gson.APIDontReturnExclusionStrategy;
 import net.miarma.api.common.gson.JsonObjectTypeAdapter;
 import net.miarma.api.common.gson.LocalDateTimeAdapter;
+import net.miarma.api.common.gson.ValuableEnumDeserializer;
 import net.miarma.api.common.gson.ValuableEnumTypeAdapter;
 
 public class Constants {
@@ -40,6 +41,11 @@ public class Constants {
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
 			.registerTypeAdapter(JsonObject.class, new JsonObjectTypeAdapter())
 			.registerTypeHierarchyAdapter(ValuableEnum.class, new ValuableEnumTypeAdapter())
+			.registerTypeAdapter(CoreUserGlobalStatus.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(CoreUserRole.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosUserType.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosUserStatus.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosUserRole.class, new ValuableEnumDeserializer())
 			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
 			.create();
     

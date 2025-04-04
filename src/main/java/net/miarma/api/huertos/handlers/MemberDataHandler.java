@@ -41,6 +41,7 @@ public class MemberDataHandler {
 
     public void create(RoutingContext ctx) {
         MemberEntity member = Constants.GSON.fromJson(ctx.body().asString(), MemberEntity.class);
+        System.out.println(member);
 
         memberService.create(member)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))

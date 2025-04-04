@@ -40,7 +40,7 @@ public class QueryBuilder {
                 var method = fieldValue.getClass().getMethod("getValue");
                 return method.invoke(fieldValue);
             } catch (Exception e) {
-                return ((Enum<?>) fieldValue).name(); // fallback
+                return ((Enum<?>) fieldValue).name();
             }
         }
         return fieldValue;
@@ -108,42 +108,42 @@ public class QueryBuilder {
 
         return this;
     }
-    
+
     public <T> QueryBuilder where(T object) {
-    	if (object == null) {
+        if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-    	
-    	Set<String> validFields = entityClass != null
-			? Arrays.stream(entityClass.getDeclaredFields()).map(Field::getName).collect(Collectors.toSet())
-			: Collections.emptySet();
-    	
-    	QueryBuilder qb = new QueryBuilder();
-    	qb.query.append("WHERE ");
-    	StringJoiner joiner = new StringJoiner(" AND ");
-		for (Field field : object.getClass().getDeclaredFields()) {
-			field.setAccessible(true);
-			try {
-				Object fieldValue = field.get(object);
-				if (fieldValue != null) {
-					String key = field.getName();
-					if (!validFields.contains(key)) {
-						Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + key);
-						continue;
-					}
-					Object value = extractValue(fieldValue);
-					if (value instanceof String) {
-						joiner.add(key + " = '" + value + "'");
-					} else {
-						joiner.add(key + " = " + value.toString());
-					}
-				}
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
-			}
-		}
-		qb.query.append(joiner).append(" ");
-		return qb;
+
+        Set<String> validFields = entityClass != null
+            ? Arrays.stream(entityClass.getDeclaredFields()).map(Field::getName).collect(Collectors.toSet())
+            : Collections.emptySet();
+
+        QueryBuilder qb = new QueryBuilder();
+        qb.query.append("WHERE ");
+        StringJoiner joiner = new StringJoiner(" AND ");
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object fieldValue = field.get(object);
+                if (fieldValue != null) {
+                    String key = field.getName();
+                    if (!validFields.contains(key)) {
+                        Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + key);
+                        continue;
+                    }
+                    Object value = extractValue(fieldValue);
+                    if (value instanceof String) {
+                        joiner.add(key + " = '" + value + "'");
+                    } else {
+                        joiner.add(key + " = " + value.toString());
+                    }
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+            }
+        }
+        qb.query.append(joiner).append(" ");
+        return qb;
     }
 
     public static <T> QueryBuilder insert(T object) {
@@ -177,7 +177,7 @@ public class QueryBuilder {
             }
         }
         qb.query.append(columns).append(") ");
-        qb.query.append("VALUES (").append(values).append(") ");
+        qb.query.append("VALUES (").append(values).append(") RETURNING * ");
         return qb;
     }
 
@@ -209,7 +209,7 @@ public class QueryBuilder {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
             }
         }
-        qb.query.append(joiner).append(" ");
+        qb.query.append(joiner).append(" RETURNING * ");
         return qb;
     }
 
@@ -239,7 +239,7 @@ public class QueryBuilder {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
             }
         }
-        qb.query.append(joiner).append(" ");
+        qb.query.append(joiner).append(" RETURNING * ");
         return qb;
     }
 
