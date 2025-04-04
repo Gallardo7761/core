@@ -1,6 +1,7 @@
 package net.miarma.api.util;
 
 import io.vertx.ext.web.Router;
+import net.miarma.api.common.Constants;
 
 public class RouterUtil {
 
@@ -17,27 +18,23 @@ public class RouterUtil {
                 int status = ctx.response().getStatusCode();
 
                 String statusMessage = getStatusMessage(status);
-                String color = getColorCode(status);
                 String emoji = getEmoji(status);
-                String reset = "\u001B[0m";
 
                 String formattedQuery = (query != null && !query.isEmpty()) ? "?" + query : "";
 
+                // No ANSI colors porque los loggers no los renderizan en muchos entornos (a menos que uses uno con soporte explícito)
                 String log = String.format(
-                        "%s [%s%d %s%s] %s %s%s (⏱ %dms%s)",
+                        "%s [%d %s] %s %s%s (⏱ %dms)",
                         emoji,
-                        color,
                         status,
                         statusMessage,
-                        reset,
                         method,
                         path,
                         formattedQuery,
-                        duration,
-                        reset
+                        duration
                 );
 
-                System.out.println(log);
+                Constants.LOGGER.info(log);
             });
 
             ctx.next();
@@ -67,14 +64,6 @@ public class RouterUtil {
             case 503 -> "Service Unavailable";
             default -> "Unknown";
         };
-    }
-
-    private static String getColorCode(int statusCode) {
-        if (statusCode >= 200 && statusCode < 300) return "\u001B[32m"; // verde
-        if (statusCode >= 300 && statusCode < 400) return "\u001B[36m"; // cyan
-        if (statusCode >= 400 && statusCode < 500) return "\u001B[33m"; // amarillo
-        if (statusCode >= 500) return "\u001B[31m"; // rojo
-        return "\u001B[0m"; // reset
     }
 
     private static String getEmoji(int statusCode) {
