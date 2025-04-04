@@ -67,11 +67,11 @@ public class HuertosDataRouter {
 		router.put(HuertosEndpoints.INCOME).handler(AuthGuard.admin()).handler(hIncomeData::update);
 		router.delete(HuertosEndpoints.INCOME).handler(AuthGuard.admin()).handler(hIncomeData::delete);
 		
-		router.get(HuertosEndpoints.USERS).handler(AuthGuard.admin()).handler(hMemberData::getAll);
-		router.get(HuertosEndpoints.USER).handler(AuthGuard.admin()).handler(hMemberData::getById);
-		router.post(HuertosEndpoints.USERS).handler(AuthGuard.admin()).handler(hMemberData::create);
-		router.put(HuertosEndpoints.USER).handler(AuthGuard.admin()).handler(hMemberData::update);
-		router.delete(HuertosEndpoints.USER).handler(AuthGuard.admin()).handler(hMemberData::delete);
+		router.get(HuertosEndpoints.MEMBERS).handler(AuthGuard.admin()).handler(hMemberData::getAll);
+		router.get(HuertosEndpoints.MEMBER).handler(AuthGuard.admin()).handler(hMemberData::getById);
+		router.post(HuertosEndpoints.MEMBERS).handler(AuthGuard.admin()).handler(hMemberData::create);
+		router.put(HuertosEndpoints.MEMBER).handler(AuthGuard.admin()).handler(hMemberData::update);
+		router.delete(HuertosEndpoints.MEMBER).handler(AuthGuard.admin()).handler(hMemberData::delete);
 		
 		router.get(HuertosEndpoints.PRE_USERS).handler(AuthGuard.admin()).handler(hPreUserData::getAll);
 		router.get(HuertosEndpoints.PRE_USER).handler(AuthGuard.admin()).handler(hPreUserData::getById);

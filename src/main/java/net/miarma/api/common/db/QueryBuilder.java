@@ -1,21 +1,14 @@
 package net.miarma.api.common.db;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.annotations.Table;
 
 public class QueryBuilder {
-	private StringBuilder query;
+    private StringBuilder query;
     private String sort;
     private String order;
     private String limit;
@@ -95,19 +88,17 @@ public class QueryBuilder {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            String actualKey = key.contains(".") ? key.substring(key.indexOf('.') + 1) : key;
-
-            if (!validFields.contains(actualKey)) {
-                Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + actualKey);
+            if (!validFields.contains(key)) {
+                Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + key);
                 continue;
             }
 
             if (value.startsWith("(") && value.endsWith(")")) {
-                conditions.add(actualKey + " IN " + value);
+                conditions.add(key + " IN " + value);
             } else if (value.matches("-?\\d+(\\.\\d+)?")) {
-                conditions.add(actualKey + " = " + value);
+                conditions.add(key + " = " + value);
             } else {
-                conditions.add(actualKey + " = '" + value + "'");
+                conditions.add(key + " = '" + value + "'");
             }
         }
 
@@ -117,47 +108,42 @@ public class QueryBuilder {
 
         return this;
     }
-
-    public QueryBuilder whereWithAlias(Map<String, String> filters, String alias) {
-        if (filters == null || filters.isEmpty()) {
-            return this;
+    
+    public <T> QueryBuilder where(T object) {
+    	if (object == null) {
+            throw new IllegalArgumentException("Object cannot be null");
         }
-
-        Set<String> validFields = entityClass != null
-            ? Arrays.stream(entityClass.getDeclaredFields()).map(Field::getName).collect(Collectors.toSet())
-            : Collections.emptySet();
-
-        List<String> conditions = new ArrayList<>();
-
-        for (Map.Entry<String, String> entry : filters.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-
-            String actualKey = key.contains(".") ? key.substring(key.indexOf('.') + 1) : key;
-
-            if (!validFields.contains(actualKey)) {
-                Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE (alias): " + actualKey);
-                continue;
-            }
-
-            if (value.startsWith("(") && value.endsWith(")")) {
-                conditions.add(alias + "." + actualKey + " IN " + value);
-            } else if (value.matches("-?\\d+(\\.\\d+)?")) {
-                conditions.add(alias + "." + actualKey + " = " + value);
-            } else {
-                conditions.add(alias + "." + actualKey + " = '" + value + "'");
-            }
-        }
-
-        if (!conditions.isEmpty()) {
-            if (!query.toString().contains("WHERE")) {
-                query.append("WHERE ").append(String.join(" AND ", conditions)).append(" ");
-            } else {
-                query.append("AND ").append(String.join(" AND ", conditions)).append(" ");
-            }
-        }
-
-        return this;
+    	
+    	Set<String> validFields = entityClass != null
+			? Arrays.stream(entityClass.getDeclaredFields()).map(Field::getName).collect(Collectors.toSet())
+			: Collections.emptySet();
+    	
+    	QueryBuilder qb = new QueryBuilder();
+    	qb.query.append("WHERE ");
+    	StringJoiner joiner = new StringJoiner(" AND ");
+		for (Field field : object.getClass().getDeclaredFields()) {
+			field.setAccessible(true);
+			try {
+				Object fieldValue = field.get(object);
+				if (fieldValue != null) {
+					String key = field.getName();
+					if (!validFields.contains(key)) {
+						Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + key);
+						continue;
+					}
+					Object value = extractValue(fieldValue);
+					if (value instanceof String) {
+						joiner.add(key + " = '" + value + "'");
+					} else {
+						joiner.add(key + " = " + value.toString());
+					}
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+			}
+		}
+		qb.query.append(joiner).append(" ");
+		return qb;
     }
 
     public static <T> QueryBuilder insert(T object) {
@@ -259,20 +245,18 @@ public class QueryBuilder {
 
     public QueryBuilder orderBy(Optional<String> column, Optional<String> order) {
         column.ifPresent(c -> {
-            String field = c.contains(".") ? c.substring(c.indexOf('.') + 1) : c;
-
             if (entityClass != null) {
                 boolean isValid = Arrays.stream(entityClass.getDeclaredFields())
                     .map(Field::getName)
-                    .anyMatch(f -> f.equals(field));
+                    .anyMatch(f -> f.equals(c));
 
                 if (!isValid) {
-                    Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en ORDER BY: " + field);
+                    Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en ORDER BY: " + c);
                     return;
                 }
             }
 
-            sort = "ORDER BY " + field + " ";
+            sort = "ORDER BY " + c + " ";
             order.ifPresent(o -> {
                 sort += o.equalsIgnoreCase("asc") ? "ASC" : "DESC" + " ";
             });

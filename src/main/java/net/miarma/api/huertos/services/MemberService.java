@@ -1,21 +1,19 @@
 package net.miarma.api.huertos.services;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.Constants.CoreUserGlobalStatus;
-import net.miarma.api.common.Constants.CoreUserRole;
+import net.miarma.api.common.Constants.HuertosUserRole;
+import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
-import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.QueryParams;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
+import net.miarma.api.huertos.dao.MemberDAO;
 import net.miarma.api.huertos.dao.UserMetadataDAO;
 import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
@@ -26,10 +24,12 @@ public class MemberService {
 
     private final UserDAO userDAO;
     private final UserMetadataDAO userMetadataDAO;
+    private final MemberDAO memberDAO;
     private final UserService userService;
     
     public MemberService(Pool pool) {
         this.userDAO = new UserDAO(pool);
+        this.memberDAO = new MemberDAO(pool);
         this.userMetadataDAO = new UserMetadataDAO(pool);
         this.userService = new UserService(pool);
     }
@@ -55,159 +55,113 @@ public class MemberService {
         });
     }
 
-    public Future<List<MemberEntity>> getAll() {
-		return getAll(new QueryParams(Map.of(), new QueryFilters()));
-	}
     
     public Future<List<MemberEntity>> getAll(QueryParams params) {
-        QueryParams userParams = QueryParams.filterForEntity(params, UserEntity.class, "user");
-        QueryParams metadataParams = QueryParams.filterForEntity(params, UserMetadataEntity.class, "metadata");
-
-        if (!metadataParams.getFilters().isEmpty()) {
-            return userMetadataDAO.getAll(metadataParams).compose(metadataList -> {
-                List<Integer> userIds = metadataList.stream()
-                    .map(UserMetadataEntity::getUser_id)
-                    .toList();
-
-                if (userIds.isEmpty()) {
-                    return Future.succeededFuture(List.of());
-                }
-
-                String joinedIds = userIds.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(","));
-                userParams.getFilters().put("user_id", "(" + joinedIds + ")");
-
-                return userDAO.getAll(userParams).map(userList ->
-                    userList.stream()
-                        .map(user -> {
-                            UserMetadataEntity metadata = metadataList.stream()
-                                .filter(m -> m.getUser_id().equals(user.getUser_id()))
-                                .findFirst()
-                                .orElse(null);
-                            return new MemberEntity(user, metadata);
-                        })
-                        .toList()
-                );
-            });
-        } else {
-            return userDAO.getAll(userParams).compose(userList ->
-                userMetadataDAO.getAll().map(metadataList ->
-                    userList.stream()
-                        .map(user -> {
-                            UserMetadataEntity metadata = metadataList.stream()
-                                .filter(m -> m.getUser_id().equals(user.getUser_id()))
-                                .findFirst()
-                                .orElse(null);
-                            return new MemberEntity(user, metadata);
-                        })
-                        .toList()
-                )
-            );
-        }
+        return memberDAO.getAll(params);
     }
-
-
     
     public Future<MemberEntity> getById(Integer id) {
-    	return getAll().map(list -> list.stream()
-				.filter(member -> member.getUser().getUser_id().equals(id))
+    	return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getUser_id().equals(id))
 				.findFirst()
 				.orElse(null));
     }
     
     public Future<MemberEntity> getByMemberNumber(Integer memberNumber) {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getMetadata().getMember_number().equals(memberNumber))
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getMember_number().equals(memberNumber))
 				.findFirst()
 				.orElse(null));
 	}
     
     public Future<MemberEntity> getByPlotNumber(Integer plotNumber) {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getMetadata().getPlot_number().equals(plotNumber))
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getPlot_number().equals(plotNumber))
 				.findFirst()
 				.orElse(null));
     			
     }    
     
     public Future<MemberEntity> getByEmail(String email) {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getUser().getEmail().equals(email))
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getEmail().equals(email))
 				.findFirst()
 				.orElse(null));
 	}
 	
 	public Future<MemberEntity> getByDni(String dni) {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getMetadata().getDni().equals(dni))
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getDni().equals(dni))
 				.findFirst()
 				.orElse(null));
 	}
 	
 	public Future<MemberEntity> getByPhone(String phone) {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getMetadata().getPhone().equals(phone))
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getPhone().equals(phone))
 				.findFirst()
 				.orElse(null));
 	}
 	
 	public Future<List<MemberEntity>> getWaitlist() {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getMetadata().getType().equals(HuertosUserType.WAIT_LIST))
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getType().equals(HuertosUserType.WAIT_LIST))
 				.toList());
 	}
 	
 	public Future<Integer> getLastMemberNumber() {
-		return getAll().map(list -> list.stream()
-				.filter(member -> member.getMetadata().getType().equals(HuertosUserType.MEMBER))
-				.map(member -> member.getMetadata().getMember_number())
+		return memberDAO.getAll().map(list -> list.stream()
+				.filter(member -> member.getType().equals(HuertosUserType.MEMBER))
+				.map(member -> member.getMember_number())
 				.max(Integer::compareTo)
 				.orElse(0));
 	}
 	
-	public Future<MemberEntity> updateRole(Integer userId, CoreUserRole role) {
-		return getById(userId).compose(member -> {
-			if (member == null) {
-				return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
-			}
-			member.getUser().setRole(role);
-			return userDAO.update(member.getUser()).map(updatedUser -> new MemberEntity(updatedUser, member.getMetadata()));
-		});
+	public Future<MemberEntity> updateRole(Integer userId, HuertosUserRole role) {
+	    return getById(userId).compose(member -> {
+	        if (member == null) {
+	            return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
+	        }
+	        member.setRole(role);
+	        return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+	            .compose(updated -> getById(userId));
+	    });
 	}
-	
-	public Future<MemberEntity> updateStatus(Integer userId, CoreUserGlobalStatus status) {
-		return getById(userId).compose(member -> {
-			if (member == null) {
-				return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
-			}
-			member.getUser().setGlobal_status(status);
-			return userDAO.update(member.getUser()).map(updatedUser -> new MemberEntity(updatedUser, member.getMetadata()));
-		});
+
+	public Future<MemberEntity> updateStatus(Integer userId, HuertosUserStatus status) {
+	    return getById(userId).compose(member -> {
+	        if (member == null) {
+	            return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
+	        }
+	        member.setStatus(status);
+	        return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+	            .compose(updated -> getById(userId));
+	    });
 	}
-	
+
 	public Future<MemberEntity> create(MemberEntity member) {
-		return userDAO.insert(member.getUser()).compose(user -> {
-			member.getMetadata().setUser_id(user.getUser_id());
-			return userMetadataDAO.insert(member.getMetadata())
-					.map(metadata -> new MemberEntity(user, metadata));
-		});
+	    return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
+	        UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);
+	        metadata.setUser_id(user.getUser_id());
+	        return userMetadataDAO.insert(metadata)
+	            .map(meta -> new MemberEntity(user, meta));
+	    });
 	}
-	
+
 	public Future<MemberEntity> update(MemberEntity member) {
-		return userDAO.update(member.getUser()).compose(user -> {
-			return userMetadataDAO.update(member.getMetadata())
-					.map(metadata -> new MemberEntity(user, metadata));
-		});
+	    return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
+	        return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+	            .map(meta -> new MemberEntity(user, meta));
+	    });
 	}
-	
+
 	public Future<MemberEntity> delete(Integer userId) {
 		return getById(userId).compose(member -> {
 			if (member == null) {
 				return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
 			}
 			return userDAO.delete(userId).compose(deletedUser -> {
-				return userMetadataDAO.delete(member.getMetadata().getUser_id())
+				return userMetadataDAO.delete(member.getUser_id())
 						.map(deletedMetadata -> member);
 			});
 		});

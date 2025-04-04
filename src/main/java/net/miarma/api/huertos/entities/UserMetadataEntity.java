@@ -106,6 +106,22 @@ public class UserMetadataEntity extends AbstractEntity {
 		this.role = role;
 	}
 	
+	public static UserMetadataEntity fromMemberEntity(MemberEntity member) {
+		UserMetadataEntity meta = new UserMetadataEntity();
+		meta.setUser_id(member.getUser_id());
+		meta.setMember_number(member.getMember_number());
+		meta.setPlot_number(member.getPlot_number());
+		meta.setDni(member.getDni());
+		meta.setPhone(member.getPhone());
+		meta.setCreated_at(member.getCreated_at());
+		meta.setAssigned_at(member.getAssigned_at());
+		meta.setDeactivated_at(member.getDeactivated_at());
+		meta.setNotes(member.getNotes());
+		meta.setType(member.getType());
+		meta.setStatus(member.getStatus());
+		meta.setRole(member.getRole());
+		return meta;
+	}
 	
 	
 }

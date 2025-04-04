@@ -33,7 +33,6 @@ public class Constants {
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
 			.registerTypeHierarchyAdapter(ValuableEnum.class, new ValuableEnumTypeAdapter())
-			.registerTypeAdapter(MemberEntitySerializer.class, new MemberEntitySerializer())
 			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
 			.create();
     

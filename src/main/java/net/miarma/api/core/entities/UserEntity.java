@@ -8,6 +8,7 @@ import net.miarma.api.common.Constants.CoreUserRole;
 import net.miarma.api.common.annotations.APIDontReturn;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
+import net.miarma.api.huertos.entities.MemberEntity;
 
 @Table("users")
 public class UserEntity extends AbstractEntity {
@@ -46,5 +47,19 @@ public class UserEntity extends AbstractEntity {
     public void setCreated_at(LocalDateTime created_at) { this.created_at = created_at; }
     public LocalDateTime getUpdated_at() { return updated_at; }
     public void setUpdated_at(LocalDateTime updated_at) { this.updated_at = updated_at; }
+    
+    public static UserEntity fromMemberEntity(MemberEntity member) {
+    	UserEntity user = new UserEntity();
+    	user.setUser_id(member.getUser_id());
+    	user.setUser_name(member.getUser_name());
+    	user.setDisplay_name(member.getDisplay_name());
+    	user.setEmail(member.getEmail());
+    	user.setPassword(member.getPassword());
+    	user.setAvatar(member.getAvatar());
+    	user.setGlobal_status(member.getGlobal_status());
+    	user.setRole(member.getGlobal_role());
+    	return user;
+    }
+
     
 }
