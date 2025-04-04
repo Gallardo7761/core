@@ -6,7 +6,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.db.DatabaseProvider;
-import net.miarma.api.core.api.CoreLogicRouter;
+import net.miarma.api.core.routing.CoreLogicRouter;
 import net.miarma.api.util.RouterUtil;
 
 public class CoreLogicVerticle extends AbstractVerticle {

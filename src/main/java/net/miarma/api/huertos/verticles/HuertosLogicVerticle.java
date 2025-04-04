@@ -6,7 +6,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.db.DatabaseProvider;
-import net.miarma.api.huertos.api.HuertosLogicRouter;
+import net.miarma.api.huertos.routing.HuertosLogicRouter;
 import net.miarma.api.util.RouterUtil;
 
 public class HuertosLogicVerticle extends AbstractVerticle{

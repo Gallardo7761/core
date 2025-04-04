@@ -11,7 +11,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.db.DatabaseProvider;
-import net.miarma.api.huertos.api.HuertosDataRouter;
+import net.miarma.api.huertos.routing.HuertosDataRouter;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
 import net.miarma.api.util.EventBusUtil;
