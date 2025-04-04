@@ -65,17 +65,14 @@ public class MemberService {
 
         if (!metadataParams.getFilters().isEmpty()) {
             return userMetadataDAO.getAll(metadataParams).compose(metadataList -> {
-                // Extraemos los user_id de los metadata que coinciden
                 List<Integer> userIds = metadataList.stream()
                     .map(UserMetadataEntity::getUser_id)
                     .toList();
 
                 if (userIds.isEmpty()) {
-                    // Si no hay coincidencias, no hay que seguir consultando users
                     return Future.succeededFuture(List.of());
                 }
 
-                // Creamos un filtro por user_id IN (...)
                 String joinedIds = userIds.stream()
                     .map(String::valueOf)
                     .collect(Collectors.joining(","));
@@ -94,7 +91,6 @@ public class MemberService {
                 );
             });
         } else {
-            // No hay filtros en metadata, pillamos todos los metadata posibles
             return userDAO.getAll(userParams).compose(userList ->
                 userMetadataDAO.getAll().map(metadataList ->
                     userList.stream()
