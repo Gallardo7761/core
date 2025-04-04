@@ -11,22 +11,23 @@ import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.huertos.api.HuertosDataRouter;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
+import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.RouterUtil;
 
 public class HuertosDataVerticle extends AbstractVerticle {
-	
-	private ConfigManager configManager;
-	private MemberService memberService;
-	private IncomeService incomeService;
-	
-	@Override
+
+    private ConfigManager configManager;
+    private MemberService memberService;
+    private IncomeService incomeService;
+
+    @Override
     public void start(Promise<Void> startPromise) {
         configManager = ConfigManager.getInstance();
         Pool pool = DatabaseProvider.createPool(vertx, configManager);
-        
+
         memberService = new MemberService(pool);
         incomeService = new IncomeService(pool);
-        
+
         Router router = Router.router(vertx);
         RouterUtil.attachLogger(router);
         HuertosDataRouter.mount(router, vertx, pool);
@@ -39,104 +40,54 @@ public class HuertosDataVerticle extends AbstractVerticle {
                 else startPromise.fail(res.cause());
             });
     }
-	
-	private void registerLogicVerticleConsumer() {
-		vertx.eventBus().consumer(Constants.HUERTOS_EVENT_BUS, message -> {
-			JsonObject body = (JsonObject) message.body();
-			String action = body.getString("action");
 
-			switch (action) {
-				case "login" -> {
-					String email = body.getString("email", null);
-					String userName = body.getString("userName", null);
-					String password = body.getString("password");
-					boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
+    private void registerLogicVerticleConsumer() {
+        vertx.eventBus().consumer(Constants.HUERTOS_EVENT_BUS, message -> {
+            JsonObject body = (JsonObject) message.body();
+            String action = body.getString("action");
 
-					memberService.login(email != null ? email : userName, password, keepLoggedIn)
-						.onSuccess(res -> {
-							JsonObject response = new JsonObject()
-								.put("token", res.getString("token"))
-								.put("member", res.getJsonObject("member")); // esto ya es JSON, no hace falta Gson
-	
-							message.reply(response);
-						})
-						.onFailure(err -> message.fail(401, err.getMessage()));
-				}
+            switch (action) {
+                case "login" -> {
+                    String email = body.getString("email", null);
+                    String userName = body.getString("userName", null);
+                    String password = body.getString("password");
+                    boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
 
-				case "getByMemberNumber" -> {
-					Integer memberNumber = body.getInteger("memberNumber");
+                    memberService.login(email != null ? email : userName, password, keepLoggedIn)
+                        .onSuccess(message::reply)
+                        .onFailure(EventBusUtil.fail(message));
+                }
 
-					memberService.getByMemberNumber(memberNumber)
-						.onSuccess(res -> {
-							JsonObject json = new JsonObject(Constants.GSON.toJson(res));
-							message.reply(json);
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
+                case "getByMemberNumber" -> memberService.getByMemberNumber(body.getInteger("memberNumber"))
+                    .onSuccess(message::reply)
+                    .onFailure(EventBusUtil.fail(message));
 
-				case "getByPlotNumber" -> {
-					Integer plotNumber = body.getInteger("plotNumber");
+                case "getByPlotNumber" -> memberService.getByPlotNumber(body.getInteger("plotNumber"))
+                    .onSuccess(message::reply)
+                    .onFailure(EventBusUtil.fail(message));
 
-					memberService.getByPlotNumber(plotNumber)
-						.onSuccess(res -> {
-							JsonObject json = new JsonObject(Constants.GSON.toJson(res));
-							message.reply(json);
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
+                case "getByDNI" -> memberService.getByDni(body.getString("dni"))
+                    .onSuccess(message::reply)
+                    .onFailure(EventBusUtil.fail(message));
 
-				case "getByDNI" -> {
-					String dni = body.getString("dni");
+                case "getUserPayments" -> incomeService.getUserPayments(body.getInteger("memberNumber"))
+                    .onSuccess(payments -> message.reply(new JsonObject().put("payments", payments)))
+                    .onFailure(EventBusUtil.fail(message));
 
-					memberService.getByDni(dni)
-						.onSuccess(res -> {
-							JsonObject json = new JsonObject(Constants.GSON.toJson(res));
-							message.reply(json);
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
+                case "hasPaid" -> incomeService.hasPaid(body.getInteger("memberNumber"))
+                    .onSuccess(result -> message.reply(new JsonObject().put("hasPaid", result)))
+                    .onFailure(EventBusUtil.fail(message));
 
-				case "getUserPayments" -> {
-					Integer memberNumber = body.getInteger("memberNumber");
+                case "getWaitlist" -> memberService.getWaitlist()
+                    .onSuccess(waitlist -> message.reply(new JsonObject().put("waitlist", waitlist)))
+                    .onFailure(EventBusUtil.fail(message));
 
-					incomeService.getUserPayments(memberNumber)
-						.onSuccess(res -> {
-							// Si es una lista, conviértelo en array
-							message.reply(new JsonObject().put("payments", Constants.GSON.toJson(res)));
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
+                case "getLastMemberNumber" -> memberService.getLastMemberNumber()
+                    .onSuccess(last -> message.reply(new JsonObject().put("lastMemberNumber", last)))
+                    .onFailure(EventBusUtil.fail(message));
 
-				case "hasPaid" -> {
-					Integer memberNumber = body.getInteger("memberNumber");
-
-					incomeService.hasPaid(memberNumber)
-						.onSuccess(res -> {
-							message.reply(new JsonObject().put("hasPaid", res));
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
-				
-				case "getWaitlist" -> {
-					memberService.getWaitlist()
-						.onSuccess(res -> {
-							message.reply(new JsonObject().put("waitlist", Constants.GSON.toJson(res)));
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
-				
-				case "getLastMemberNumber" -> {
-					memberService.getLastMemberNumber()
-						.onSuccess(res -> {
-							message.reply(new JsonObject().put("lastMemberNumber", res));
-						})
-						.onFailure(err -> message.fail(404, err.getMessage()));
-				}
-
-				default -> message.fail(400, "Unknown action: " + action);
-			}
-		});
-	}
-
-
+                default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
+            }
+        });
+    }
 }

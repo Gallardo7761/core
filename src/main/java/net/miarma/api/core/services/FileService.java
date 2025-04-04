@@ -10,7 +10,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants.CoreFileContext;
-import net.miarma.api.common.QueryParams;
+import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.core.dao.FileDAO;
 import net.miarma.api.core.entities.FileEntity;
 import net.miarma.api.util.MessageUtil;

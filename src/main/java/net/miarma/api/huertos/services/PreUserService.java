@@ -4,10 +4,12 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryParams;
+import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.PreUserDAO;
 import net.miarma.api.huertos.entities.PreUserEntity;
+import net.miarma.api.util.MessageUtil;
 
+@SuppressWarnings("unused")
 public class PreUserService {
 
 	private final PreUserDAO preUserDAO;
@@ -26,6 +28,11 @@ public class PreUserService {
 				.filter(p -> p.getPre_user_id().equals(id))
 				.findFirst()
 				.orElse(null);
+
+			if (preUser == null) {
+				return Future.failedFuture(MessageUtil.notFound("PreUser", "with id " + id));
+			}
+
 			return Future.succeededFuture(preUser);
 		});
 	}
@@ -35,10 +42,14 @@ public class PreUserService {
 	}
 
 	public Future<PreUserEntity> update(PreUserEntity preUser) {
-		return preUserDAO.update(preUser);
+		return getById(preUser.getPre_user_id()).compose(existing -> {
+			return preUserDAO.update(preUser);
+		});
 	}
 
 	public Future<PreUserEntity> delete(Integer id) {
-		return preUserDAO.delete(id);
+		return getById(id).compose(existing -> {
+			return preUserDAO.delete(id);
+		});
 	}
 }

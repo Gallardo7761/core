@@ -4,15 +4,20 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.SingleJsonResponse;
-import net.miarma.api.common.security.JWTManager;
+import net.miarma.api.common.http.ApiStatus;
+import net.miarma.api.util.JsonUtil;
 
 public class UserLogicHandler {
 
     private final Vertx vertx;
-    
+
     public UserLogicHandler(Vertx vertx) {
         this.vertx = vertx;
+    }
+
+    private void handleError(RoutingContext ctx, Throwable err) {
+        ApiStatus status = ApiStatus.fromException(err);
+        JsonUtil.sendJson(ctx, status, null, err.getMessage());
     }
 
     public void login(RoutingContext ctx) {
@@ -26,14 +31,11 @@ public class UserLogicHandler {
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body())
-                        		.put("tokenTime", System.currentTimeMillis())
-                        		.encode());
+                JsonObject result = (JsonObject) ar.result().body();
+                result.put("tokenTime", System.currentTimeMillis());
+                JsonUtil.sendJson(ctx, ApiStatus.OK, result);
             } else {
-                ctx.response().setStatusCode(401).end(
-            		Constants.GSON.toJson(SingleJsonResponse.of("The user is inactive or banned"))
-        		);
+                handleError(ctx, ar.cause());
             }
         });
     }
@@ -50,9 +52,9 @@ public class UserLogicHandler {
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response().setStatusCode(201).end();
+                JsonUtil.sendJson(ctx, ApiStatus.CREATED, null);
             } else {
-                ctx.response().setStatusCode(400).end(ar.cause().getMessage());
+                handleError(ctx, ar.cause());
             }
         });
     }
@@ -67,9 +69,9 @@ public class UserLogicHandler {
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response().setStatusCode(204).end();
+                JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
             } else {
-                ctx.response().setStatusCode(400).end(ar.cause().getMessage());
+                handleError(ctx, ar.cause());
             }
         });
     }
@@ -85,38 +87,30 @@ public class UserLogicHandler {
                     .put("token", token);
 
             vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
-                if (ar.succeeded() && (Boolean) ar.result().body()) {
-                    ctx.response().setStatusCode(200)
-                    .putHeader("Content-Type", "application/json")
-                    .end(
-                    	Constants.GSON.toJson(SingleJsonResponse.of("Valid token"))
-            		);
+                if (ar.succeeded() && Boolean.TRUE.equals(ar.result().body())) {
+                    JsonUtil.sendJson(ctx, ApiStatus.OK, true, "Valid token");
                 } else {
-                    ctx.response().setStatusCode(401).end(
-                    		Constants.GSON.toJson(SingleJsonResponse.of("Invalid token"))
-            		);
+                    JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, false, "Invalid token");
                 }
             });
         } else {
-            ctx.response().setStatusCode(400).end(
-            	Constants.GSON.toJson(SingleJsonResponse.of("Missing or invalid Authorization header"))
-    		);
+            JsonUtil.sendJson(ctx, ApiStatus.BAD_REQUEST, null, "Missing or invalid Authorization header");
         }
-    }   
-    
+    }
+
     public void getInfo(RoutingContext ctx) {
         String authHeader = ctx.request().getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Unauthorized")));
+            JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, null, "Unauthorized");
             return;
         }
 
         String token = authHeader.substring(7);
-        int userId = JWTManager.getInstance().getUserId(token);
+        int userId = net.miarma.api.common.security.JWTManager.getInstance().getUserId(token);
 
         if (userId <= 0) {
-            ctx.response().setStatusCode(401).end(Constants.GSON.toJson(SingleJsonResponse.of("Invalid token")));
+            JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, null, "Invalid token");
             return;
         }
 
@@ -126,119 +120,108 @@ public class UserLogicHandler {
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response()
-                        .putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
+                JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                ctx.response()
-                        .setStatusCode(404)
-                        .end(Constants.GSON.toJson(SingleJsonResponse.of("User not found")));
+                handleError(ctx, ar.cause());
             }
         });
     }
 
     public void exists(RoutingContext ctx) {
-        String userId = ctx.pathParam("user_id");
+        int userId = Integer.parseInt(ctx.pathParam("user_id"));
 
         JsonObject request = new JsonObject()
                 .put("action", "userExists")
-                .put("userId", Integer.parseInt(userId));
+                .put("userId", userId);
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response()
-                        .putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
+                JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                ctx.response()
-                        .setStatusCode(500)
-                        .end(Constants.GSON.toJson(SingleJsonResponse.of("Error checking existence")));
+                handleError(ctx, ar.cause());
             }
         });
     }
 
     public void getStatus(RoutingContext ctx) {
-        String userId = ctx.pathParam("user_id");
+        int userId = Integer.parseInt(ctx.pathParam("user_id"));
 
         JsonObject request = new JsonObject()
                 .put("action", "getStatus")
-                .put("userId", Integer.parseInt(userId));
+                .put("userId", userId);
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
+                JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
+                handleError(ctx, ar.cause());
             }
         });
     }
 
     public void getRole(RoutingContext ctx) {
-        String userId = ctx.pathParam("user_id");
+        int userId = Integer.parseInt(ctx.pathParam("user_id"));
 
         JsonObject request = new JsonObject()
                 .put("action", "getRole")
-                .put("userId", Integer.parseInt(userId));
+                .put("userId", userId);
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
+                JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
+                handleError(ctx, ar.cause());
             }
         });
     }
 
     public void getAvatar(RoutingContext ctx) {
-        String userId = ctx.pathParam("user_id");
+        int userId = Integer.parseInt(ctx.pathParam("user_id"));
 
         JsonObject request = new JsonObject()
                 .put("action", "getAvatar")
-                .put("userId", Integer.parseInt(userId));
+                .put("userId", userId);
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                ctx.response().putHeader("Content-Type", "application/json")
-                        .end(((JsonObject) ar.result().body()).encode());
+                JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
+                handleError(ctx, ar.cause());
             }
         });
     }
-    
+
     public void updateStatus(RoutingContext ctx) {
-		JsonObject body = ctx.body().asJsonObject();
+        JsonObject body = ctx.body().asJsonObject();
 
-		JsonObject request = new JsonObject()
-				.put("action", "updateStatus")
-				.put("userId", body.getInteger("userId"))
-				.put("status", body.getInteger("status"));
+        JsonObject request = new JsonObject()
+                .put("action", "updateStatus")
+                .put("userId", body.getInteger("userId"))
+                .put("status", body.getInteger("status"));
 
-		vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
-			if (ar.succeeded()) {
-				ctx.response().setStatusCode(204).end();
-			} else {
-				ctx.response().setStatusCode(400).end(ar.cause().getMessage());
-			}
-		});
-	}
-    
+        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
+            if (ar.succeeded()) {
+                JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
+            } else {
+                handleError(ctx, ar.cause());
+            }
+        });
+    }
+
     public void updateRole(RoutingContext ctx) {
-		JsonObject body = ctx.body().asJsonObject();
+        JsonObject body = ctx.body().asJsonObject();
 
-		JsonObject request = new JsonObject()
-				.put("action", "updateRole")
-				.put("userId", body.getInteger("userId"))
-				.put("role", body.getInteger("role"));
+        JsonObject request = new JsonObject()
+                .put("action", "updateRole")
+                .put("userId", body.getInteger("userId"))
+                .put("role", body.getInteger("role"));
 
-		vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
-			if (ar.succeeded()) {
-				ctx.response().setStatusCode(204).end();
-			} else {
-				ctx.response().setStatusCode(400).end(ar.cause().getMessage());
-			}
-		});
-	}
+        vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
+            if (ar.succeeded()) {
+                JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
+            } else {
+                handleError(ctx, ar.cause());
+            }
+        });
+    }
 }

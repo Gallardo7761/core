@@ -6,11 +6,11 @@ import java.util.Map;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryFilters;
-import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
+import net.miarma.api.common.http.QueryFilters;
+import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 
 public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
@@ -49,10 +49,10 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		Promise<UserMetadataEntity> promise = Promise.promise();
 		String query = QueryBuilder.insert(user).build();
 
-		db.execute(query, UserMetadataEntity.class,
-			list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-			promise::fail
-		);
+		db.executeOne(query, UserMetadataEntity.class,
+            result -> promise.complete(result),
+            promise::fail
+        );
 
 		return promise.future();
 	}
@@ -62,10 +62,10 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		Promise<UserMetadataEntity> promise = Promise.promise();
 		String query = QueryBuilder.update(user).build();
 
-		db.execute(query, UserMetadataEntity.class,
-			list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-			promise::fail
-		);
+		db.executeOne(query, UserMetadataEntity.class,
+            result -> promise.complete(result),
+            promise::fail
+        );
 
 		return promise.future();
 	}
@@ -78,10 +78,10 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 
 		String query = QueryBuilder.delete(user).build();
 
-		db.execute(query, UserMetadataEntity.class,
-			list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-			promise::fail
-		);
+		db.executeOne(query, UserMetadataEntity.class,
+            result -> promise.complete(result),
+            promise::fail
+        );
 
 		return promise.future();
 	}

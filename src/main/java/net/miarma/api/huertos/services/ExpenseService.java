@@ -4,9 +4,10 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryParams;
+import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.ExpenseDAO;
 import net.miarma.api.huertos.entities.ExpenseEntity;
+import net.miarma.api.util.MessageUtil;
 
 public class ExpenseService {
 
@@ -26,6 +27,9 @@ public class ExpenseService {
 				.filter(e -> e.getExpense_id().equals(id))
 				.findFirst()
 				.orElse(null);
+			if (expense == null) {
+				return Future.failedFuture(MessageUtil.notFound("Expense", "in the database"));
+			}
 			return Future.succeededFuture(expense);
 		});
 	}
@@ -35,10 +39,20 @@ public class ExpenseService {
 	}
 
 	public Future<ExpenseEntity> update(ExpenseEntity expense) {
-		return expenseDAO.update(expense);
+		return getById(expense.getExpense_id()).compose(existing -> {
+			if (existing == null) {
+				return Future.failedFuture(MessageUtil.notFound("Expense", "to update"));
+			}
+			return expenseDAO.update(expense);
+		});
 	}
 
 	public Future<ExpenseEntity> delete(Integer id) {
-		return expenseDAO.delete(id);
+		return getById(id).compose(existing -> {
+			if (existing == null) {
+				return Future.failedFuture(MessageUtil.notFound("Expense", "to delete"));
+			}
+			return expenseDAO.delete(id);
+		});
 	}
 }

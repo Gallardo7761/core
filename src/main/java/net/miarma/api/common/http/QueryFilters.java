@@ -1,4 +1,4 @@
-package net.miarma.api.common;
+package net.miarma.api.common.http;
 
 import java.util.Optional;
 

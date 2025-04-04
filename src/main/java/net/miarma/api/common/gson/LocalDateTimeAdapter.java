@@ -1,4 +1,4 @@
-package net.miarma.api.common;
+package net.miarma.api.common.gson;
 
 import com.google.gson.*;
 import java.lang.reflect.Type;

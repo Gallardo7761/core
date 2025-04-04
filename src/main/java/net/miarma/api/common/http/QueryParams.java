@@ -1,4 +1,4 @@
-package net.miarma.api.common;
+package net.miarma.api.common.http;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

@@ -1,14 +1,14 @@
 package net.miarma.api.core.handlers;
 
-import java.util.stream.Collectors;
-
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.QueryParams;
-import net.miarma.api.common.SingleJsonResponse;
+import net.miarma.api.common.http.ApiStatus;
+import net.miarma.api.common.http.QueryParams;
+import net.miarma.api.common.http.SingleJsonResponse;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
+import net.miarma.api.util.JsonUtil;
 
 @SuppressWarnings("unused")
 public class UserDataHandler {
@@ -22,50 +22,60 @@ public class UserDataHandler {
     public void getAll(RoutingContext ctx) {
     	QueryParams params = QueryParams.from(ctx);
     	
-        userService.getAll(params).onSuccess(users -> {
-            String result = users.stream()
-                .map(u -> Constants.GSON.toJson(u, UserEntity.class))
-                .collect(Collectors.joining(", ", "[", "]"));
-            ctx.response().putHeader("Content-Type", "application/json").end(result);
-        }).onFailure(err -> {
-            ctx.response().setStatusCode(500).end(Constants.GSON.toJson(SingleJsonResponse.of("Internal server error")));
-        });
+        userService.getAll(params)
+	        .onSuccess(users -> {
+	            JsonUtil.sendJson(ctx, ApiStatus.OK, users);
+	        }).onFailure(err -> {
+	        	ApiStatus status = ApiStatus.fromException(err);
+	        	JsonUtil.sendJson(ctx, status, null, err.getMessage());
+	        });
     }
 
     public void getById(RoutingContext ctx) {
         Integer userId = Integer.parseInt(ctx.pathParam("user_id"));
-        userService.getById(userId).onSuccess(user -> {
-            String result = Constants.GSON.toJson(user, UserEntity.class);
-            ctx.response().putHeader("Content-Type", "application/json").end(result);
-        }).onFailure(err -> {
-            ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
-        });
+        
+        userService.getById(userId)
+	        .onSuccess(user -> {
+	            JsonUtil.sendJson(ctx, ApiStatus.OK, user);
+	        }).onFailure(err -> {
+	            ApiStatus status = ApiStatus.fromException(err);
+				JsonUtil.sendJson(ctx, status, null, err.getMessage());
+	        });
     }
 
     public void create(RoutingContext ctx) {
         UserEntity user = Constants.GSON.fromJson(ctx.body().asString(), UserEntity.class);
-        userService.create(user).onSuccess(result -> {
-            ctx.response().setStatusCode(201).end(result.encode());
-        }).onFailure(err -> {
-            ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
-        });
+        
+        userService.register(user)
+	        .onSuccess(result -> {
+	            JsonUtil.sendJson(ctx, ApiStatus.CREATED, result);
+	        }).onFailure(err -> {
+	            ApiStatus status = ApiStatus.fromException(err);
+				JsonUtil.sendJson(ctx, status, null, err.getMessage());
+	        });
     }
 
     public void update(RoutingContext ctx) {
         UserEntity user = Constants.GSON.fromJson(ctx.body().asString(), UserEntity.class);
-        userService.update(user).onSuccess(result -> {
-            ctx.response().setStatusCode(204).end();
-        }).onFailure(err -> {
-            ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Not found")));
-        });
+        
+        userService.update(user)
+	        .onSuccess(result -> {
+	            JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, result);
+	        }).onFailure(err -> {
+	            ApiStatus status = ApiStatus.fromException(err);
+				JsonUtil.sendJson(ctx, status, null, err.getMessage());
+	        });
     }
 
     public void delete(RoutingContext ctx) {
         Integer userId = Integer.parseInt(ctx.pathParam("user_id"));
-        userService.delete(userId).onSuccess(result -> {
-            ctx.response().setStatusCode(204).end();
-        }).onFailure(err -> {
-            ctx.response().setStatusCode(404).end(Constants.GSON.toJson(SingleJsonResponse.of("Bad request")));
-        });
+        
+        userService.delete(userId)
+	        .onSuccess(result -> {
+	            JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, result);
+	        }).onFailure(err -> {
+	            ApiStatus status = ApiStatus.fromException(err);
+				JsonUtil.sendJson(ctx, status, null, err.getMessage());
+	        });
     }
 } 

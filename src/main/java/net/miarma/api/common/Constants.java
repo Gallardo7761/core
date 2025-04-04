@@ -8,6 +8,12 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.vertx.core.json.JsonObject;
+import net.miarma.api.common.gson.APIDontReturnExclusionStrategy;
+import net.miarma.api.common.gson.JsonObjectTypeAdapter;
+import net.miarma.api.common.gson.LocalDateTimeAdapter;
+import net.miarma.api.common.gson.ValuableEnumTypeAdapter;
+
 public class Constants {
 	public static final String APP_NAME = "MiarmaCoreAPI";
 	public static final String BASE_PREFIX = "/api";
@@ -32,6 +38,7 @@ public class Constants {
 	
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+			.registerTypeAdapter(JsonObject.class, new JsonObjectTypeAdapter())
 			.registerTypeHierarchyAdapter(ValuableEnum.class, new ValuableEnumTypeAdapter())
 			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
 			.create();

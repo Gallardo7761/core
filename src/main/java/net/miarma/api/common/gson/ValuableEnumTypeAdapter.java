@@ -1,9 +1,11 @@
-package net.miarma.api.common;
+package net.miarma.api.common.gson;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import net.miarma.api.common.ValuableEnum;
 
 import java.lang.reflect.Type;
 

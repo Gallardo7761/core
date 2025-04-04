@@ -1,5 +1,8 @@
 package net.miarma.api.core.verticles;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -14,6 +17,7 @@ import net.miarma.api.core.api.CoreDataRouter;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.FileService;
 import net.miarma.api.core.services.UserService;
+import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.RouterUtil;
 
 @SuppressWarnings("unused")
@@ -47,9 +51,15 @@ public class CoreDataVerticle extends AbstractVerticle {
             String action = body.getString("action");
 
             switch (action) {
-                case "login" -> userService.login(body.getString("email"), body.getString("password"), body.getBoolean("keepLoggedIn"))
-                    .onSuccess(message::reply)
-                    .onFailure(err -> message.fail(401, err.getMessage()));
+                case "login" -> {
+                	String email = body.getString("email");
+                	String password = body.getString("password");
+                	boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
+                	
+                	userService.login(email, password, keepLoggedIn)
+		                .onSuccess(message::reply)
+		                .onFailure(EventBusUtil.fail(message));
+                }
 
                 case "register" -> {
                     UserEntity user = new UserEntity();
@@ -59,85 +69,108 @@ public class CoreDataVerticle extends AbstractVerticle {
                     user.setPassword(body.getString("password"));
 
                     userService.register(user)
-                        .onSuccess(res -> message.reply("User registered successfully"))
-                        .onFailure(err -> message.fail(400, err.getMessage()));
+	                    .onSuccess(message::reply)
+	                    .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "changePassword" -> userService.changePassword(body.getInteger("userId"), body.getString("newPassword"))
-                    .onSuccess(res -> message.reply("Password changed successfully"))
-                    .onFailure(err -> message.fail(400, err.getMessage()));
+                case "changePassword" -> {
+                	Integer userId = body.getInteger("userId");
+                	String newPassword = body.getString("newPassword");
+                	
+                	userService.changePassword(userId, newPassword)
+		                .onSuccess(message::reply)
+		                .onFailure(EventBusUtil.fail(message));
+                }
 
                 case "validateToken" -> {
-                    boolean isValid = userService.validateToken(body.getString("token"));
-                    message.reply(isValid);
+                	String token = body.getString("token");
+                	
+                    userService.validateToken(token)
+	            		.onSuccess(message::reply)
+		                .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "getInfo", "getById" -> userService.getById(body.getInteger("userId"))
-                    .onSuccess(user -> message.reply(new JsonObject(user.encode())))
-                    .onFailure(err -> message.fail(404, "User not found"));
+                case "getInfo", "getById" -> {
+                	Integer userId = body.getInteger("userId");
+                	
+                	userService.getById(userId)
+	                    .onSuccess(message::reply)
+	                    .onFailure(EventBusUtil.fail(message));
+                }
 
-                case "userExists" -> userService.getById(body.getInteger("userId"))
-                    .onSuccess(user -> message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", user != null)))
-                    .onFailure(err -> message.reply(new JsonObject().put("user_id", body.getInteger("userId")).put("exists", false)));
+                case "userExists" -> {
+                    Integer userId = body.getInteger("userId");
+
+                    userService.getById(userId)
+                        .onSuccess(user -> {
+                            Map<String, Object> result = new HashMap<>();
+                            result.put("user_id", userId);
+                            result.put("exists", user != null);
+                            message.reply(result);
+                        })
+                        .onFailure(EventBusUtil.fail(message));
+                }
 
                 case "getByEmail" -> userService.getByEmail(body.getString("email"))
-                    .onSuccess(user -> message.reply(new JsonObject(user.encode())))
-                    .onFailure(err -> message.fail(404, "Not found"));
+                    .onSuccess(message::reply)
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "getByUserName" -> userService.getByUserName(body.getString("userName"))
-                    .onSuccess(user -> message.reply(new JsonObject(user.encode())))
-                    .onFailure(err -> message.fail(404, "Not found"));
+                    .onSuccess(message::reply)
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "getStatus" -> userService.getById(body.getInteger("userId"))
                     .onSuccess(user -> {
-                        JsonObject response = new JsonObject()
-                            .put("user_id", user.getUser_id())
-                            .put("status", user.getGlobal_status());
-                        message.reply(response);
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("user_id", user.getUser_id());
+                        result.put("status", user.getGlobal_status());
+                        message.reply(result);
                     })
-                    .onFailure(err -> message.fail(404, "User not found"));
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "getRole" -> userService.getById(body.getInteger("userId"))
                     .onSuccess(user -> {
-                        JsonObject response = new JsonObject()
-                            .put("user_id", user.getUser_id())
-                            .put("role", user.getRole());
-                        message.reply(response);
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("user_id", user.getUser_id());
+                        result.put("role", user.getRole());
+                        message.reply(result);
                     })
-                    .onFailure(err -> message.fail(404, "User not found"));
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "getAvatar" -> userService.getById(body.getInteger("userId"))
                     .onSuccess(user -> {
-                        JsonObject response = new JsonObject()
-                            .put("user_id", user.getUser_id())
-                            .put("avatar", user.getAvatar());
-                        message.reply(response);
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("user_id", user.getUser_id());
+                        result.put("avatar", user.getAvatar());
+                        message.reply(result);
                     })
-                    .onFailure(err -> message.fail(404, "User not found"));
+                    .onFailure(EventBusUtil.fail(message));
 
-                case "updateStatus" -> userService.updateStatus(body.getInteger("userId"),
+                case "updateStatus" -> userService.updateStatus(
+                        body.getInteger("userId"),
                         CoreUserGlobalStatus.fromInt(body.getInteger("status")))
                     .onSuccess(res -> message.reply("Status updated successfully"))
-                    .onFailure(err -> message.fail(400, err.getMessage()));
+                    .onFailure(EventBusUtil.fail(message));
 
-                case "updateRole" -> userService.updateRole(body.getInteger("userId"),
+                case "updateRole" -> userService.updateRole(
+                        body.getInteger("userId"),
                         CoreUserRole.fromInt(body.getInteger("role")))
                     .onSuccess(res -> message.reply("Role updated successfully"))
-                    .onFailure(err -> message.fail(400, err.getMessage()));
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "getUserFiles" -> fileService.getUserFiles(body.getInteger("userId"))
-                    .onSuccess(files -> message.reply(Constants.GSON.toJson(files, files.getClass())))
-                    .onFailure(err -> message.fail(404, "The user has no files"));
+                    .onSuccess(message::reply)
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "uploadFile" -> fileService.create(body)
                     .onSuccess(res -> message.reply("File uploaded successfully"))
-                    .onFailure(err -> message.fail(400, err.getMessage()));
+                    .onFailure(EventBusUtil.fail(message));
 
                 case "downloadFile" -> fileService.downloadFile(body.getInteger("fileId"))
                     .onSuccess(message::reply)
-                    .onFailure(err -> message.fail(404, "File not found"));
+                    .onFailure(EventBusUtil.fail(message));
 
-                default -> message.fail(400, "Unknown action: " + action);
+                default -> EventBusUtil.fail(message);
             }
         });
     }

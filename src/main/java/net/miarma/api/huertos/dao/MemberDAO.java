@@ -6,11 +6,11 @@ import java.util.Map;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryFilters;
-import net.miarma.api.common.QueryParams;
 import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
+import net.miarma.api.common.http.QueryFilters;
+import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.entities.MemberEntity;
 
 public class MemberDAO implements DataAccessObject<MemberEntity> {

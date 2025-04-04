@@ -4,10 +4,12 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.QueryParams;
+import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.RequestDAO;
 import net.miarma.api.huertos.entities.RequestEntity;
+import net.miarma.api.util.MessageUtil;
 
+@SuppressWarnings("unused")
 public class RequestService {
 
 	private final RequestDAO requestDAO;
@@ -26,6 +28,11 @@ public class RequestService {
 				.filter(r -> r.getRequest_id().equals(id))
 				.findFirst()
 				.orElse(null);
+
+			if (request == null) {
+				return Future.failedFuture(MessageUtil.notFound("Request", "with id " + id));
+			}
+
 			return Future.succeededFuture(request);
 		});
 	}
@@ -35,10 +42,14 @@ public class RequestService {
 	}
 
 	public Future<RequestEntity> update(RequestEntity request) {
-		return requestDAO.update(request);
+		return getById(request.getRequest_id()).compose(existing -> {
+			return requestDAO.update(request);
+		});
 	}
 
 	public Future<RequestEntity> delete(Integer id) {
-		return requestDAO.delete(id);
+		return getById(id).compose(existing -> {
+			return requestDAO.delete(id);
+		});
 	}
 }

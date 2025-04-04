@@ -5,6 +5,7 @@ import java.util.Set;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.middlewares.AuthGuard;
 import net.miarma.api.core.handlers.FileDataHandler;
@@ -31,6 +32,8 @@ public class CoreDataRouter {
 			.handler(routingContext -> routingContext.response()
 					.putHeader("Content-Type", "application/json")
 					.setStatusCode(200).end());
+		
+		router.route().handler(BodyHandler.create());
 		
 		router.get(CoreEndpoints.USERS).handler(AuthGuard.admin()).handler(hUserData::getAll);
 		router.get(CoreEndpoints.USER).handler(AuthGuard.admin()).handler(hUserData::getById);

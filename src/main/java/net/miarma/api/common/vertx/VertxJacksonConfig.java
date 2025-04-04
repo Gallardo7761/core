@@ -1,4 +1,4 @@
-package net.miarma.api.common;
+package net.miarma.api.common.vertx;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
