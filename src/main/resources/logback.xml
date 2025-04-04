@@ -11,5 +11,10 @@
   <root level="INFO">
     <appender-ref ref="STDOUT"/>
   </root>
+  
+  <logger name="io.netty" level="WARN"/>
+  <logger name="io.vertx" level="INFO"/>
+  <logger name="io.vertx.core.impl.launcher" level="INFO"/>
+  <logger name="io.vertx.core.logging" level="INFO"/>
 
 </configuration>

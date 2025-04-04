@@ -35,9 +35,6 @@ C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\common\security\
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\common\security\SecretManager.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\common\ValuableEnum.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\common\vertx\VertxJacksonConfig.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\api\CoreDataRouter.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\api\CoreEndpoints.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\api\CoreLogicRouter.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\dao\FileDAO.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\dao\UserDAO.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\entities\FileEntity.java
@@ -46,14 +43,14 @@ C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\handlers\Fi
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\handlers\FileLogicHandler.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\handlers\UserDataHandler.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\handlers\UserLogicHandler.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\routing\CoreDataRouter.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\routing\CoreEndpoints.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\routing\CoreLogicRouter.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\services\FileService.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\services\UserService.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\verticles\CoreDataVerticle.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\verticles\CoreLogicVerticle.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\core\verticles\CoreMainVerticle.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\api\HuertosDataRouter.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\api\HuertosEndpoints.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\api\HuertosLogicRouter.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\dao\AnnounceDAO.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\dao\BalanceDAO.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\dao\ExpenseDAO.java
@@ -85,6 +82,9 @@ C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\handlers
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\handlers\PreUserLogicHandler.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\handlers\RequestDataHandler.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\handlers\RequestLogicHandler.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\routing\HuertosDataRouter.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\routing\HuertosEndpoints.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\routing\HuertosLogicRouter.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\services\AnnounceService.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\services\BalanceService.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\services\ExpenseService.java
@@ -96,9 +96,6 @@ C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\verticle
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\verticles\HuertosLogicVerticle.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\huertos\verticles\HuertosMainVerticle.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\MainVerticle.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\api\MMCDataRouter.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\api\MMCEndpoints.java
-C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\api\MMCLogicRouter.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\dao\ModDAO.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\dao\SuggestionDAO.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\dao\SuggestionTagDAO.java
@@ -114,6 +111,9 @@ C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\hand
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\handlers\SuggestionTagHandler.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\handlers\SuggestionVoteHandler.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\handlers\UserHandler.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\routing\MMCDataRouter.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\routing\MMCEndpoints.java
+C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\routing\MMCLogicRouter.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\services\MMCService.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\verticles\MMCDataVerticle.java
 C:\Users\jomaa\git\MiarmaEcosystem\src\main\java\net\miarma\api\miarmacraft\verticles\MMCLogicVerticle.java
