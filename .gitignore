@@ -1,3 +1,4 @@
 /src/main/resources/.env
 /target/classes
 /bin/
+/inserts.sql

@@ -2,15 +2,16 @@ package net.miarma.api.huertos.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.QueryFilters;
 import net.miarma.api.common.QueryParams;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
@@ -46,7 +47,7 @@ public class MemberService {
 
 
                 MemberEntity member = new MemberEntity(user, metadata);
-
+                
                 return new JsonObject()
                     .put("token", json.getString("token"))
                     .put("member", new JsonObject(Constants.GSON.toJson(member)));
@@ -59,23 +60,58 @@ public class MemberService {
 	}
     
     public Future<List<MemberEntity>> getAll(QueryParams params) {
-    	QueryParams userParams = QueryParams.filterForEntity(params, UserEntity.class);
-    	QueryParams metadataParams = QueryParams.filterForEntity(params, UserMetadataEntity.class);
-    	
-        return userDAO.getAll(userParams).compose(userList ->
-            userMetadataDAO.getAll(metadataParams).map(metadataList ->
-                userList.stream()
-                    .map(user -> {
-                        UserMetadataEntity metadata = metadataList.stream()
-                    		.filter(m -> m.getUser_id().equals(user.getUser_id()))
-                            .findFirst()
-                            .orElse(null);
-                        return new MemberEntity(user, metadata);
-                    })
-                    .toList()
-            )
-        );
+        QueryParams userParams = QueryParams.filterForEntity(params, UserEntity.class, "user");
+        QueryParams metadataParams = QueryParams.filterForEntity(params, UserMetadataEntity.class, "metadata");
+
+        if (!metadataParams.getFilters().isEmpty()) {
+            return userMetadataDAO.getAll(metadataParams).compose(metadataList -> {
+                // Extraemos los user_id de los metadata que coinciden
+                List<Integer> userIds = metadataList.stream()
+                    .map(UserMetadataEntity::getUser_id)
+                    .toList();
+
+                if (userIds.isEmpty()) {
+                    // Si no hay coincidencias, no hay que seguir consultando users
+                    return Future.succeededFuture(List.of());
+                }
+
+                // Creamos un filtro por user_id IN (...)
+                String joinedIds = userIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+                userParams.getFilters().put("user_id", "(" + joinedIds + ")");
+
+                return userDAO.getAll(userParams).map(userList ->
+                    userList.stream()
+                        .map(user -> {
+                            UserMetadataEntity metadata = metadataList.stream()
+                                .filter(m -> m.getUser_id().equals(user.getUser_id()))
+                                .findFirst()
+                                .orElse(null);
+                            return new MemberEntity(user, metadata);
+                        })
+                        .toList()
+                );
+            });
+        } else {
+            // No hay filtros en metadata, pillamos todos los metadata posibles
+            return userDAO.getAll(userParams).compose(userList ->
+                userMetadataDAO.getAll().map(metadataList ->
+                    userList.stream()
+                        .map(user -> {
+                            UserMetadataEntity metadata = metadataList.stream()
+                                .filter(m -> m.getUser_id().equals(user.getUser_id()))
+                                .findFirst()
+                                .orElse(null);
+                            return new MemberEntity(user, metadata);
+                        })
+                        .toList()
+                )
+            );
+        }
     }
+
+
     
     public Future<MemberEntity> getById(Integer id) {
     	return getAll().map(list -> list.stream()

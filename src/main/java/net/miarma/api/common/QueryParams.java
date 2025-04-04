@@ -44,15 +44,22 @@ public class QueryParams {
         return new QueryParams(filters, queryFilters);
     }
     
-    public static QueryParams filterForEntity(QueryParams original, Class<?> entityClass) {
+    public static QueryParams filterForEntity(QueryParams original, Class<?> entityClass, String prefix) {
         Set<String> validKeys = getFieldNames(entityClass);
 
         Map<String, String> filtered = original.getFilters().entrySet().stream()
-            .filter(e -> validKeys.contains(e.getKey()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .filter(e -> {
+                String key = e.getKey();
+                return key.startsWith(prefix + ".") && validKeys.contains(key.substring(prefix.length() + 1));
+            })
+            .collect(Collectors.toMap(
+                e -> e.getKey().substring(prefix.length() + 1), // quitar el prefijo
+                Map.Entry::getValue
+            ));
 
         return new QueryParams(filtered, original.getQueryFilters());
     }
+
 
     
     private static Set<String> getFieldNames(Class<?> clazz) {

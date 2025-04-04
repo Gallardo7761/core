@@ -90,6 +90,7 @@ public class QueryBuilder {
                     Object value = extractValue(fieldValue);
                     if (value instanceof String) {
                         conditions.add(field.getName() + " = '" + value + "'");
+                        
                     } else {
                         conditions.add(field.getName() + " = " + value);
                     }
@@ -106,6 +107,38 @@ public class QueryBuilder {
         return qb;
     }
     
+    public QueryBuilder whereWithAlias(Map<String, String> filters, String alias) {
+        if (filters == null || filters.isEmpty()) {
+            return this;
+        }
+
+        List<String> conditions = new ArrayList<>();
+
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (value.startsWith("(") && value.endsWith(")")) {
+                conditions.add(alias + "." + key + " IN " + value);
+            } else if (value.matches("-?\\d+(\\.\\d+)?")) {
+                conditions.add(alias + "." + key + " = " + value);
+            } else {
+                conditions.add(alias + "." + key + " = '" + value + "'");
+            }
+        }
+
+        if (!conditions.isEmpty()) {
+            if (!query.toString().contains("WHERE")) {
+                query.append("WHERE ").append(String.join(" AND ", conditions)).append(" ");
+            } else {
+                query.append("AND ").append(String.join(" AND ", conditions)).append(" ");
+            }
+        }
+
+        return this;
+    }
+
+    
     public QueryBuilder where(Map<String, String> filters) {
         if (filters == null || filters.isEmpty()) {
             return this;
@@ -117,10 +150,14 @@ public class QueryBuilder {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            // Detectar si es número o texto (rudimentario, pero efectivo)
-            if (value.matches("-?\\d+(\\.\\d+)?")) {
+            if (value.startsWith("(") && value.endsWith(")")) {
+                // Soporte para IN (1, 2, 3)
+                conditions.add(key + " IN " + value);
+            } else if (value.matches("-?\\d+(\\.\\d+)?")) {
+                // Número (int o decimal)
                 conditions.add(key + " = " + value);
             } else {
+                // Cadena
                 conditions.add(key + " = '" + value + "'");
             }
         }
@@ -131,6 +168,7 @@ public class QueryBuilder {
 
         return this;
     }
+
 
 
     public static <T> QueryBuilder select(T object, String... columns) {
