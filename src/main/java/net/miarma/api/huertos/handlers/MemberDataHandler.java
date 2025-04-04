@@ -17,12 +17,6 @@ public class MemberDataHandler {
         this.memberService = new MemberService(pool);
     }
 
-    public void resetPasswords(RoutingContext ctx) {
-    	memberService.resetPasswordsToEncryptedDni()
-	        .onSuccess(v -> ctx.response().end("Contraseñas actualizadas"))
-	        .onFailure(err -> ctx.response().setStatusCode(500).end(err.getMessage()));
-	}
-    
     public void getAll(RoutingContext ctx) {
         QueryParams params = QueryParams.from(ctx);
 

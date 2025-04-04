@@ -44,9 +44,7 @@ public class HuertosDataRouter {
 					.setStatusCode(200).end());
 		
 		router.route().handler(BodyHandler.create());
-		
-		router.post("/admin/reset-passwords").handler(hMemberData::resetPasswords);
-		
+				
 		router.get(HuertosEndpoints.ANNOUNCES).handler(AuthGuard.check()).handler(hAnnounceData::getAll);
 		router.get(HuertosEndpoints.ANNOUNCE).handler(AuthGuard.check()).handler(hAnnounceData::getById);
 		router.post(HuertosEndpoints.ANNOUNCES).handler(AuthGuard.admin()).handler(hAnnounceData::create);

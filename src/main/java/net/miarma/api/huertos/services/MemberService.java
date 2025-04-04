@@ -36,26 +36,6 @@ public class MemberService {
         this.userMetadataDAO = new UserMetadataDAO(pool);
         this.userService = new UserService(pool);
     }
-    
-    public Future<Void> resetPasswordsToEncryptedDni() {
-        return memberDAO.getAll().compose(members -> {
-            List<Future<UserEntity>> updates = new ArrayList<>();
-            
-            for (MemberEntity member : members) {
-                String dni = member.getDni();
-                if (dni != null && !dni.isBlank()) {
-                    String hashed = PasswordHasher.hash(dni);
-                    member.setPassword(hashed);
-                    UserEntity user = UserEntity.fromMemberEntity(member);
-                    user.setUser_id(member.getUser_id());
-                    System.out.println(QueryBuilder.update(user).build());
-                    updates.add(userDAO.update(user));
-                }
-            }
-
-            return Future.all(updates).mapEmpty();
-        });
-    }
 
     public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {
         return userService.login(emailOrUserName, password, keepLoggedIn).compose(json -> {
