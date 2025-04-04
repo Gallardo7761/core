@@ -1,7 +1,10 @@
 package net.miarma.api.huertos.verticles;
 
+import java.util.stream.Collectors;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
@@ -58,17 +61,22 @@ public class HuertosDataVerticle extends AbstractVerticle {
                         .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "getByMemberNumber" -> memberService.getByMemberNumber(body.getInteger("memberNumber"))
-                    .onSuccess(message::reply)
-                    .onFailure(EventBusUtil.fail(message));
+                case "getByMemberNumber" ->
+	                memberService.getByMemberNumber(body.getInteger("memberNumber"))
+	                    .onSuccess(member -> message.reply(new JsonObject(Constants.GSON.toJson(member))))
+	                    .onFailure(EventBusUtil.fail(message));
 
-                case "getByPlotNumber" -> memberService.getByPlotNumber(body.getInteger("plotNumber"))
-                    .onSuccess(message::reply)
-                    .onFailure(EventBusUtil.fail(message));
 
-                case "getByDNI" -> memberService.getByDni(body.getString("dni"))
-                    .onSuccess(message::reply)
-                    .onFailure(EventBusUtil.fail(message));
+                case "getByPlotNumber" ->
+	                memberService.getByPlotNumber(body.getInteger("plotNumber"))
+	                    .onSuccess(member -> message.reply(new JsonObject(Constants.GSON.toJson(member))))
+	                    .onFailure(EventBusUtil.fail(message));
+
+
+                case "getByDNI" ->
+	                memberService.getByDni(body.getString("dni"))
+	                    .onSuccess(member -> message.reply(new JsonObject(Constants.GSON.toJson(member))))
+	                    .onFailure(EventBusUtil.fail(message));
 
                 case "getUserPayments" -> incomeService.getUserPayments(body.getInteger("memberNumber"))
                     .onSuccess(payments -> message.reply(new JsonObject().put("payments", payments)))
@@ -78,9 +86,16 @@ public class HuertosDataVerticle extends AbstractVerticle {
                     .onSuccess(result -> message.reply(new JsonObject().put("hasPaid", result)))
                     .onFailure(EventBusUtil.fail(message));
 
-                case "getWaitlist" -> memberService.getWaitlist()
-                    .onSuccess(waitlist -> message.reply(new JsonObject().put("waitlist", waitlist)))
-                    .onFailure(EventBusUtil.fail(message));
+                case "getWaitlist" ->
+	                memberService.getWaitlist()
+	                    .onSuccess(list -> {
+	                    	String listJson = list.stream()
+	                    			.map(member -> Constants.GSON.toJson(member))
+	                    			.collect(Collectors.joining(",", "[", "]"));
+	                        message.reply(new JsonArray(listJson));
+	                    })
+	                    .onFailure(EventBusUtil.fail(message));
+
 
                 case "getLastMemberNumber" -> memberService.getLastMemberNumber()
                     .onSuccess(last -> message.reply(new JsonObject().put("lastMemberNumber", last)))

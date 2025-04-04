@@ -3,6 +3,7 @@ package net.miarma.api.huertos.entities;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
@@ -12,6 +13,14 @@ public class BalanceEntity extends AbstractEntity {
 	private BigDecimal initial_bank;
 	private BigDecimal initial_cash;
 	private LocalDateTime created_at;
+	
+	public BalanceEntity() {
+		super();
+	}
+	
+	public BalanceEntity(Row row) {
+		super(row);
+	}
 	
 	public Integer getId() {
 		return id;

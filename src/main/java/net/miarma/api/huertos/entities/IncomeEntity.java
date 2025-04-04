@@ -1,7 +1,10 @@
 package net.miarma.api.huertos.entities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosPaymentFrequency;
 import net.miarma.api.common.Constants.HuertosPaymentType;
 import net.miarma.api.common.annotations.Table;
@@ -15,8 +18,15 @@ public class IncomeEntity extends AbstractEntity {
 	private BigDecimal amount;
 	private HuertosPaymentType type;
 	private HuertosPaymentFrequency frequency;
-	private Long created_at;
+	private LocalDateTime created_at;
 	
+	public IncomeEntity() {
+		super();
+	}
+	
+	public IncomeEntity(Row row) {
+		super(row);
+	}	
 	
 	public Integer getIncome_id() {
 		return income_id;
@@ -54,18 +64,18 @@ public class IncomeEntity extends AbstractEntity {
 	public void setFrequency(HuertosPaymentFrequency frequency) {
 		this.frequency = frequency;
 	}
-	public Long getCreated_at() {
+	public LocalDateTime getCreated_at() {
 		return created_at;
 	}
-	public void setCreated_at(Long created_at) {
+	public void setCreated_at(LocalDateTime created_at) {
 		this.created_at = created_at;
 	}
 	
 	public boolean isPaid() {
 		if(frequency == HuertosPaymentFrequency.BIYEARLY) {
-			return (System.currentTimeMillis() - created_at) > 6 * 30 * 24 * 60 * 60 * 1000;
+			return (System.currentTimeMillis() - created_at.toEpochSecond(ZoneOffset.UTC)) > 6 * 30 * 24 * 60 * 60 * 1000;
 		} else if(frequency == HuertosPaymentFrequency.YEARLY) {
-			return (System.currentTimeMillis() - created_at) > 12 * 30 * 24 * 60 * 60 * 1000;
+			return (System.currentTimeMillis() - created_at.toEpochSecond(ZoneOffset.UTC)) > 12 * 30 * 24 * 60 * 60 * 1000;
 		} else {
 			return false;
 		}

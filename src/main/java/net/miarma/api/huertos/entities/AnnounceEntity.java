@@ -2,6 +2,7 @@ package net.miarma.api.huertos.entities;
 
 import java.time.LocalDateTime;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosAnnouncePriority;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
@@ -13,6 +14,14 @@ public class AnnounceEntity extends AbstractEntity {
 	private HuertosAnnouncePriority priority;
 	private Integer published_by;
 	private LocalDateTime created_at;
+	
+	public AnnounceEntity() {
+		super();
+	}
+	
+	public AnnounceEntity(Row row) {
+		super(row);
+	}
 	
 	public Integer getAnnounce_id() {
 		return announce_id;

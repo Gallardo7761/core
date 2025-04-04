@@ -2,6 +2,7 @@ package net.miarma.api.core.entities;
 
 import java.time.LocalDateTime;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.CoreFileContext;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
@@ -15,6 +16,14 @@ public class FileEntity extends AbstractEntity {
     private Integer uploaded_by;
     private CoreFileContext context;
     private LocalDateTime uploaded_at;
+    
+    public FileEntity() {
+		super();
+	}
+    
+    public FileEntity(Row row) {
+    	super(row);
+    }
 
     public Integer getFile_id() {
         return file_id;

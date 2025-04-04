@@ -2,6 +2,7 @@ package net.miarma.api.huertos.entities;
 
 import java.time.LocalDateTime;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
 import net.miarma.api.common.annotations.Table;
@@ -24,6 +25,15 @@ public class PreUserEntity extends AbstractEntity {
 	private HuertosUserType type;
 	private HuertosUserStatus status;
 	private LocalDateTime created_at;
+	
+	
+	public PreUserEntity() {
+		super();
+	}
+	
+	public PreUserEntity(Row row) {
+		super(row);
+	}
 	
 	public Integer getPre_user_id() {
 		return pre_user_id;

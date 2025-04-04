@@ -1,7 +1,15 @@
 package net.miarma.api.common.db;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import net.miarma.api.common.Constants;
@@ -132,7 +140,7 @@ public class QueryBuilder {
                         continue;
                     }
                     Object value = extractValue(fieldValue);
-                    if (value instanceof String) {
+                    if (value instanceof String || value instanceof LocalDateTime) {
                         joiner.add(key + " = '" + value + "'");
                     } else {
                         joiner.add(key + " = " + value.toString());
@@ -164,7 +172,7 @@ public class QueryBuilder {
                 Object fieldValue = field.get(object);
                 if (fieldValue != null) {
                     Object value = extractValue(fieldValue);
-                    if (value instanceof String) {
+                    if (value instanceof String || value instanceof LocalDateTime) {
                         values.add("'" + value + "'");
                     } else {
                         values.add(value.toString());
@@ -206,11 +214,13 @@ public class QueryBuilder {
 
                 if (fieldName.endsWith("_id")) {
                     idField = field;
-                    whereJoiner.add(fieldName + " = " + (value instanceof String ? "'" + value + "'" : value));
+                    whereJoiner.add(fieldName + " = " + (value instanceof String
+                    		|| value instanceof LocalDateTime ? "'" + value + "'" : value));
                     continue;
                 }
 
-                setJoiner.add(fieldName + " = " + (value instanceof String ? "'" + value + "'" : value));
+                setJoiner.add(fieldName + " = " + (value instanceof String
+                		|| value instanceof LocalDateTime ? "'" + value + "'" : value));
             } catch (Exception e) {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
             }
@@ -239,7 +249,8 @@ public class QueryBuilder {
                 Object fieldValue = field.get(object);
                 if (fieldValue != null) {
                     Object value = extractValue(fieldValue);
-                    joiner.add(field.getName() + " = " + (value instanceof String ? "'" + value + "'" : value.toString()));
+                    joiner.add(field.getName() + " = " + (value instanceof String
+                    		|| value instanceof LocalDateTime ? "'" + value + "'" : value.toString()));
                 }
             } catch (Exception e) {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());

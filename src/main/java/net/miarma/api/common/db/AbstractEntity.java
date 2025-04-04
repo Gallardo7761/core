@@ -1,7 +1,6 @@
 package net.miarma.api.common.db;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
@@ -38,20 +37,31 @@ public abstract class AbstractEntity {
                         value = null;
                     }
                 } else {
-                    value = switch (type.getSimpleName()) {
-                        case "Integer" -> row.getInteger(name);
-                        case "String" -> row.getString(name);
-                        case "Double" -> row.getDouble(name);
-                        case "Long" -> row.getLong(name);
-                        case "Boolean" -> row.getBoolean(name);
-                        case "int" -> row.getInteger(name);
-                        case "double" -> row.getDouble(name);
-                        case "long" -> row.getLong(name);
-                        case "boolean" -> row.getBoolean(name);
-                        case "LocalDateTime" -> row.getLocalDateTime(name);
-                        case "BigDecimal" -> row.get(BigDecimal.class, row.getColumnIndex(name));
-                        default -> null;
-                    };
+                	value = switch (type.getSimpleName()) {
+	                    case "Integer" -> row.getInteger(name);
+	                    case "String" -> row.getString(name);
+	                    case "Double" -> row.getDouble(name);
+	                    case "Long" -> row.getLong(name);
+	                    case "Boolean" -> row.getBoolean(name);
+	                    case "int" -> row.getInteger(name);
+	                    case "double" -> row.getDouble(name);
+	                    case "long" -> row.getLong(name);
+	                    case "boolean" -> row.getBoolean(name);
+	                    case "LocalDateTime" -> row.getLocalDateTime(name);
+	                    case "BigDecimal" -> {
+	                        try {
+	                            var numeric = row.get(io.vertx.sqlclient.data.Numeric.class, row.getColumnIndex(name));
+	                            yield numeric != null ? numeric.bigDecimalValue() : null;
+	                        } catch (Exception e) {
+	                            yield null;
+	                        }
+	                    }
+	                    default -> {
+	                        System.err.println("Type not supported yet: " + type.getName() + " for field " + name);
+	                        yield null;
+	                    }
+	                };
+
                 }
 
                 field.set(this, value);

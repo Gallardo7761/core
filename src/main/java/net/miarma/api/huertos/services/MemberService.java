@@ -142,6 +142,7 @@ public class MemberService {
         return memberDAO.getAll().map(list ->
             list.stream()
                 .filter(m -> m.getType().equals(HuertosUserType.WAIT_LIST))
+                .filter(m -> m.getStatus().equals(HuertosUserStatus.ACTIVE))
                 .toList()
         );
     }
@@ -149,7 +150,6 @@ public class MemberService {
     public Future<Integer> getLastMemberNumber() {
         return memberDAO.getAll().map(list ->
             list.stream()
-                .filter(m -> m.getType().equals(HuertosUserType.MEMBER))
                 .map(MemberEntity::getMember_number)
                 .max(Integer::compareTo)
                 .orElse(0)

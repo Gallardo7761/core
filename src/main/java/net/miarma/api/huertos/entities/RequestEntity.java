@@ -2,6 +2,7 @@ package net.miarma.api.huertos.entities;
 
 import java.time.LocalDateTime;
 
+import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosRequestStatus;
 import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.annotations.Table;
@@ -15,6 +16,14 @@ public class RequestEntity extends AbstractEntity {
 	private Integer requested_by;
 	private Integer target_user_id;
 	private LocalDateTime created_at;
+	
+	public RequestEntity() {
+		super();
+	}
+	
+	public RequestEntity(Row row) {
+		super(row);
+	}
 	
 	public Integer getRequest_id() {
 		return request_id;
