@@ -86,7 +86,9 @@ public class UserLogicHandler {
 
             vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
                 if (ar.succeeded() && (Boolean) ar.result().body()) {
-                    ctx.response().setStatusCode(200).end(
+                    ctx.response().setStatusCode(200)
+                    .putHeader("Content-Type", "application/json")
+                    .end(
                     	Constants.GSON.toJson(SingleJsonResponse.of("Valid token"))
             		);
                 } else {

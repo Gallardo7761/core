@@ -47,14 +47,18 @@ public class HuertosDataVerticle extends AbstractVerticle {
 
 			switch (action) {
 				case "login" -> {
-					String emailOrUserName = body.getString("emailOrUserName");
+					String email = body.getString("email", null);
+					String userName = body.getString("userName", null);
 					String password = body.getString("password");
 					boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
 
-					memberService.login(emailOrUserName, password, keepLoggedIn)
+					memberService.login(email != null ? email : userName, password, keepLoggedIn)
 						.onSuccess(res -> {
-							JsonObject json = new JsonObject(Constants.GSON.toJson(res));
-							message.reply(json);
+							JsonObject response = new JsonObject()
+								.put("token", res.getString("token"))
+								.put("member", res.getJsonObject("member")); // esto ya es JSON, no hace falta Gson
+	
+							message.reply(response);
 						})
 						.onFailure(err -> message.fail(401, err.getMessage()));
 				}

@@ -49,7 +49,7 @@ public class MemberService {
 
                 return new JsonObject()
                     .put("token", json.getString("token"))
-                    .mergeIn(new JsonObject(Constants.GSON.toJson(member)));
+                    .put("member", new JsonObject(Constants.GSON.toJson(member)));
             });
         });
     }

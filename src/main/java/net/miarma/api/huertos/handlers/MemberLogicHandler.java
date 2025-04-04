@@ -15,14 +15,15 @@ public class MemberLogicHandler {
 	
 	public void login(RoutingContext ctx) {
 		JsonObject body = ctx.body().asJsonObject();
-		String emailOrUserName = body.getString("email") != null ? 
-				body.getString("email") : body.getString("userName");
+		String email = body.getString("email", null);
+		String userName = body.getString("userName", null);
 		String password = body.getString("password");
 		boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
 				
 		JsonObject request = new JsonObject()
 				.put("action", "login")
-				.put("emailOrUserName", emailOrUserName)
+				.put("email", email)
+				.put("userName", userName)
 				.put("password", password)
 				.put("keepLoggedIn", keepLoggedIn);
 		
@@ -33,7 +34,9 @@ public class MemberLogicHandler {
                         		.put("tokenTime", System.currentTimeMillis())
                         		.encode());
             } else {
-                ctx.response().setStatusCode(401).end(
+                ctx.response()
+                .putHeader("Content-Type", "application/json")
+                .setStatusCode(401).end(
             		Constants.GSON.toJson(SingleJsonResponse.of("The member is inactive or banned"))
         		);
             }

@@ -1,6 +1,9 @@
 package net.miarma.api.huertos.api;
 
+import java.util.Set;
+
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
@@ -10,6 +13,23 @@ import net.miarma.api.huertos.handlers.MemberLogicHandler;
 public class HuertosLogicRouter {
 	public static void mount(Router router, Vertx vertx, Pool pool) {
 		MemberLogicHandler hMemberLogic = new MemberLogicHandler(vertx);
+		
+		Set<HttpMethod> allowedMethods = Set.of(HttpMethod.GET, HttpMethod.POST, 
+				HttpMethod.PUT, HttpMethod.DELETE,
+				HttpMethod.OPTIONS);
+
+		router.route().handler(routingContext -> {
+			routingContext.response().putHeader("Access-Control-Allow-Origin", "*");
+			routingContext.response().putHeader("Access-Control-Allow-Methods", String.join(",", allowedMethods.stream().map(HttpMethod::name).toArray(String[]::new)));
+			routingContext.response().putHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+			routingContext.next();
+		});
+		
+		router.options()
+	    	.pathRegex(".*")
+			.handler(routingContext -> routingContext.response()
+					.putHeader("Content-Type", "application/json")
+					.setStatusCode(200).end());
 		
 		router.route().handler(BodyHandler.create());
 		
