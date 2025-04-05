@@ -3,3 +3,5 @@
 /bin/
 /inserts.sql
 /target/
+/last_dump.sql
+/miarma_dump.sql
