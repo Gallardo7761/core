@@ -12,10 +12,10 @@ public class HuertosEndpoints {
 	public static final String MEMBER_BY_NUMBER = Constants.HUERTOS_PREFIX + "/members/number/:member_number"; // GET por número de socio
 	public static final String MEMBER_BY_PLOT = Constants.HUERTOS_PREFIX + "/members/plot/:plot_number";      // GET por número de parcela
 	public static final String MEMBER_BY_DNI = Constants.HUERTOS_PREFIX + "/members/dni/:dni";         // GET por DNI
-	public static final String MEMBER_PAYMENTS = Constants.HUERTOS_PREFIX + "/members/:member_number/incomes"; // GET ingresos de ese miembro
-	public static final String MEMBER_HAS_PAID = Constants.HUERTOS_PREFIX + "/members/:member_number/has-paid"; // GET si ha pagado
+	public static final String MEMBER_PAYMENTS = Constants.HUERTOS_PREFIX + "/members/number/:member_number/incomes"; // GET ingresos de ese miembro
+	public static final String MEMBER_HAS_PAID = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-paid"; // GET si ha pagado
 	public static final String MEMBER_WAITLIST = Constants.HUERTOS_PREFIX + "/members/waitlist";       // GET todos los de la lista de espera
-	public static final String LAST_MEMBER_NUMBER = Constants.HUERTOS_PREFIX + "/members/last-number"; // GET último número de socio usado
+	public static final String LAST_MEMBER_NUMBER = Constants.HUERTOS_PREFIX + "/members/number/last-number"; // GET último número de socio usado
 	
 	// ingresos -> GET, POST, PUT, DELETE
 	public static final String INCOMES = Constants.HUERTOS_PREFIX + "/incomes";

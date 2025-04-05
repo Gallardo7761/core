@@ -26,7 +26,7 @@ public class MemberDataHandler {
     }
 
     public void getById(RoutingContext ctx) {
-        Integer id = Integer.parseInt(ctx.request().getParam("id"));
+        Integer id = Integer.parseInt(ctx.request().getParam("user_id"));
 
         memberService.getById(id)
             .onSuccess(member -> {
@@ -57,7 +57,7 @@ public class MemberDataHandler {
     }
 
     public void delete(RoutingContext ctx) {
-        Integer id = Integer.parseInt(ctx.request().getParam("id"));
+        Integer id = Integer.parseInt(ctx.request().getParam("user_id"));
 
         memberService.delete(id)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
