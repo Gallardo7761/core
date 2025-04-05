@@ -8,6 +8,7 @@ import net.miarma.api.common.Constants.CoreUserRole;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.annotations.APIDontReturn;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 import net.miarma.api.core.entities.UserEntity;
@@ -23,6 +24,7 @@ public class MemberEntity extends AbstractEntity {
     private Integer phone;
     private String email;
     private String user_name;
+    @APIDontReturn
     private String password;
     private String avatar;
     private LocalDateTime created_at;
