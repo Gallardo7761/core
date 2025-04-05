@@ -9,10 +9,12 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.middlewares.AuthGuard;
 import net.miarma.api.huertos.handlers.MemberLogicHandler;
+import net.miarma.api.huertos.services.MemberService;
 
 public class HuertosLogicRouter {
 	public static void mount(Router router, Vertx vertx, Pool pool) {
 		MemberLogicHandler hMemberLogic = new MemberLogicHandler(vertx);
+		MemberService memberService = new MemberService(pool);
 		
 		Set<HttpMethod> allowedMethods = Set.of(HttpMethod.GET, HttpMethod.POST, 
 				HttpMethod.PUT, HttpMethod.DELETE,
@@ -34,12 +36,12 @@ public class HuertosLogicRouter {
 		router.route().handler(BodyHandler.create());
 		
 		router.post(HuertosEndpoints.LOGIN).handler(hMemberLogic::login);
-		router.get(HuertosEndpoints.MEMBER_BY_NUMBER).handler(AuthGuard.admin()).handler(hMemberLogic::getByMemberNumber);
-		router.get(HuertosEndpoints.MEMBER_BY_PLOT).handler(AuthGuard.admin()).handler(hMemberLogic::getByPlotNumber);
-		router.get(HuertosEndpoints.MEMBER_BY_DNI).handler(AuthGuard.admin()).handler(hMemberLogic::getByDni);
-		router.get(HuertosEndpoints.MEMBER_PAYMENTS).handler(AuthGuard.admin()).handler(hMemberLogic::getUserPayments);
-		router.get(HuertosEndpoints.MEMBER_HAS_PAID).handler(AuthGuard.admin()).handler(hMemberLogic::hasPaid);
+		router.get(HuertosEndpoints.MEMBER_BY_NUMBER).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getByMemberNumber);
+		router.get(HuertosEndpoints.MEMBER_BY_PLOT).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getByPlotNumber);
+		router.get(HuertosEndpoints.MEMBER_BY_DNI).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getByDni);
+		router.get(HuertosEndpoints.MEMBER_PAYMENTS).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getUserPayments);
+		router.get(HuertosEndpoints.MEMBER_HAS_PAID).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::hasPaid);
 		router.get(HuertosEndpoints.MEMBER_WAITLIST).handler(hMemberLogic::getWaitlist);
-		router.get(HuertosEndpoints.LAST_MEMBER_NUMBER).handler(AuthGuard.admin()).handler(hMemberLogic::getLastMemberNumber);
+		router.get(HuertosEndpoints.LAST_MEMBER_NUMBER).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getLastMemberNumber);
 	}
 }

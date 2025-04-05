@@ -76,4 +76,13 @@ public class JWTManager {
             return null;
         }
     }
+
+	public int extractUserId(String token) {
+		try {
+			DecodedJWT jwt = verifier.verify(token);
+			return jwt.getClaim("userId").asInt();
+		} catch (Exception e) {
+			return -1;
+		}
+	}
 }
