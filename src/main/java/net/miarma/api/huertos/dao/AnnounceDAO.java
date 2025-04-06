@@ -62,8 +62,8 @@ public class AnnounceDAO implements DataAccessObject<AnnounceEntity> {
         Promise<AnnounceEntity> promise = Promise.promise();
         String query = QueryBuilder.update(announce).build();
 
-        db.execute(query, AnnounceEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, AnnounceEntity.class,
+            _ -> promise.complete(announce),
             promise::fail
         );
 
@@ -78,8 +78,8 @@ public class AnnounceDAO implements DataAccessObject<AnnounceEntity> {
 
         String query = QueryBuilder.delete(announce).build();
 
-        db.execute(query, AnnounceEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, AnnounceEntity.class,
+            _ -> promise.complete(announce),
             promise::fail
         );
 

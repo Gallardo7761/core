@@ -62,8 +62,8 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
         Promise<ExpenseEntity> promise = Promise.promise();
         String query = QueryBuilder.update(expense).build();
 
-        db.execute(query, ExpenseEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, ExpenseEntity.class,
+            _ -> promise.complete(expense),
             promise::fail
         );
 
@@ -78,8 +78,8 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
 
         String query = QueryBuilder.delete(expense).build();
 
-        db.execute(query, ExpenseEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, ExpenseEntity.class,
+            _ -> promise.complete(expense),
             promise::fail
         );
 

@@ -183,10 +183,15 @@ public class MemberService {
 
     public Future<MemberEntity> update(MemberEntity member) {
         return getById(member.getUser_id()).compose(existing -> {
-            return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> 
-                userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
-                    .map(meta -> new MemberEntity(user, meta))
-            );
+        	System.out.println(existing);
+            return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
+            	System.out.println(user);
+                return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+	                .map(meta -> {
+	                	System.out.println(meta);
+	                	return new MemberEntity(user, meta);
+	                });
+            });
         });
     }
 

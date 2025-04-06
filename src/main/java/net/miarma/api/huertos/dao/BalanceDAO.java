@@ -49,8 +49,8 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         Promise<BalanceEntity> promise = Promise.promise();
         String query = QueryBuilder.update(balance).build();
 
-        db.execute(query, BalanceEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, BalanceEntity.class,
+            _ -> promise.complete(balance),
             promise::fail
         );
 
@@ -65,8 +65,8 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
 
         String query = QueryBuilder.delete(balance).build();
 
-        db.execute(query, BalanceEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, BalanceEntity.class,
+            _ -> promise.complete(balance),
             promise::fail
         );
 

@@ -62,8 +62,8 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
         Promise<RequestEntity> promise = Promise.promise();
         String query = QueryBuilder.update(request).build();
 
-        db.execute(query, RequestEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, RequestEntity.class,
+            _ -> promise.complete(request),
             promise::fail
         );
 
@@ -78,8 +78,8 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
 
         String query = QueryBuilder.delete(request).build();
 
-        db.execute(query, RequestEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, RequestEntity.class,
+            _ -> promise.complete(request),
             promise::fail
         );
 

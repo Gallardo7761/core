@@ -63,7 +63,7 @@ public class UserDAO implements DataAccessObject<UserEntity> {
         String query = QueryBuilder.update(user).build();
         
         db.executeOne(query, UserEntity.class,
-            result -> promise.complete(result),
+            _ -> promise.complete(user),
             promise::fail
         );
 
@@ -79,7 +79,7 @@ public class UserDAO implements DataAccessObject<UserEntity> {
         String query = QueryBuilder.delete(user).build();
 
         db.executeOne(query, UserEntity.class,
-	        result -> promise.complete(result),
+	        _ -> promise.complete(user),
 	        promise::fail
 	    );
 

@@ -62,8 +62,8 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
         Promise<IncomeEntity> promise = Promise.promise();
         String query = QueryBuilder.update(income).build();
 
-        db.execute(query, IncomeEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, IncomeEntity.class,
+            _ -> promise.complete(income),
             promise::fail
         );
 
@@ -78,8 +78,8 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
 
         String query = QueryBuilder.delete(income).build();
 
-        db.execute(query, IncomeEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, IncomeEntity.class,
+            _ -> promise.complete(income),
             promise::fail
         );
 

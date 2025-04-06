@@ -63,7 +63,7 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		String query = QueryBuilder.update(user).build();
 
 		db.executeOne(query, UserMetadataEntity.class,
-            result -> promise.complete(result),
+            _ -> promise.complete(user),
             promise::fail
         );
 
@@ -79,7 +79,7 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		String query = QueryBuilder.delete(user).build();
 
 		db.executeOne(query, UserMetadataEntity.class,
-            result -> promise.complete(result),
+            _ -> promise.complete(user),
             promise::fail
         );
 

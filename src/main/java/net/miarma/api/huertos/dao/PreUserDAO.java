@@ -62,8 +62,8 @@ public class PreUserDAO implements DataAccessObject<PreUserEntity> {
         Promise<PreUserEntity> promise = Promise.promise();
         String query = QueryBuilder.update(preUser).build();
 
-        db.execute(query, PreUserEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, PreUserEntity.class,
+            _ -> promise.complete(preUser),
             promise::fail
         );
 
@@ -78,8 +78,8 @@ public class PreUserDAO implements DataAccessObject<PreUserEntity> {
 
         String query = QueryBuilder.delete(preUser).build();
 
-        db.execute(query, PreUserEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+        db.executeOne(query, PreUserEntity.class,
+            _ -> promise.complete(preUser),
             promise::fail
         );
 
