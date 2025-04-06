@@ -41,7 +41,8 @@ public class HuertosLogicRouter {
 		router.get(HuertosEndpoints.MEMBER_BY_DNI).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getByDni);
 		router.get(HuertosEndpoints.MEMBER_PAYMENTS).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getUserPayments);
 		router.get(HuertosEndpoints.MEMBER_HAS_PAID).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::hasPaid);
-		router.get(HuertosEndpoints.MEMBER_WAITLIST).handler(hMemberLogic::getWaitlist);
+		router.get(HuertosEndpoints.MEMBER_WAITLIST).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getWaitlist);
+		router.get(HuertosEndpoints.MEMBER_LIMITED_WAITLIST).handler(hMemberLogic::getLimitedWaitlist);
 		router.get(HuertosEndpoints.LAST_MEMBER_NUMBER).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::getLastMemberNumber);
 	}
 }

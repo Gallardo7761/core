@@ -91,6 +91,14 @@ public class MemberLogicHandler {
             else handleError(ctx, ar.cause(), "Waitlist not found");
         });
     }
+    
+    public void getLimitedWaitlist(RoutingContext ctx) {
+		JsonObject request = new JsonObject().put("action", "getLimitedWaitlist");
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Waitlist not found");
+		});
+	}
 
     public void getLastMemberNumber(RoutingContext ctx) {
         JsonObject request = new JsonObject().put("action", "getLastMemberNumber");

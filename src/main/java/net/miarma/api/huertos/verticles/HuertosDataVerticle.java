@@ -15,6 +15,7 @@ import net.miarma.api.huertos.routing.HuertosDataRouter;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
 import net.miarma.api.util.EventBusUtil;
+import net.miarma.api.util.NameCensorer;
 import net.miarma.api.util.RouterUtil;
 
 public class HuertosDataVerticle extends AbstractVerticle {
@@ -100,7 +101,34 @@ public class HuertosDataVerticle extends AbstractVerticle {
 	                        message.reply(new JsonArray(listJson));
 	                    })
 	                    .onFailure(EventBusUtil.fail(message));
-
+	                
+				case "getLimitedWaitlist" ->
+					memberService.getWaitlist()
+						.onSuccess(list -> {
+							String listJson = list.stream()
+									.map(member -> {
+										JsonObject json = new JsonObject(Constants.GSON.toJson(member));
+										json.put("display_name", NameCensorer.censor(json.getString("display_name")));
+										json.remove("user_id");
+										json.remove("member_number");
+										json.remove("plot_number");
+										json.remove("dni");
+										json.remove("phone");
+										json.remove("email");
+										json.remove("user_name");
+										json.remove("notes");
+										json.remove("type");
+										json.remove("status");
+										json.remove("role");
+										json.remove("global_status");
+										json.remove("global_role");
+										return json;
+									})
+									.map(member -> Constants.GSON.toJson(member))
+									.collect(Collectors.joining(",", "[", "]"));
+							message.reply(new JsonArray(listJson));
+						})
+						.onFailure(EventBusUtil.fail(message));
 
                 case "getLastMemberNumber" -> memberService.getLastMemberNumber()
                     .onSuccess(last -> message.reply(new JsonObject().put("lastMemberNumber", last)))
