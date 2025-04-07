@@ -133,6 +133,15 @@ public class HuertosDataVerticle extends AbstractVerticle {
                 case "getLastMemberNumber" -> memberService.getLastMemberNumber()
                     .onSuccess(last -> message.reply(new JsonObject().put("lastMemberNumber", last)))
                     .onFailure(EventBusUtil.fail(message));
+                
+                case "getIncomesWithNames" -> incomeService.getIncomesWithNames()
+                    .onSuccess(incomes -> {
+                    	String incomesJson = incomes.stream()
+								.map(income -> Constants.GSON.toJson(income))
+								.collect(Collectors.joining(",", "[", "]"));
+						message.reply(new JsonArray(incomesJson));
+                    })
+                    .onFailure(EventBusUtil.fail(message));
 
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }

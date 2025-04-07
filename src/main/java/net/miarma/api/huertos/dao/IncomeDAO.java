@@ -12,6 +12,7 @@ import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryFilters;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.entities.IncomeEntity;
+import net.miarma.api.huertos.entities.ViewIncomesWithFullNames;
 
 public class IncomeDAO implements DataAccessObject<IncomeEntity> {
 
@@ -43,6 +44,20 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
 
         return promise.future();
     }
+    
+    public Future<List<ViewIncomesWithFullNames>> getAllWithNames() {
+		Promise<List<ViewIncomesWithFullNames>> promise = Promise.promise();
+		String query = QueryBuilder
+						.select(ViewIncomesWithFullNames.class)
+						.build();
+		
+		db.execute(query, ViewIncomesWithFullNames.class,
+	            list -> promise.complete(list.isEmpty() ? List.of() : list),
+	            promise::fail
+        );
+		
+		return promise.future();
+	}
 
     @Override
     public Future<IncomeEntity> insert(IncomeEntity income) {

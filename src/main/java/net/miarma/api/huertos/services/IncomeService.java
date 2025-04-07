@@ -7,6 +7,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
+import net.miarma.api.huertos.entities.ViewIncomesWithFullNames;
 import net.miarma.api.util.MessageUtil;
 
 public class IncomeService {
@@ -70,5 +71,9 @@ public class IncomeService {
 			}
 			return incomeDAO.delete(id);
 		});
+	}
+
+	public Future<List<ViewIncomesWithFullNames>> getIncomesWithNames() {
+		return incomeDAO.getAllWithNames();
 	}
 }
