@@ -1,14 +1,8 @@
 package net.miarma.api.core.routing;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.middlewares.AuthGuard;
 import net.miarma.api.core.handlers.FileLogicHandler;
@@ -18,21 +12,6 @@ public class CoreLogicRouter {
 	public static void mount(Router router, Vertx vertx, Pool pool) {
 		UserLogicHandler hUserLogic = new UserLogicHandler(vertx);
 		FileLogicHandler hFileLogic = new FileLogicHandler(vertx);
-		
-		Set<HttpMethod> allowedMethods = new HashSet<>(
-	    		Arrays.asList(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.OPTIONS)); // Por ejemplo
-		Set<String> allowedHeaders = new HashSet<>(Arrays.asList("Content-Type", "Authorization"));
-
-        router.route().handler(CorsHandler.create()
-                .allowCredentials(true)
-                .allowedHeaders(allowedHeaders)
-                .allowedMethods(allowedMethods));
-        
-        router.options()
-        	.pathRegex(".*")
-			.handler(routingContext -> routingContext.response()
-					.putHeader("Content-Type", "application/json")
-					.setStatusCode(200).end());
         
 		router.route().handler(BodyHandler.create());
 		
