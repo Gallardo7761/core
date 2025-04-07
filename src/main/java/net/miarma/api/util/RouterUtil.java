@@ -22,15 +22,23 @@ public class RouterUtil {
 
                 String formattedQuery = (query != null && !query.isEmpty()) ? "?" + query : "";
 
-                // No ANSI colors porque los loggers no los renderizan en muchos entornos (a menos que uses uno con soporte explícito)
+                String clientIP = ctx.request().getHeader("X-Forwarded-For");
+                if (clientIP != null && !clientIP.isBlank()) {
+                    clientIP = clientIP.split(",")[0].trim(); // IP real del cliente
+                } else {
+                    clientIP = ctx.request().remoteAddress().host(); // fallback
+                }
+
+
                 String log = String.format(
-                        "%s [%d %s] %s %s%s (⏱ %dms)",
+                        "%s [%d %s] %s %s%s (IP: %s) (⏱ %dms)",
                         emoji,
                         status,
                         statusMessage,
                         method,
                         path,
                         formattedQuery,
+                        clientIP,
                         duration
                 );
 
