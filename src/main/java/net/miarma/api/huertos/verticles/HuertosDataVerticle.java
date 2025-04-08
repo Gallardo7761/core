@@ -12,6 +12,7 @@ import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.huertos.routing.HuertosDataRouter;
+import net.miarma.api.huertos.services.BalanceService;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
 import net.miarma.api.util.EventBusUtil;
@@ -23,6 +24,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
     private ConfigManager configManager;
     private MemberService memberService;
     private IncomeService incomeService;
+    private BalanceService balanceService;
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -31,7 +33,8 @@ public class HuertosDataVerticle extends AbstractVerticle {
 
         memberService = new MemberService(pool);
         incomeService = new IncomeService(pool);
-
+        balanceService = new BalanceService(pool);
+        
         Router router = Router.router(vertx);
         RouterUtil.attachLogger(router);
         HuertosDataRouter.mount(router, vertx, pool);
@@ -140,6 +143,13 @@ public class HuertosDataVerticle extends AbstractVerticle {
 								.map(income -> Constants.GSON.toJson(income))
 								.collect(Collectors.joining(",", "[", "]"));
 						message.reply(new JsonArray(incomesJson));
+                    })
+                    .onFailure(EventBusUtil.fail(message));
+                
+                case "getBalanceWithTotals" -> balanceService.getBalanceWithTotals()
+                    .onSuccess(balance -> {
+                    	String balanceJson = Constants.GSON.toJson(balance);
+                    	message.reply(new JsonObject(balanceJson));	
                     })
                     .onFailure(EventBusUtil.fail(message));
 

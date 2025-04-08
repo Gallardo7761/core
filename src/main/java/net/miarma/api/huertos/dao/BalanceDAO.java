@@ -5,10 +5,11 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.DataAccessObject;
+import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.huertos.entities.BalanceEntity;
+import net.miarma.api.huertos.entities.ViewBalanceWithTotals;
 
 public class BalanceDAO implements DataAccessObject<BalanceEntity> {
 
@@ -29,6 +30,18 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         );
 
         return promise.future();
+    }
+    
+    public Future<List<ViewBalanceWithTotals>> getAllWithTotals() {
+    	Promise<List<ViewBalanceWithTotals>> promise = Promise.promise();
+    	String query = QueryBuilder.select(ViewBalanceWithTotals.class).build();
+    	
+    	db.execute(query, ViewBalanceWithTotals.class,
+			list -> promise.complete(list.isEmpty() ? List.of() : list),
+			promise::fail
+		);
+		
+		return promise.future();
     }
 
     @Override

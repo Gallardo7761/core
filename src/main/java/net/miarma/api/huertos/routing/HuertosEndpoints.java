@@ -29,6 +29,7 @@ public class HuertosEndpoints {
 	
 	// balance -> GET, POST, PUT, DELETE
 	public static final String BALANCE = Constants.HUERTOS_PREFIX + "/balance";
+	public static final String BALANCE_WITH_TOTALS = Constants.HUERTOS_PREFIX + "/balance/with-totals";
 	
 	// anuncios -> GET, POST, PUT, DELETE
 	public static final String ANNOUNCES = Constants.HUERTOS_PREFIX + "/announces";
