@@ -28,7 +28,7 @@ public class HuertosDataRouter {
 				
 		router.route().handler(BodyHandler.create());
 				
-		router.get(HuertosEndpoints.ANNOUNCES).handler(AuthGuard.huertosAdmin(memberService)).handler(hAnnounceData::getAll);
+		router.get(HuertosEndpoints.ANNOUNCES).handler(AuthGuard.check()).handler(hAnnounceData::getAll);
 		router.get(HuertosEndpoints.ANNOUNCE).handler(AuthGuard.check()).handler(hAnnounceData::getById);
 		router.post(HuertosEndpoints.ANNOUNCES).handler(AuthGuard.huertosAdmin(memberService)).handler(hAnnounceData::create);
 		router.put(HuertosEndpoints.ANNOUNCE).handler(AuthGuard.huertosAdmin(memberService)).handler(hAnnounceData::update);
