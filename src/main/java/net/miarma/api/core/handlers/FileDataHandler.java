@@ -1,7 +1,12 @@
 package net.miarma.api.core.handlers;
 
+import io.vertx.core.buffer.Buffer;
+import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.ConfigManager;
+import net.miarma.api.common.Constants;
+import net.miarma.api.common.Constants.CoreFileContext;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.core.entities.FileEntity;
@@ -34,15 +39,39 @@ public class FileDataHandler {
     }
 
     public void create(RoutingContext ctx) {
-        FileEntity file = net.miarma.api.common.Constants.GSON.fromJson(ctx.body().asString(), FileEntity.class);
+    	try {
+            String fileName = ctx.request().getFormAttribute("file_name");
+            String mimeType = ctx.request().getFormAttribute("mime_type");
+            int uploadedBy = Integer.parseInt(ctx.request().getFormAttribute("uploaded_by"));
+            int contextValue = Integer.parseInt(ctx.request().getFormAttribute("context"));
 
-        fileService.create(file)
-            .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))
-            .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+            
+            FileUpload upload = ctx.fileUploads().stream()
+                .filter(f -> f.name().equals("file"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Archivo no encontrado"));
+
+            Buffer buffer = ctx.vertx().fileSystem().readFileBlocking(upload.uploadedFileName());
+            byte[] fileBinary = buffer.getBytes();
+
+            FileEntity file = new FileEntity();
+            file.setFile_name(fileName);
+            file.setMime_type(mimeType);
+            file.setUploaded_by(uploadedBy);
+            file.setContext(CoreFileContext.fromInt(contextValue));
+
+            fileService.create(file, fileBinary)
+                .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))
+                .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, e.getMessage());
+        }
     }
 
+
     public void update(RoutingContext ctx) {
-        FileEntity file = net.miarma.api.common.Constants.GSON.fromJson(ctx.body().asString(), FileEntity.class);
+        FileEntity file = Constants.GSON.fromJson(ctx.body().asString(), FileEntity.class);
 
         fileService.update(file)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.OK, result))

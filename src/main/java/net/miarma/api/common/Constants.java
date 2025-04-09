@@ -46,6 +46,14 @@ public class Constants {
 			.registerTypeAdapter(HuertosUserType.class, new ValuableEnumDeserializer())
 			.registerTypeAdapter(HuertosUserStatus.class, new ValuableEnumDeserializer())
 			.registerTypeAdapter(HuertosUserRole.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosRequestStatus.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosRequestType.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosPaymentType.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosPaymentFrequency.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(HuertosAnnouncePriority.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(MMCUserStatus.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(MMCUserRole.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(CoreFileContext.class, new ValuableEnumDeserializer())
 			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
 			.create();
     
@@ -110,6 +118,14 @@ public class Constants {
 		@Override
 		public int getValue() {
 			return value;
+		}
+		
+		public String toCtxString() {
+			return switch(this) {
+				case CORE -> "core";
+				case HUERTOS -> "huertos";
+				case MMC -> "miarmacraft";
+			};
 		}
 		
 		public static CoreFileContext fromInt(int i) {

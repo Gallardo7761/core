@@ -49,22 +49,6 @@ public class FileLogicHandler {
         });
     }
 
-    public void uploadFile(RoutingContext ctx) {
-        JsonObject request = new JsonObject()
-            .put("action", "uploadFile")
-            .put("file", ctx.body().asJsonObject());
-
-        if (!validateAuth(ctx, request)) return;
-
-        vertx.eventBus().request(Constants.CORE_EVENT_BUS, request, ar -> {
-            if (ar.succeeded()) {
-                JsonUtil.sendJson(ctx, ApiStatus.CREATED, ar.result().body());
-            } else {
-                JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, "Error uploading file");
-            }
-        });
-    }
-
     public void downloadFile(RoutingContext ctx) {
         JsonObject request = new JsonObject()
             .put("action", "downloadFile")

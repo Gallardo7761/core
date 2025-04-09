@@ -162,10 +162,6 @@ public class CoreDataVerticle extends AbstractVerticle {
                     .onSuccess(message::reply)
                     .onFailure(EventBusUtil.fail(message));
 
-                case "uploadFile" -> fileService.create(body)
-                    .onSuccess(res -> message.reply("File uploaded successfully"))
-                    .onFailure(EventBusUtil.fail(message));
-
                 case "downloadFile" -> fileService.downloadFile(body.getInteger("fileId"))
                     .onSuccess(message::reply)
                     .onFailure(EventBusUtil.fail(message));

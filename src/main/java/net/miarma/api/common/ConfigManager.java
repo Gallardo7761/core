@@ -57,6 +57,16 @@ public class ConfigManager {
 				".contaminus/");
 	}
     
+    public String getFilesDir(String context) {
+    			return config.getProperty("files.dir") != null ?
+						config.getProperty("files.dir") :
+						(getOS() == OSType.WINDOWS ?
+							System.getProperty("user.home") + "\\" + "Documents\\" + context + "\\" :
+							getOS() == OSType.LINUX ?
+								"/var/www/" + context + "/" :
+									null);
+    }
+    
     public String getWebRoot() {
 		return config.getProperty("web.root") != null ? 
 				config.getProperty("web.root") : 

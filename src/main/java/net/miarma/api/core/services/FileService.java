@@ -7,9 +7,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.Constants.CoreFileContext;
+import net.miarma.api.common.ConfigManager;
+import net.miarma.api.common.OSType;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.core.dao.FileDAO;
 import net.miarma.api.core.entities.FileEntity;
@@ -49,26 +49,28 @@ public class FileService {
         );
     }
 
-    public Future<FileEntity> create(FileEntity file) {
-        return fileDAO.insert(file);
-    }
-
-    public Future<FileEntity> create(JsonObject body) {
-        byte[] fileBinary = body.getBinary("file");
-        Path filePath = Paths.get(body.getString("file_path"));
+    public Future<FileEntity> create(FileEntity file, byte[] fileBinary) {
+    	String dir = ConfigManager.getInstance()
+    			.getFilesDir(file.getContext().toCtxString());
+    	
+    	System.out.println(dir + file.getFile_name());
+    	
+    	String pathString = dir + file.getFile_name();
+        Path filePath = Paths.get(dir + file.getFile_name());
+        file.setFile_path(ConfigManager.getOS() == OSType.WINDOWS ?
+        		pathString.replace("\\", "\\\\") : pathString);
 
         try {
+            Path parent = filePath.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+
             Files.write(filePath, fileBinary);
         } catch (IOException e) {
+            e.printStackTrace();
             return Future.failedFuture(e);
         }
-
-        FileEntity file = new FileEntity();
-        file.setFile_name(body.getString("file_name"));
-        file.setFile_path(body.getString("file_path"));
-        file.setMime_type(body.getString("mime_type"));
-        file.setUploaded_by(body.getInteger("uploaded_by"));
-        file.setContext(CoreFileContext.fromInt(body.getInteger("context")));
 
         return fileDAO.insert(file);
     }
