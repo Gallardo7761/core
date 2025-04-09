@@ -1,10 +1,14 @@
 package net.miarma.api.core.handlers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
-import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreFileContext;
 import net.miarma.api.common.http.ApiStatus;
@@ -45,7 +49,6 @@ public class FileDataHandler {
             int uploadedBy = Integer.parseInt(ctx.request().getFormAttribute("uploaded_by"));
             int contextValue = Integer.parseInt(ctx.request().getFormAttribute("context"));
 
-            
             FileUpload upload = ctx.fileUploads().stream()
                 .filter(f -> f.name().equals("file"))
                 .findFirst()
@@ -80,7 +83,17 @@ public class FileDataHandler {
 
     public void delete(RoutingContext ctx) {
         Integer fileId = Integer.parseInt(ctx.pathParam("file_id"));
-
+        JsonObject body = ctx.body().asJsonObject();
+        String filePath = body.getString("file_path");
+        
+        try {
+        	Files.deleteIfExists(Paths.get(filePath));
+        } catch (IOException e) {
+        	e.printStackTrace();
+			JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, e.getMessage());
+			return;
+        }
+        
         fileService.delete(fileId)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
