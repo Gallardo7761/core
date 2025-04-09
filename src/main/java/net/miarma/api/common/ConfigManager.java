@@ -63,7 +63,7 @@ public class ConfigManager {
 						(getOS() == OSType.WINDOWS ?
 							System.getProperty("user.home") + "\\" + "Documents\\" + context + "\\" :
 							getOS() == OSType.LINUX ?
-								"/var/www/" + context + "/" :
+								"/var/www/files/" + context + "/" :
 									null);
     }
     

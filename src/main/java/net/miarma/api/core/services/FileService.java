@@ -9,6 +9,7 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
+import net.miarma.api.common.Constants;
 import net.miarma.api.common.OSType;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.core.dao.FileDAO;
@@ -61,14 +62,9 @@ public class FileService {
         		pathString.replace("\\", "\\\\") : pathString);
 
         try {
-            Path parent = filePath.getParent();
-            if (parent != null && !Files.exists(parent)) {
-                Files.createDirectories(parent);
-            }
-
             Files.write(filePath, fileBinary);
         } catch (IOException e) {
-            e.printStackTrace();
+            Constants.LOGGER.error("Error writing file to disk: ", e);
             return Future.failedFuture(e);
         }
 
