@@ -12,6 +12,7 @@ import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryFilters;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.entities.RequestEntity;
+import net.miarma.api.huertos.entities.ViewRequestsWithPreUsers;
 
 public class RequestDAO implements DataAccessObject<RequestEntity> {
 
@@ -43,6 +44,20 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
 
         return promise.future();
     }
+    
+    public Future<List<ViewRequestsWithPreUsers>> getRequestsWithPreUsers() {
+		Promise<List<ViewRequestsWithPreUsers>> promise = Promise.promise();
+		String query = QueryBuilder
+				.select(ViewRequestsWithPreUsers.class)
+				.build();
+
+		db.execute(query, ViewRequestsWithPreUsers.class,
+			list -> promise.complete(list.isEmpty() ? List.of() : list),
+			promise::fail
+		);
+
+		return promise.future();
+	}
 
     @Override
     public Future<RequestEntity> insert(RequestEntity request) {

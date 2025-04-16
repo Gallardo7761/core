@@ -15,6 +15,7 @@ import net.miarma.api.huertos.routing.HuertosDataRouter;
 import net.miarma.api.huertos.services.BalanceService;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
+import net.miarma.api.huertos.services.RequestService;
 import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.NameCensorer;
 import net.miarma.api.util.RouterUtil;
@@ -25,6 +26,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
     private MemberService memberService;
     private IncomeService incomeService;
     private BalanceService balanceService;
+    private RequestService requestService;
 
     @Override
     public void start(Promise<Void> startPromise) {
@@ -34,6 +36,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
         memberService = new MemberService(pool);
         incomeService = new IncomeService(pool);
         balanceService = new BalanceService(pool);
+        requestService = new RequestService(pool);
         
         Router router = Router.router(vertx);
         RouterUtil.attachLogger(router);
@@ -153,6 +156,22 @@ public class HuertosDataVerticle extends AbstractVerticle {
                     })
                     .onFailure(EventBusUtil.fail(message));
 
+                case "getRequestsWithPreUsers" -> requestService.getRequestsWithPreUsers()
+					.onSuccess(requests -> {
+						String requestsJson = requests.stream()
+								.map(request -> Constants.GSON.toJson(request))
+								.collect(Collectors.joining(",", "[", "]"));
+						message.reply(new JsonArray(requestsJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
+                
+                case "getRequestWithPreUser" -> requestService.getRequestWithPreUserById(body.getInteger("requestId"))
+					.onSuccess(request -> {
+						String requestJson = Constants.GSON.toJson(request);
+						message.reply(new JsonObject(requestJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
+                
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }
         });

@@ -7,6 +7,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.RequestDAO;
 import net.miarma.api.huertos.entities.RequestEntity;
+import net.miarma.api.huertos.entities.ViewRequestsWithPreUsers;
 import net.miarma.api.util.MessageUtil;
 
 @SuppressWarnings("unused")
@@ -25,6 +26,25 @@ public class RequestService {
 	public Future<RequestEntity> getById(Integer id) {
 		return requestDAO.getAll().compose(requests -> {
 			RequestEntity request = requests.stream()
+				.filter(r -> r.getRequest_id().equals(id))
+				.findFirst()
+				.orElse(null);
+
+			if (request == null) {
+				return Future.failedFuture(MessageUtil.notFound("Request", "with id " + id));
+			}
+
+			return Future.succeededFuture(request);
+		});
+	}
+	
+	public Future<List<ViewRequestsWithPreUsers>> getRequestsWithPreUsers() {
+		return requestDAO.getRequestsWithPreUsers();
+	}
+	
+	public Future<ViewRequestsWithPreUsers> getRequestWithPreUserById(Integer id) {
+		return requestDAO.getRequestsWithPreUsers().compose(requests -> {
+			ViewRequestsWithPreUsers request = requests.stream()
 				.filter(r -> r.getRequest_id().equals(id))
 				.findFirst()
 				.orElse(null);
