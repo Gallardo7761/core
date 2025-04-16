@@ -12,6 +12,7 @@ import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryParams;
+import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
@@ -154,6 +155,16 @@ public class MemberService {
                 .max(Integer::compareTo)
                 .orElse(0)
         );
+    }
+    
+    public Future<MemberEntity> getProfile(String token) {
+    	Integer userId = JWTManager.getInstance().getUserId(token);
+    	return getById(userId).compose(member -> {
+			if (member.getStatus() == HuertosUserStatus.INACTIVE) {
+				return Future.failedFuture(MessageUtil.notFound("Member", "inactive"));
+			}
+			return Future.succeededFuture(member);
+		});
     }
 
     public Future<MemberEntity> updateRole(Integer userId, HuertosUserRole role) {

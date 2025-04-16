@@ -34,5 +34,6 @@ public class HuertosLogicRouter {
 		router.get(HuertosEndpoints.BALANCE_WITH_TOTALS).handler(AuthGuard.huertosAdmin(memberService)).handler(hBalanceLogic::getBalanceWithTotals);
 		router.get(HuertosEndpoints.REQUESTS_WITH_PRE_USERS).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::getRequestsWithPreUsers);
 		router.get(HuertosEndpoints.REQUEST_WITH_PRE_USER).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::getRequestWithPreUser);
+		router.get(HuertosEndpoints.MEMBER_PROFILE).handler(hMemberLogic::getProfile);
 	}
 }

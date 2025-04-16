@@ -17,6 +17,7 @@ public class HuertosEndpoints {
 	public static final String MEMBER_WAITLIST = Constants.HUERTOS_PREFIX + "/members/waitlist";       // GET todos los de la lista de espera
 	public static final String MEMBER_LIMITED_WAITLIST = Constants.HUERTOS_PREFIX + "/members/waitlist/limited";       // GET lista limitada
 	public static final String LAST_MEMBER_NUMBER = Constants.HUERTOS_PREFIX + "/members/latest-number"; // GET último número de socio usado
+	public static final String MEMBER_PROFILE = Constants.HUERTOS_PREFIX + "/members/profile"; // GET perfil del usuario logado (socio o admin)
 	
 	// ingresos -> GET, POST, PUT, DELETE
 	public static final String INCOMES = Constants.HUERTOS_PREFIX + "/incomes";

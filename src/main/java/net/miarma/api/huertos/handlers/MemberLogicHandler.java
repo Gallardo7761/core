@@ -107,4 +107,14 @@ public class MemberLogicHandler {
             else handleError(ctx, ar.cause(), "Last member number not found");
         });
     }
+    
+    public void getProfile(RoutingContext ctx) {
+    	String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
+		JsonObject request = new JsonObject().put("action", "getProfile").put("token", token);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Profile not found");
+		});
+	}
+    
 }

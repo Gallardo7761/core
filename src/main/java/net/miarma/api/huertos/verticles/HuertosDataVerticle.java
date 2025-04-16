@@ -172,6 +172,13 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					})
 					.onFailure(EventBusUtil.fail(message));
                 
+                case "getProfile" -> memberService.getProfile(body.getString("token"))
+                	.onSuccess(profile -> {
+						String profileJson = Constants.GSON.toJson(profile);
+						message.reply(new JsonObject(profileJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
+                
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }
         });
