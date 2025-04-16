@@ -32,7 +32,7 @@ public class HuertosLogicRouter {
 		router.get(HuertosEndpoints.LAST_MEMBER_NUMBER).handler(hMemberLogic::getLastMemberNumber);
 		router.get(HuertosEndpoints.INCOMES_WITH_NAMES).handler(AuthGuard.huertosAdmin(memberService)).handler(hIncomeLogic::getIncomesWithNames);
 		router.get(HuertosEndpoints.BALANCE_WITH_TOTALS).handler(AuthGuard.huertosAdmin(memberService)).handler(hBalanceLogic::getBalanceWithTotals);
-		router.get(HuertosEndpoints.REQUESTS_WITH_PRE_USERS).handler(hRequestLogic::getRequestsWithPreUsers);
-		router.get(HuertosEndpoints.REQUEST_WITH_PRE_USER).handler(hRequestLogic::getRequestWithPreUser);
+		router.get(HuertosEndpoints.REQUESTS_WITH_PRE_USERS).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::getRequestsWithPreUsers);
+		router.get(HuertosEndpoints.REQUEST_WITH_PRE_USER).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::getRequestWithPreUser);
 	}
 }
