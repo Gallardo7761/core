@@ -68,7 +68,7 @@ public class RequestService {
 	    Integer userId = JWTManager.getInstance().getUserId(token);
 	    return requestDAO.getAll().compose(requests -> {
 	        List<RequestEntity> myRequests = requests.stream()
-	            .filter(r -> r.getRequested_by().equals(userId))
+	            .filter(r -> userId.equals(r.getRequested_by()))
 	            .toList();
 
 	        return Future.succeededFuture(myRequests);
