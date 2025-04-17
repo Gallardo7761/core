@@ -13,7 +13,7 @@ public class EventBusUtil {
 	}
 	
 	public static <T> Handler<Throwable> fail(Throwable err) {
-	    return e -> {
+	    return _ -> {
 	        ApiStatus status = ApiStatus.fromException(err);
 	        throw new RuntimeException(status.getDefaultMessage(), err);
 	    };

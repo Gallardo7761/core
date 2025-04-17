@@ -8,7 +8,6 @@ import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
-import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.ViewIncomesWithFullNames;
 import net.miarma.api.util.MessageUtil;
 

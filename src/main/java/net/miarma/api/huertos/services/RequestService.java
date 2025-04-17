@@ -65,19 +65,16 @@ public class RequestService {
 	}
 	
 	public Future<List<RequestEntity>> getMyRequests(String token) {
-		Integer userId = JWTManager.getInstance().getUserId(token);
-		return requestDAO.getAll().compose(requests -> {
-			List<RequestEntity> myRequests = requests.stream()
-				.filter(r -> r.getRequested_by().equals(userId))
-				.toList();
+	    Integer userId = JWTManager.getInstance().getUserId(token);
+	    return requestDAO.getAll().compose(requests -> {
+	        List<RequestEntity> myRequests = requests.stream()
+	            .filter(r -> r.getRequested_by().equals(userId))
+	            .toList();
 
-			if (myRequests.isEmpty()) {
-				return Future.failedFuture(MessageUtil.notFound("Request", "for user with id " + userId));
-			}
-
-			return Future.succeededFuture(myRequests);
-		});
+	        return Future.succeededFuture(myRequests);
+	    });
 	}
+
 
 	public Future<RequestEntity> create(RequestEntity request) {
 		return requestDAO.insert(request);
