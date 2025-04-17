@@ -19,6 +19,8 @@ public class ViewRequestsWithPreUsers extends AbstractEntity {
     public HuertosRequestType request_type;
     public HuertosRequestStatus request_status;
     public Integer requested_by;
+    	// huertos_users
+    	public String requested_by_name;
     public Integer target_user_id;
     public LocalDateTime request_created_at;
 
@@ -77,6 +79,14 @@ public class ViewRequestsWithPreUsers extends AbstractEntity {
 
 	public void setRequested_by(Integer requested_by) {
 		this.requested_by = requested_by;
+	}
+
+	public String getRequested_by_name() {
+		return requested_by_name;
+	}
+
+	public void setRequested_by_name(String requested_by_name) {
+		this.requested_by_name = requested_by_name;
 	}
 
 	public Integer getTarget_user_id() {
@@ -213,7 +223,6 @@ public class ViewRequestsWithPreUsers extends AbstractEntity {
 
 	public void setPre_created_at(LocalDateTime pre_created_at) {
 		this.pre_created_at = pre_created_at;
-	}
-    
+	}   
     
 }
