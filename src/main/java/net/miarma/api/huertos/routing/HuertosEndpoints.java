@@ -41,6 +41,7 @@ public class HuertosEndpoints {
 	public static final String REQUESTS = Constants.HUERTOS_PREFIX + "/requests";
 	public static final String REQUEST = Constants.HUERTOS_PREFIX + "/requests/:request_id";
 	public static final String REQUEST_COUNT = Constants.HUERTOS_PREFIX + "/requests/count"; // GET número de solicitudes
+	public static final String MY_REQUESTS = Constants.HUERTOS_PREFIX + "/requests/my-requests"; // GET solicitudes del usuario logado (socio o admin)
 
 	// pre-socios -> GET, POST, PUT, DELETE
 	public static final String PRE_USERS = Constants.HUERTOS_PREFIX + "/pre_users";

@@ -5,6 +5,7 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.http.QueryParams;
+import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.dao.RequestDAO;
 import net.miarma.api.huertos.entities.RequestEntity;
 import net.miarma.api.huertos.entities.ViewRequestsWithPreUsers;
@@ -60,6 +61,21 @@ public class RequestService {
 	public Future<Integer> getRequestCount() {
 		return requestDAO.getAll().compose(requests -> {
 			return Future.succeededFuture(requests.size());
+		});
+	}
+	
+	public Future<List<RequestEntity>> getMyRequests(String token) {
+		Integer userId = JWTManager.getInstance().getUserId(token);
+		return requestDAO.getAll().compose(requests -> {
+			List<RequestEntity> myRequests = requests.stream()
+				.filter(r -> r.getRequested_by().equals(userId))
+				.toList();
+
+			if (myRequests.isEmpty()) {
+				return Future.failedFuture(MessageUtil.notFound("Request", "for user with id " + userId));
+			}
+
+			return Future.succeededFuture(myRequests);
 		});
 	}
 
