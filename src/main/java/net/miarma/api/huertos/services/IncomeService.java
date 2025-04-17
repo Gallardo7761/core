@@ -5,17 +5,21 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.http.QueryParams;
+import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
+import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.ViewIncomesWithFullNames;
 import net.miarma.api.util.MessageUtil;
 
 public class IncomeService {
 
 	private final IncomeDAO incomeDAO;
+	private final MemberService memberService;
 
 	public IncomeService(Pool pool) {
 		this.incomeDAO = new IncomeDAO(pool);
+		this.memberService = new MemberService(pool);
 	}
 
 	public Future<List<IncomeEntity>> getAll(QueryParams params) {
@@ -35,6 +39,22 @@ public class IncomeService {
 		});
 	}
 
+	public Future<List<IncomeEntity>> getMyIncomes(String token) {
+		Integer userId = JWTManager.getInstance().getUserId(token);
+		return memberService.getById(userId).compose(memberEntity -> {
+			if (memberEntity == null) {
+				return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
+			}
+			return incomeDAO.getAll().compose(incomes -> {
+				List<IncomeEntity> myIncomes = incomes.stream()
+					.filter(i -> i.getMember_number().equals(memberEntity.getMember_number()))
+					.toList();
+				return Future.succeededFuture(myIncomes);
+			});
+		});
+		
+	}
+	
 	public Future<List<IncomeEntity>> getUserPayments(Integer memberNumber) {
 		return incomeDAO.getAll().compose(incomes -> {
 			List<IncomeEntity> userPayments = incomes.stream()

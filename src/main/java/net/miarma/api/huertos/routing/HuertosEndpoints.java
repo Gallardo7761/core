@@ -23,6 +23,7 @@ public class HuertosEndpoints {
 	public static final String INCOMES = Constants.HUERTOS_PREFIX + "/incomes";
 	public static final String INCOMES_WITH_NAMES = Constants.HUERTOS_PREFIX + "/incomes/with-names";
 	public static final String INCOME = Constants.HUERTOS_PREFIX + "/incomes/:income_id";
+	public static final String MY_INCOMES = Constants.HUERTOS_PREFIX + "/incomes/my-incomes"; // GET ingresos del usuario logado (socio o admin)
 	
 	// gastos -> GET, POST, PUT, DELETE
 	public static final String EXPENSES = Constants.HUERTOS_PREFIX + "/expenses";
