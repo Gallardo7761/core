@@ -10,6 +10,7 @@ import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
@@ -20,6 +21,7 @@ import net.miarma.api.huertos.dao.MemberDAO;
 import net.miarma.api.huertos.dao.UserMetadataDAO;
 import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
+import net.miarma.api.huertos.validators.MemberValidator;
 import net.miarma.api.util.MessageUtil;
 
 @SuppressWarnings("unused")
@@ -30,6 +32,7 @@ public class MemberService {
     private final MemberDAO memberDAO;
     private final UserService userService;
     private final RequestService requestService;
+    private final MemberValidator memberValidator;
 
     public MemberService(Pool pool) {
         this.userDAO = new UserDAO(pool);
@@ -37,6 +40,7 @@ public class MemberService {
         this.userMetadataDAO = new UserMetadataDAO(pool);
         this.userService = new UserService(pool);
         this.requestService = new RequestService(pool);
+        this.memberValidator = new MemberValidator();
     }
 
     public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {
@@ -235,28 +239,46 @@ public class MemberService {
     }
 
     public Future<MemberEntity> create(MemberEntity member) {
-    	member.setPassword(PasswordHasher.hash(member.getPassword()));
-    	return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
-            UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);
-            metadata.setUser_id(user.getUser_id());
-            return userMetadataDAO.insert(metadata)
-                .map(meta -> new MemberEntity(user, meta));
-        });
+    	return memberValidator.validate(member).compose(validation -> {
+    		if (!validation.isValid()) {
+    			return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+    		}
+
+    		member.setPassword(PasswordHasher.hash(member.getPassword()));
+
+    		return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
+    			UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);
+    			metadata.setUser_id(user.getUser_id());
+
+    			return userMetadataDAO.insert(metadata)
+    				.map(meta -> new MemberEntity(user, meta));
+    		});
+    	});
     }
 
     public Future<MemberEntity> update(MemberEntity member) {
-		if (member.getPassword() != null) {
-			member.setPassword(PasswordHasher.hash(member.getPassword()));
-		}
-        return getById(member.getUser_id()).compose(existing -> {
-            return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
-                return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
-	                .map(meta -> {
-	                	return new MemberEntity(user, meta);
-	                });
-            });
-        });
+    	return getById(member.getUser_id()).compose(existing -> {
+    		if (existing == null) {
+    			return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
+    		}
+
+    		return memberValidator.validate(member).compose(validation -> {
+    			if (!validation.isValid()) {
+    				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+    			}
+
+    			if (member.getPassword() != null) {
+    				member.setPassword(PasswordHasher.hash(member.getPassword()));
+    			}
+
+    			return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
+    				return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+    						.map(meta -> new MemberEntity(user, meta));
+    			});
+    		});
+    	});
     }
+
 
     public Future<MemberEntity> delete(Integer userId) {
         return getById(userId).compose(member -> 

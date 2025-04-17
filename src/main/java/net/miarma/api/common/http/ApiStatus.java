@@ -8,6 +8,7 @@ import net.miarma.api.common.exceptions.ServiceUnavailableException;
 import net.miarma.api.common.exceptions.UnauthorizedException;
 import net.miarma.api.common.exceptions.UnprocessableEntityException;
 import net.miarma.api.common.exceptions.UnsupportedMediaTypeException;
+import net.miarma.api.common.exceptions.ValidationException;
 
 public enum ApiStatus {
     OK(200),
@@ -61,6 +62,7 @@ public enum ApiStatus {
 		if (t instanceof ServiceUnavailableException) return ApiStatus.SERVICE_UNAVAILABLE;
 		if (t instanceof UnprocessableEntityException) return ApiStatus.UNPROCESSABLE_ENTITY;
 		if (t instanceof UnsupportedMediaTypeException) return ApiStatus.UNSUPPORTED_MEDIA_TYPE;
+		if (t instanceof ValidationException) return ApiStatus.BAD_REQUEST;
 		return ApiStatus.INTERNAL_SERVER_ERROR;
 	}
 }

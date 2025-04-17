@@ -4,17 +4,22 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.ExpenseDAO;
 import net.miarma.api.huertos.entities.ExpenseEntity;
+import net.miarma.api.huertos.validators.ExpenseValidator;
 import net.miarma.api.util.MessageUtil;
 
 public class ExpenseService {
 
 	private final ExpenseDAO expenseDAO;
+	private final ExpenseValidator expenseValidator;
 
 	public ExpenseService(Pool pool) {
 		this.expenseDAO = new ExpenseDAO(pool);
+		this.expenseValidator = new ExpenseValidator();
 	}
 
 	public Future<List<ExpenseEntity>> getAll(QueryParams params) {
@@ -35,7 +40,12 @@ public class ExpenseService {
 	}
 
 	public Future<ExpenseEntity> create(ExpenseEntity expense) {
-		return expenseDAO.insert(expense);
+		return expenseValidator.validate(expense).compose(validation -> {
+			if (!validation.isValid()) {
+			    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return expenseDAO.insert(expense);
+		});
 	}
 
 	public Future<ExpenseEntity> update(ExpenseEntity expense) {
@@ -43,7 +53,13 @@ public class ExpenseService {
 			if (existing == null) {
 				return Future.failedFuture(MessageUtil.notFound("Expense", "to update"));
 			}
-			return expenseDAO.update(expense);
+			
+			return expenseValidator.validate(expense).compose(validation -> {
+				if (!validation.isValid()) {
+				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+				}
+				return expenseDAO.update(expense);
+			});
 		});
 	}
 

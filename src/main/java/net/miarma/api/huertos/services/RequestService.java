@@ -4,20 +4,25 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.dao.RequestDAO;
 import net.miarma.api.huertos.entities.RequestEntity;
 import net.miarma.api.huertos.entities.ViewRequestsWithPreUsers;
+import net.miarma.api.huertos.validators.RequestValidator;
 import net.miarma.api.util.MessageUtil;
 
 @SuppressWarnings("unused")
 public class RequestService {
 
 	private final RequestDAO requestDAO;
+	private final RequestValidator requestValidator;
 
 	public RequestService(Pool pool) {
 		this.requestDAO = new RequestDAO(pool);
+		this.requestValidator = new RequestValidator();
 	}
 
 	
@@ -82,12 +87,22 @@ public class RequestService {
 
 
 	public Future<RequestEntity> create(RequestEntity request) {
-		return requestDAO.insert(request);
+		return requestValidator.validate(request).compose(validation -> {
+			if (!validation.isValid()) {
+			    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return requestDAO.insert(request);
+		});
 	}
 
 	public Future<RequestEntity> update(RequestEntity request) {
 		return getById(request.getRequest_id()).compose(existing -> {
-			return requestDAO.update(request);
+			return requestValidator.validate(request).compose(validation -> {
+				if (!validation.isValid()) {
+				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+				}
+				return requestDAO.update(request);
+			});
 		});
 	}
 

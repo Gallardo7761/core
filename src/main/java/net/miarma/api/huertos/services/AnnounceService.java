@@ -4,17 +4,23 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.AnnounceDAO;
 import net.miarma.api.huertos.entities.AnnounceEntity;
+import net.miarma.api.huertos.validators.AnnounceValidator;
 import net.miarma.api.util.MessageUtil;
 
 public class AnnounceService {
 
 	private final AnnounceDAO announceDAO;
+	private final AnnounceValidator announceValidator;
 
 	public AnnounceService(Pool pool) {
 		this.announceDAO = new AnnounceDAO(pool);
+		this.announceValidator = new AnnounceValidator();
+		
 	}
 
 	public Future<List<AnnounceEntity>> getAll(QueryParams params) {
@@ -32,7 +38,12 @@ public class AnnounceService {
 	}
 
 	public Future<AnnounceEntity> create(AnnounceEntity announce) {
-		return announceDAO.insert(announce);
+		return announceValidator.validate(announce).compose(validation -> {
+			if (!validation.isValid()) {
+			    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return announceDAO.insert(announce);
+		});
 	}
 
 	public Future<AnnounceEntity> update(AnnounceEntity announce) {
@@ -40,7 +51,12 @@ public class AnnounceService {
 			if (existing == null) {
 				return Future.failedFuture(MessageUtil.notFound("Announce", "in the database"));
 			}
-			return announceDAO.update(announce);
+			return announceValidator.validate(announce).compose(validation -> {
+				if (!validation.isValid()) {
+				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+				}
+				return announceDAO.update(announce);
+			});
 		});
 	}
 

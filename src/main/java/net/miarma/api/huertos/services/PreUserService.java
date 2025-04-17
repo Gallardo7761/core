@@ -4,18 +4,23 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.PreUserDAO;
 import net.miarma.api.huertos.entities.PreUserEntity;
+import net.miarma.api.huertos.validators.PreUserValidator;
 import net.miarma.api.util.MessageUtil;
 
 @SuppressWarnings("unused")
 public class PreUserService {
 
 	private final PreUserDAO preUserDAO;
+	private final PreUserValidator preUserValidator;
 
 	public PreUserService(Pool pool) {
 		this.preUserDAO = new PreUserDAO(pool);
+		this.preUserValidator = new PreUserValidator();
 	}
 
 	public Future<List<PreUserEntity>> getAll(QueryParams params) {
@@ -38,12 +43,22 @@ public class PreUserService {
 	}
 
 	public Future<PreUserEntity> create(PreUserEntity preUser) {
-		return preUserDAO.insert(preUser);
+		return preUserValidator.validate(preUser).compose(validation -> {
+			if (!validation.isValid()) {
+			    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return preUserDAO.insert(preUser);
+		});
 	}
 
 	public Future<PreUserEntity> update(PreUserEntity preUser) {
 		return getById(preUser.getPre_user_id()).compose(existing -> {
-			return preUserDAO.update(preUser);
+			return preUserValidator.validate(preUser).compose(validation -> {
+				if (!validation.isValid()) {
+				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+				}
+				return preUserDAO.update(preUser);
+			});
 		});
 	}
 

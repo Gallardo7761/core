@@ -4,21 +4,26 @@ import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
 import net.miarma.api.huertos.entities.ViewIncomesWithFullNames;
+import net.miarma.api.huertos.validators.IncomeValidator;
 import net.miarma.api.util.MessageUtil;
 
 public class IncomeService {
 
 	private final IncomeDAO incomeDAO;
 	private final MemberService memberService;
+	private final IncomeValidator incomeValidator;
 
 	public IncomeService(Pool pool) {
 		this.incomeDAO = new IncomeDAO(pool);
 		this.memberService = new MemberService(pool);
+		this.incomeValidator = new IncomeValidator();
 	}
 
 	public Future<List<IncomeEntity>> getAll(QueryParams params) {
@@ -71,7 +76,12 @@ public class IncomeService {
 	}
 
 	public Future<IncomeEntity> create(IncomeEntity income) {
-		return incomeDAO.insert(income);
+		return incomeValidator.validate(income).compose(validation -> {
+			if (!validation.isValid()) {
+			    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return incomeDAO.insert(income);
+		});
 	}
 
 	public Future<IncomeEntity> update(IncomeEntity income) {
@@ -79,7 +89,13 @@ public class IncomeService {
 			if (existing == null) {
 				return Future.failedFuture(MessageUtil.notFound("Income", "to update"));
 			}
-			return incomeDAO.update(income);
+			
+			return incomeValidator.validate(income).compose(validation -> {
+				if (!validation.isValid()) {
+				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+				}
+				return incomeDAO.update(income);
+			});
 		});
 	}
 

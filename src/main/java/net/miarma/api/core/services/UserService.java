@@ -5,21 +5,26 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
+import net.miarma.api.core.validators.UserValidator;
 import net.miarma.api.util.MessageUtil;
 
 public class UserService {
 
     private final UserDAO userDAO;
+    private final UserValidator userValidator;
 
     public UserService(Pool pool) {
-        this.userDAO = new UserDAO(pool);
+    	this.userDAO = new UserDAO(pool);
+        this.userValidator = new UserValidator();
     }
 
     /* AUTHENTICATION */
@@ -59,8 +64,13 @@ public class UserService {
             user.setPassword(PasswordHasher.hash(user.getPassword()));
             user.setRole(CoreUserRole.USER);
             user.setGlobal_status(CoreUserGlobalStatus.ACTIVE);
-
-            return userDAO.insert(user);
+            
+            return userValidator.validate(user).compose(validation -> {
+				if (!validation.isValid()) {
+					return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+				}
+				return userDAO.insert(user);
+			});
         });
     }
 
@@ -141,11 +151,21 @@ public class UserService {
     /* CRUD OPERATIONS */
 
     public Future<UserEntity> create(UserEntity user) {
-        return register(user);
+        return userValidator.validate(user).compose(validation -> {
+			if (!validation.isValid()) {
+				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return userDAO.insert(user);
+		});
     }
 
     public Future<UserEntity> update(UserEntity user) {
-        return userDAO.update(user);
+    	return userValidator.validate(user).compose(validation -> {
+			if (!validation.isValid()) {
+				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			return userDAO.update(user);
+		});
     }
 
     public Future<UserEntity> delete(Integer id) {

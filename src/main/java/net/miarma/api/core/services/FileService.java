@@ -11,17 +11,21 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.OSType;
+import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.core.dao.FileDAO;
 import net.miarma.api.core.entities.FileEntity;
+import net.miarma.api.core.validators.FileValidator;
 import net.miarma.api.util.MessageUtil;
 
 public class FileService {
 
     private final FileDAO fileDAO;
+    private final FileValidator fileValidator;
 
     public FileService(Pool pool) {
         this.fileDAO = new FileDAO(pool);
+        this.fileValidator = new FileValidator();
     }
 
     public Future<List<FileEntity>> getAll(QueryParams params) {
@@ -51,24 +55,28 @@ public class FileService {
     }
 
     public Future<FileEntity> create(FileEntity file, byte[] fileBinary) {
-    	String dir = ConfigManager.getInstance()
-    			.getFilesDir(file.getContext().toCtxString());
-    	
-    	System.out.println(dir + file.getFile_name());
-    	
-    	String pathString = dir + file.getFile_name();
-        Path filePath = Paths.get(dir + file.getFile_name());
-        file.setFile_path(ConfigManager.getOS() == OSType.WINDOWS ?
-        		pathString.replace("\\", "\\\\") : pathString);
+        return fileValidator.validate(file, fileBinary.length).compose(validation -> {
+            if (!validation.isValid()) {
+                return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+            }
 
-        try {
-            Files.write(filePath, fileBinary);
-        } catch (IOException e) {
-            Constants.LOGGER.error("Error writing file to disk: ", e);
-            return Future.failedFuture(e);
-        }
+            String dir = ConfigManager.getInstance()
+                .getFilesDir(file.getContext().toCtxString());
 
-        return fileDAO.insert(file);
+            String pathString = dir + file.getFile_name();
+            Path filePath = Paths.get(dir + file.getFile_name());
+            file.setFile_path(ConfigManager.getOS() == OSType.WINDOWS ?
+                pathString.replace("\\", "\\\\") : pathString);
+
+            try {
+                Files.write(filePath, fileBinary);
+            } catch (IOException e) {
+                Constants.LOGGER.error("Error writing file to disk: ", e);
+                return Future.failedFuture(e);
+            }
+
+            return fileDAO.insert(file);
+        });
     }
 
     public Future<FileEntity> downloadFile(Integer fileId) {
@@ -76,7 +84,13 @@ public class FileService {
     }
 
     public Future<FileEntity> update(FileEntity file) {
-        return fileDAO.update(file);
+        return fileValidator.validate(file).compose(validation -> {
+            if (!validation.isValid()) {
+                return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+            }
+
+            return fileDAO.update(file);
+        });
     }
 
     public Future<Void> delete(Integer fileId) {

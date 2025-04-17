@@ -15,7 +15,7 @@ public class PreUserEntity extends AbstractEntity {
 	private String user_name;
 	private String display_name;
 	private String dni;
-	private String phone;
+	private Integer phone;
 	private String email;
 	private String address;
 	private String zip_code;
@@ -65,10 +65,10 @@ public class PreUserEntity extends AbstractEntity {
 	public void setDni(String dni) {
 		this.dni = dni;
 	}
-	public String getPhone() {
+	public Integer getPhone() {
 		return phone;
 	}
-	public void setPhone(String phone) {
+	public void setPhone(Integer phone) {
 		this.phone = phone;
 	}
 	public String getEmail() {
