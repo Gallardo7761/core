@@ -18,6 +18,10 @@ public class HuertosEndpoints {
 	public static final String MEMBER_LIMITED_WAITLIST = Constants.HUERTOS_PREFIX + "/members/waitlist/limited";       // GET lista limitada
 	public static final String LAST_MEMBER_NUMBER = Constants.HUERTOS_PREFIX + "/members/latest-number"; // GET último número de socio usado
 	public static final String MEMBER_PROFILE = Constants.HUERTOS_PREFIX + "/members/profile"; // GET perfil del usuario logado (socio o admin)
+	public static final String MEMBER_HAS_COLLABORATOR = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-collaborator"; // GET si tiene colaborador asignado
+	public static final String MEMBER_HAS_COLLABORATOR_REQUEST = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-collaborator-request"; // GET si tiene solicitud de colaborador asignada
+	public static final String MEMBER_HAS_GREENHOUSE = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-greenhouse"; // GET si tiene invernadero asignado
+	public static final String MEMBER_HAS_GREENHOUSE_REQUEST = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-greenhouse-request"; // GET si tiene solicitud de invernadero asignada
 	
 	// ingresos -> GET, POST, PUT, DELETE
 	public static final String INCOMES = Constants.HUERTOS_PREFIX + "/incomes";

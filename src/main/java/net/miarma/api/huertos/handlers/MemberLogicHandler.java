@@ -117,4 +117,40 @@ public class MemberLogicHandler {
 		});
 	}
     
+    public void hasCollaborator(RoutingContext ctx) {
+		String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());	
+		JsonObject request = new JsonObject().put("action", "hasCollaborator").put("token", token);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Profile not found");
+		});
+	}
+    
+    public void hasCollaboratorRequest(RoutingContext ctx) {
+		String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
+		JsonObject request = new JsonObject().put("action", "hasCollaboratorRequest").put("token", token);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Profile not found");
+		});
+	}
+    
+    public void hasGreenHouse(RoutingContext ctx) {
+		String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
+    	JsonObject request = new JsonObject().put("action", "hasGreenHouse").put("token", token);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Profile not found");
+		});
+    }
+    
+    public void hasGreenHouseRequest(RoutingContext ctx) {
+		String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
+		JsonObject request = new JsonObject().put("action", "hasGreenHouseRequest").put("token", token);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Profile not found");
+		});
+    }
+    
 }

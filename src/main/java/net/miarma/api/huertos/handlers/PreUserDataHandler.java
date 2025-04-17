@@ -49,7 +49,7 @@ public class PreUserDataHandler {
     }
 
     public void delete(RoutingContext ctx) {
-        Integer id = Integer.parseInt(ctx.request().getParam("id"));
+        Integer id = Integer.parseInt(ctx.request().getParam("pre_user_id"));
 
         preUserService.delete(id)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))

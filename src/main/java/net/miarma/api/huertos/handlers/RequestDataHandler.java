@@ -34,7 +34,7 @@ public class RequestDataHandler {
 
     public void create(RoutingContext ctx) {
         RequestEntity request = net.miarma.api.common.Constants.GSON.fromJson(ctx.body().asString(), RequestEntity.class);
-
+        
         requestService.create(request)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));

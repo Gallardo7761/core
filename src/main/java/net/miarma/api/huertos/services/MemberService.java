@@ -1,16 +1,15 @@
 package net.miarma.api.huertos.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
-import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
@@ -30,12 +29,14 @@ public class MemberService {
     private final UserMetadataDAO userMetadataDAO;
     private final MemberDAO memberDAO;
     private final UserService userService;
+    private final RequestService requestService;
 
     public MemberService(Pool pool) {
         this.userDAO = new UserDAO(pool);
         this.memberDAO = new MemberDAO(pool);
         this.userMetadataDAO = new UserMetadataDAO(pool);
         this.userService = new UserService(pool);
+        this.requestService = new RequestService(pool);
     }
 
     public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {
@@ -62,6 +63,10 @@ public class MemberService {
             });
         });
     }
+    
+    public Future<List<MemberEntity>> getAll() {
+		return memberDAO.getAll();
+	}
 
     public Future<List<MemberEntity>> getAll(QueryParams params) {
         return memberDAO.getAll(params);
@@ -166,6 +171,52 @@ public class MemberService {
 			return Future.succeededFuture(member);
 		});
     }
+    
+    public Future<Boolean> hasCollaborator(String token) {
+        Integer userId = JWTManager.getInstance().getUserId(token);
+
+        return getById(userId).compose(member -> {
+            Integer plotNumber = member.getPlot_number();
+
+            if (plotNumber == null) {
+                return Future.succeededFuture(false);
+            }
+
+            return getAll().map(users -> 
+                users.stream().anyMatch(u -> u.getType() == HuertosUserType.COLLABORATOR)
+            );
+        });
+    }
+    
+    public Future<Boolean> hasCollaboratorRequest(String token) {
+    	Integer userId = JWTManager.getInstance().getUserId(token);
+    	
+    	return requestService.getAll().compose(requests -> {
+			return Future.succeededFuture(requests.stream()
+					.filter(r -> r.getRequested_by().equals(userId))
+					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_COLLABORATOR));
+		});
+    }
+    
+    public Future<Boolean> hasGreenHouse(String token) {
+    	Integer userId = JWTManager.getInstance().getUserId(token);
+		
+		return getById(userId).compose(member -> {
+			return getAll().map(members -> 
+				members.stream().anyMatch(m -> m.getType() == HuertosUserType.WITH_GREENHOUSE)
+			);
+		});
+    }
+    
+    public Future<Boolean> hasGreenHouseRequest(String token) {
+		Integer userId = JWTManager.getInstance().getUserId(token);
+		
+		return requestService.getAll().compose(requests -> {
+			return Future.succeededFuture(requests.stream()
+					.filter(r -> r.getRequested_by().equals(userId))
+					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_GREENHOUSE));
+		});
+	}
 
     public Future<MemberEntity> updateRole(Integer userId, HuertosUserRole role) {
         return getById(userId).compose(member -> {

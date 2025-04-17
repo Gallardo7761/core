@@ -262,7 +262,9 @@ public class Constants {
 		REGISTER(0),
 		UNREGISTER(1),
 		ADD_COLLABORATOR(2),
-		REMOVE_COLLABORATOR(3);
+		REMOVE_COLLABORATOR(3),
+		ADD_GREENHOUSE(4),
+		REMOVE_GREENHOUSE(5);
 		
 		private final int value;
 		

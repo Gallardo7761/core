@@ -20,6 +20,11 @@ public class RequestService {
 		this.requestDAO = new RequestDAO(pool);
 	}
 
+	
+	public Future<List<RequestEntity>> getAll() {
+		return requestDAO.getAll();
+	}
+	
 	public Future<List<RequestEntity>> getAll(QueryParams params) {
 		return requestDAO.getAll(params);
 	}

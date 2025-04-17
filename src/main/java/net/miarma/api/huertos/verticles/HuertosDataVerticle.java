@@ -201,6 +201,22 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					})
 					.onFailure(EventBusUtil.fail(message));
                 
+                case "hasCollaborator" -> memberService.hasCollaborator(body.getString("token"))
+					.onSuccess(result -> message.reply(new JsonObject().put("hasCollaborator", result)))
+					.onFailure(EventBusUtil.fail(message));
+                
+                case "hasCollaboratorRequest" -> memberService.hasCollaboratorRequest(body.getString("token"))
+					.onSuccess(result -> message.reply(new JsonObject().put("hasCollaboratorRequest", result)))
+					.onFailure(EventBusUtil.fail(message));
+                
+                case "hasGreenhouse" -> memberService.hasGreenHouse(body.getString("token"))
+					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenhouse", result)))
+					.onFailure(EventBusUtil.fail(message));
+                
+                case "hasGreenhouseRequest" -> memberService.hasGreenHouseRequest(body.getString("token"))
+					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenhouseRequest", result)))
+					.onFailure(EventBusUtil.fail(message));
+                
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }
         });
