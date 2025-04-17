@@ -56,6 +56,12 @@ public class RequestService {
 			return Future.succeededFuture(request);
 		});
 	}
+	
+	public Future<Integer> getRequestCount() {
+		return requestDAO.getAll().compose(requests -> {
+			return Future.succeededFuture(requests.size());
+		});
+	}
 
 	public Future<RequestEntity> create(RequestEntity request) {
 		return requestDAO.insert(request);

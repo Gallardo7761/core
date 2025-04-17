@@ -179,6 +179,10 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					})
 					.onFailure(EventBusUtil.fail(message));
                 
+                case "getRequestCount" -> requestService.getRequestCount()
+					.onSuccess(count -> message.reply(new JsonObject().put("count", count)))
+					.onFailure(EventBusUtil.fail(message));
+                
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }
         });

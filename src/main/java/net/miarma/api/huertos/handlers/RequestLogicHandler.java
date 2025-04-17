@@ -35,5 +35,13 @@ public class RequestLogicHandler {
             else handleError(ctx, ar.cause(), "Request not found");
         });
 	}
+	
+	public void getRequestCount(RoutingContext ctx) {
+		JsonObject request = new JsonObject().put("action", "getRequestCount");
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "No requests found");
+		});
+	}
 
 }
