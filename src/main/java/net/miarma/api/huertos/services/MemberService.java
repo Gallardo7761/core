@@ -184,7 +184,8 @@ public class MemberService {
     }
 
     public Future<MemberEntity> create(MemberEntity member) {
-        return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
+    	member.setPassword(PasswordHasher.hash(member.getPassword()));
+    	return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
             UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);
             metadata.setUser_id(user.getUser_id());
             return userMetadataDAO.insert(metadata)
@@ -193,13 +194,13 @@ public class MemberService {
     }
 
     public Future<MemberEntity> update(MemberEntity member) {
+		if (member.getPassword() != null) {
+			member.setPassword(PasswordHasher.hash(member.getPassword()));
+		}
         return getById(member.getUser_id()).compose(existing -> {
-        	System.out.println(existing);
             return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
-            	System.out.println(user);
                 return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
 	                .map(meta -> {
-	                	System.out.println(meta);
 	                	return new MemberEntity(user, meta);
 	                });
             });
