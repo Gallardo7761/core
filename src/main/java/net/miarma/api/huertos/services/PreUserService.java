@@ -41,7 +41,22 @@ public class PreUserService {
 			return Future.succeededFuture(preUser);
 		});
 	}
+	
+	public Future<PreUserEntity> getByRequestId(Integer requestId) {
+		return preUserDAO.getAll().compose(preUsers -> {
+			PreUserEntity preUser = preUsers.stream()
+				.filter(p -> p.getRequest_id().equals(requestId))
+				.findFirst()
+				.orElse(null);
 
+			if (preUser == null) {
+				return Future.failedFuture(MessageUtil.notFound("PreUser", "with request id " + requestId));
+			}
+
+			return Future.succeededFuture(preUser);
+		});
+	}
+	
 	public Future<PreUserEntity> create(PreUserEntity preUser) {
 		return preUserValidator.validate(preUser).compose(validation -> {
 			if (!validation.isValid()) {
@@ -50,7 +65,7 @@ public class PreUserService {
 			return preUserDAO.insert(preUser);
 		});
 	}
-
+	
 	public Future<PreUserEntity> update(PreUserEntity preUser) {
 		return getById(preUser.getPre_user_id()).compose(existing -> {
 			return preUserValidator.validate(preUser).compose(validation -> {

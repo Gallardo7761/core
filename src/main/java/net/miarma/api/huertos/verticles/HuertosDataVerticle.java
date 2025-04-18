@@ -10,6 +10,8 @@ import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.Constants.HuertosUserStatus;
+import net.miarma.api.common.Constants.HuertosUserType;
 import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.huertos.routing.HuertosDataRouter;
 import net.miarma.api.huertos.services.BalanceService;
@@ -205,7 +207,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					.onSuccess(result -> message.reply(new JsonObject().put("hasCollaborator", result)))
 					.onFailure(EventBusUtil.fail(message));
                 
-                case "hasCollaboratorRequest" -> memberService.hasCollaboratorRequest(body.getString("token"))
+                case "hasCollaboratorRequest" -> requestService.hasCollaboratorRequest(body.getString("token"))
 					.onSuccess(result -> message.reply(new JsonObject().put("hasCollaboratorRequest", result)))
 					.onFailure(EventBusUtil.fail(message));
                 
@@ -213,9 +215,43 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenhouse", result)))
 					.onFailure(EventBusUtil.fail(message));
                 
-                case "hasGreenhouseRequest" -> memberService.hasGreenHouseRequest(body.getString("token"))
+                case "hasGreenhouseRequest" -> requestService.hasGreenHouseRequest(body.getString("token"))
 					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenhouseRequest", result)))
 					.onFailure(EventBusUtil.fail(message));
+                
+                case "acceptRequest" -> requestService.acceptRequest(body.getInteger("requestId"))
+					.onSuccess(request -> {
+						String requestJson = Constants.GSON.toJson(request);
+						message.reply(new JsonObject(requestJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
+                
+                case "rejectRequest" -> requestService.rejectRequest(body.getInteger("requestId"))
+					.onSuccess(request -> {
+						String requestJson = Constants.GSON.toJson(request);
+						message.reply(new JsonObject(requestJson));	
+					})
+					.onFailure(EventBusUtil.fail(message));
+                
+                case "changeMemberStatus" -> {
+                	HuertosUserStatus status = HuertosUserStatus.fromInt(body.getInteger("status"));
+                	memberService.changeMemberStatus(body.getInteger("memberNumber"), status)
+					.onSuccess(member -> {
+						String memberJson = Constants.GSON.toJson(member);
+						message.reply(new JsonObject(memberJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
+                }
+                
+                case "changeMemberType" -> {
+                	HuertosUserType type = HuertosUserType.fromInt(body.getInteger("type"));
+                	memberService.changeMemberType(body.getInteger("memberNumber"), type)
+					.onSuccess(member -> {
+						String memberJson = Constants.GSON.toJson(member);
+						message.reply(new JsonObject(memberJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
+                }
                 
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }

@@ -153,4 +153,30 @@ public class MemberLogicHandler {
 		});
     }
     
+    public void changeMemberStatus(RoutingContext ctx) {
+		Integer memberNumber = Integer.parseInt(ctx.request().getParam("member_number"));
+		String status = ctx.request().getParam("status");
+		JsonObject request = new JsonObject()
+			.put("action", "changeMemberStatus")
+			.put("memberNumber", memberNumber)
+			.put("status", status);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Member not found");
+		});
+	}
+    
+    public void changeMemberType(RoutingContext ctx) {
+		Integer memberNumber = Integer.parseInt(ctx.request().getParam("member_number"));
+		String type = ctx.request().getParam("type");
+		JsonObject request = new JsonObject()
+			.put("action", "changeMemberType")
+			.put("memberNumber", memberNumber)
+			.put("type", type);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Member not found");
+		});
+    }
+    
 }

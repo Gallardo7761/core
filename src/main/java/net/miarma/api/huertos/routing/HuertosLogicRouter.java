@@ -38,5 +38,9 @@ public class HuertosLogicRouter {
 		router.get(HuertosEndpoints.REQUEST_COUNT).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::getRequestCount);
 		router.get(HuertosEndpoints.MY_INCOMES).handler(AuthGuard.check()).handler(hIncomeLogic::getMyIncomes);
 		router.get(HuertosEndpoints.MY_REQUESTS).handler(AuthGuard.check()).handler(hRequestLogic::getMyRequests);
+		router.put(HuertosEndpoints.ACCEPT_REQUEST).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::acceptRequest);
+		router.put(HuertosEndpoints.REJECT_REQUEST).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::rejectRequest);
+		router.put(HuertosEndpoints.CHANGE_MEMBER_STATUS).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::changeMemberStatus);
+		router.put(HuertosEndpoints.CHANGE_MEMBER_TYPE).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::changeMemberType);
 	}
 }

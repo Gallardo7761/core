@@ -52,5 +52,23 @@ public class RequestLogicHandler {
 			else handleError(ctx, ar.cause(), "No requests found");
 		});
 	}
-
+	
+	public void acceptRequest(RoutingContext ctx) {
+		Integer requestId = Integer.parseInt(ctx.request().getParam("request_id"));
+		JsonObject request = new JsonObject().put("action", "acceptRequest").put("requestId", requestId);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Request not found");
+		});
+	}
+	
+	public void rejectRequest(RoutingContext ctx) {
+		Integer requestId = Integer.parseInt(ctx.request().getParam("request_id"));
+		JsonObject request = new JsonObject().put("action", "rejectRequest").put("requestId", requestId);
+		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else handleError(ctx, ar.cause(), "Request not found");
+		});
+	}
+	
 }

@@ -20,6 +20,7 @@ import net.miarma.api.core.services.UserService;
 import net.miarma.api.huertos.dao.MemberDAO;
 import net.miarma.api.huertos.dao.UserMetadataDAO;
 import net.miarma.api.huertos.entities.MemberEntity;
+import net.miarma.api.huertos.entities.PreUserEntity;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 import net.miarma.api.huertos.validators.MemberValidator;
 import net.miarma.api.util.MessageUtil;
@@ -31,7 +32,6 @@ public class MemberService {
     private final UserMetadataDAO userMetadataDAO;
     private final MemberDAO memberDAO;
     private final UserService userService;
-    private final RequestService requestService;
     private final MemberValidator memberValidator;
 
     public MemberService(Pool pool) {
@@ -39,7 +39,6 @@ public class MemberService {
         this.memberDAO = new MemberDAO(pool);
         this.userMetadataDAO = new UserMetadataDAO(pool);
         this.userService = new UserService(pool);
-        this.requestService = new RequestService(pool);
         this.memberValidator = new MemberValidator();
     }
 
@@ -192,16 +191,6 @@ public class MemberService {
         });
     }
     
-    public Future<Boolean> hasCollaboratorRequest(String token) {
-    	Integer userId = JWTManager.getInstance().getUserId(token);
-    	
-    	return requestService.getAll().compose(requests -> {
-			return Future.succeededFuture(requests.stream()
-					.filter(r -> r.getRequested_by().equals(userId))
-					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_COLLABORATOR));
-		});
-    }
-    
     public Future<Boolean> hasGreenHouse(String token) {
     	Integer userId = JWTManager.getInstance().getUserId(token);
 		
@@ -211,16 +200,6 @@ public class MemberService {
 			);
 		});
     }
-    
-    public Future<Boolean> hasGreenHouseRequest(String token) {
-		Integer userId = JWTManager.getInstance().getUserId(token);
-		
-		return requestService.getAll().compose(requests -> {
-			return Future.succeededFuture(requests.stream()
-					.filter(r -> r.getRequested_by().equals(userId))
-					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_GREENHOUSE));
-		});
-	}
 
     public Future<MemberEntity> updateRole(Integer userId, HuertosUserRole role) {
         return getById(userId).compose(member -> {
@@ -255,6 +234,26 @@ public class MemberService {
     		});
     	});
     }
+    
+    public Future<MemberEntity> createFromPreUser(PreUserEntity preUser) {
+		MemberEntity memberFromPreUser = MemberEntity.fromPreUser(preUser);
+		System.out.println("Miembro a validar: " + memberFromPreUser);
+		return memberValidator.validate(memberFromPreUser).compose(validation -> {
+			if (!validation.isValid()) {
+				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+
+			memberFromPreUser.setPassword(PasswordHasher.hash(memberFromPreUser.getPassword()));
+
+			return userDAO.insert(UserEntity.fromMemberEntity(memberFromPreUser)).compose(user -> {
+				UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(memberFromPreUser);
+				metadata.setUser_id(user.getUser_id());
+
+				return userMetadataDAO.insert(metadata)
+					.map(meta -> new MemberEntity(user, meta));
+			});
+		});	
+	}
 
     public Future<MemberEntity> update(MemberEntity member) {
     	return getById(member.getUser_id()).compose(existing -> {
@@ -287,5 +286,22 @@ public class MemberService {
                     .map(deletedMetadata -> member)
             )
         );
+    }
+    
+    public Future<MemberEntity> changeMemberStatus(Integer userId, HuertosUserStatus status) {
+		return getById(userId).compose(member -> {
+			member.setStatus(status);
+			return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+				.map(updated -> member);
+		});
+	}
+    
+    public Future<MemberEntity> changeMemberType(Integer userId, HuertosUserType type) {
+		return getById(userId).compose(member -> {
+			member.setType(type);
+			return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+				.map(updated -> member);
+			});
+    			
     }
 }

@@ -22,6 +22,8 @@ public class HuertosEndpoints {
 	public static final String MEMBER_HAS_COLLABORATOR_REQUEST = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-collaborator-request"; // GET si tiene solicitud de colaborador asignada
 	public static final String MEMBER_HAS_GREENHOUSE = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-greenhouse"; // GET si tiene invernadero asignado
 	public static final String MEMBER_HAS_GREENHOUSE_REQUEST = Constants.HUERTOS_PREFIX + "/members/number/:member_number/has-greenhouse-request"; // GET si tiene solicitud de invernadero asignada
+	public static final String CHANGE_MEMBER_STATUS = Constants.HUERTOS_PREFIX + "/members/:user_id/status"; // PUT cambiar estado de socio (activo, inactivo, baja, etc.)
+	public static final String CHANGE_MEMBER_TYPE = Constants.HUERTOS_PREFIX + "/members/:user_id/type"; // PUT cambiar tipo de socio (socio, colaborador, etc.)
 	
 	// ingresos -> GET, POST, PUT, DELETE
 	public static final String INCOMES = Constants.HUERTOS_PREFIX + "/incomes";
@@ -46,6 +48,8 @@ public class HuertosEndpoints {
 	public static final String REQUEST = Constants.HUERTOS_PREFIX + "/requests/:request_id";
 	public static final String REQUEST_COUNT = Constants.HUERTOS_PREFIX + "/requests/count"; // GET número de solicitudes
 	public static final String MY_REQUESTS = Constants.HUERTOS_PREFIX + "/requests/my-requests"; // GET solicitudes del usuario logado (socio o admin)
+	public static final String ACCEPT_REQUEST = Constants.HUERTOS_PREFIX + "/requests/:request_id/accept"; // PUT aceptar solicitud
+	public static final String REJECT_REQUEST = Constants.HUERTOS_PREFIX + "/requests/:request_id/reject"; // PUT rechazar solicitud
 
 	// pre-socios -> GET, POST, PUT, DELETE
 	public static final String PRE_USERS = Constants.HUERTOS_PREFIX + "/pre_users";

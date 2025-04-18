@@ -17,6 +17,7 @@ public class PreUserEntity extends AbstractEntity {
 	private String dni;
 	private Integer phone;
 	private String email;
+	private String password;
 	private String address;
 	private String zip_code;
 	private String city;
@@ -76,6 +77,12 @@ public class PreUserEntity extends AbstractEntity {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public String getAddress() {
 		return address;

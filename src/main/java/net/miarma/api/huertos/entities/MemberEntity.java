@@ -218,4 +218,22 @@ public class MemberEntity extends AbstractEntity {
     public void setGlobal_role(CoreUserRole global_role) {
         this.global_role = global_role;
     }
+    
+    public static MemberEntity fromPreUser(PreUserEntity preUser) {
+		MemberEntity member = new MemberEntity();
+		member.setMember_number(preUser.getMember_number());
+		member.setPlot_number(preUser.getPlot_number());
+		member.setDisplay_name(preUser.getDisplay_name());
+		member.setDni(preUser.getDni());
+		member.setPhone(preUser.getPhone());
+		member.setEmail(preUser.getEmail());
+		member.setUser_name(preUser.getUser_name());
+		member.setCreated_at(preUser.getCreated_at());
+		member.setType(preUser.getType());
+		member.setStatus(preUser.getStatus());
+		member.setRole(HuertosUserRole.USER);
+		member.setGlobal_status(CoreUserGlobalStatus.ACTIVE);
+		member.setGlobal_role(CoreUserRole.USER);
+		return member;
+	}
 }
