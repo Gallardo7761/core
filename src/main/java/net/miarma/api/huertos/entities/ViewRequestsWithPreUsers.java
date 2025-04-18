@@ -29,7 +29,7 @@ public class ViewRequestsWithPreUsers extends AbstractEntity {
     public String pre_user_name;
     public String pre_display_name;
     public String pre_dni;
-    public String pre_phone;
+    public Integer pre_phone;
     public String pre_email;
     public String pre_address;
     public String pre_zip_code;
@@ -137,11 +137,11 @@ public class ViewRequestsWithPreUsers extends AbstractEntity {
 		this.pre_dni = pre_dni;
 	}
 
-	public String getPre_phone() {
+	public Integer getPre_phone() {
 		return pre_phone;
 	}
 
-	public void setPre_phone(String pre_phone) {
+	public void setPre_phone(Integer pre_phone) {
 		this.pre_phone = pre_phone;
 	}
 
