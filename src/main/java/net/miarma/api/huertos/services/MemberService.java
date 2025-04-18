@@ -237,7 +237,6 @@ public class MemberService {
     
     public Future<MemberEntity> createFromPreUser(PreUserEntity preUser) {
 		MemberEntity memberFromPreUser = MemberEntity.fromPreUser(preUser);
-		System.out.println("Miembro a validar: " + memberFromPreUser);
 		return memberValidator.validate(memberFromPreUser).compose(validation -> {
 			if (!validation.isValid()) {
 				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));

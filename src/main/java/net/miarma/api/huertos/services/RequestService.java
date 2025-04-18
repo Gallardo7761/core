@@ -78,7 +78,10 @@ public class RequestService {
 	
 	public Future<Integer> getRequestCount() {
 		return requestDAO.getAll().compose(requests -> {
-			return Future.succeededFuture(requests.size());
+			return Future.succeededFuture(requests.stream()
+				.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
+				.mapToInt(r -> 1)
+				.sum());
 		});
 	}
 	

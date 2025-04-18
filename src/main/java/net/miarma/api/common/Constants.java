@@ -165,7 +165,9 @@ public class Constants {
 		WAIT_LIST(0),
 		MEMBER(1),
 		WITH_GREENHOUSE(2),
-		COLLABORATOR(3);
+		COLLABORATOR(3),
+		DEVELOPER(4),
+		SUBSIDY(5);
 		
 		private final int value;
 		
