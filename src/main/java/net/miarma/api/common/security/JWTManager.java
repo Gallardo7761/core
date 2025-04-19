@@ -40,6 +40,10 @@ public class JWTManager {
     	        .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
     	        .sign(algorithm);
     }
+    
+    public DecodedJWT decodeWithoutVerification(String token) {
+        return JWT.decode(token);
+    }
 
     public boolean isValid(String token) {
         try {

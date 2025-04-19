@@ -1,10 +1,14 @@
 package net.miarma.api.core.handlers;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
+import net.miarma.api.common.security.JWTManager;
+import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.util.JsonUtil;
 
 public class UserLogicHandler {
@@ -97,6 +101,47 @@ public class UserLogicHandler {
             JsonUtil.sendJson(ctx, ApiStatus.BAD_REQUEST, null, "Missing or invalid Authorization header");
         }
     }
+    
+    public void refreshToken(RoutingContext ctx) {
+        String tokenHeader = ctx.request().getHeader("Authorization");
+
+        if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+            JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, null, "Missing or invalid Authorization header");
+            return;
+        }
+
+        String token = tokenHeader.substring("Bearer ".length());
+        JWTManager jwt = JWTManager.getInstance();
+
+        try {
+            DecodedJWT decoded = jwt.decodeWithoutVerification(token);
+            int userId = decoded.getClaim("userId").asInt();
+            if (userId == -1) {
+                JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, null, "Invalid token");
+                return;
+            }
+
+            vertx.eventBus().request(Constants.AUTH_EVENT_BUS, new JsonObject()
+                .put("action", "getUserById")
+                .put("userId", userId), ar -> {
+
+                if (ar.succeeded()) {
+                    JsonObject userJson = (JsonObject) ar.result().body();
+                    UserEntity user = Constants.GSON.fromJson(userJson.encode(), UserEntity.class);
+                    String newToken = jwt.generateToken(user, false);
+
+                    JsonUtil.sendJson(ctx, ApiStatus.OK, new JsonObject().put("token", newToken));
+                } else {
+                    JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, null, "User not found");
+                }
+            });
+
+        } catch (Exception e) {
+            JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, null, "Invalid token");
+        }
+    }
+
+
 
     public void getInfo(RoutingContext ctx) {
         String authHeader = ctx.request().getHeader("Authorization");

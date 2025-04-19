@@ -165,6 +165,13 @@ public class CoreDataVerticle extends AbstractVerticle {
                 case "downloadFile" -> fileService.downloadFile(body.getInteger("fileId"))
                     .onSuccess(message::reply)
                     .onFailure(EventBusUtil.fail(message));
+                
+                case "getUserById" -> userService.getById(body.getInteger("userId"))
+					.onSuccess(user -> {
+						String userJson = Constants.GSON.toJson(user);
+						message.reply(new JsonObject(userJson));
+					})
+					.onFailure(EventBusUtil.fail(message));
 
                 default -> EventBusUtil.fail(message);
             }
