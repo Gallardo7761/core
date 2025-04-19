@@ -28,10 +28,11 @@ public class UserLogicHandler {
         JsonObject body = ctx.body().asJsonObject();
 
         JsonObject request = new JsonObject()
-                .put("action", "login")
-                .put("email", body.getString("email"))
-                .put("password", body.getString("password"))
-                .put("keepLoggedIn", body.getBoolean("keepLoggedIn", false));
+    		.put("action", "login")
+            .put("email", body.getString("email", null))
+            .put("userName", body.getString("userName", null))
+            .put("password", body.getString("password"))
+            .put("keepLoggedIn", body.getBoolean("keepLoggedIn", false));
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
