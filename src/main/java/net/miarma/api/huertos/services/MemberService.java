@@ -186,7 +186,8 @@ public class MemberService {
             }
 
             return getAll().map(users -> 
-                users.stream().anyMatch(u -> u.getType() == HuertosUserType.COLLABORATOR)
+                users.stream().anyMatch(u -> u.getType() == HuertosUserType.COLLABORATOR
+                	&& u.getPlot_number() != null && u.getPlot_number().equals(plotNumber))
             );
         });
     }
