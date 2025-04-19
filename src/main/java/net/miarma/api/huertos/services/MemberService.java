@@ -181,7 +181,7 @@ public class MemberService {
         return getById(userId).compose(member -> {
             Integer plotNumber = member.getPlot_number();
 
-            if (plotNumber == null) {
+            if (plotNumber == null || plotNumber == 0) {
                 return Future.succeededFuture(false);
             }
 
@@ -193,12 +193,12 @@ public class MemberService {
     
     public Future<Boolean> hasGreenHouse(String token) {
     	Integer userId = JWTManager.getInstance().getUserId(token);
-		
-		return getById(userId).compose(member -> {
-			return getAll().map(members -> 
-				members.stream().anyMatch(m -> m.getType() == HuertosUserType.WITH_GREENHOUSE)
-			);
-		});
+
+        return getById(userId).compose(member -> {
+            return getAll().map(users -> 
+                users.stream().anyMatch(u -> u.getType() == HuertosUserType.WITH_GREENHOUSE)
+            );
+        });
     }
 
     public Future<MemberEntity> updateRole(Integer userId, HuertosUserRole role) {

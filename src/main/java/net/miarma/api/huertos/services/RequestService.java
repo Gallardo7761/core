@@ -102,16 +102,18 @@ public class RequestService {
     	return getAll().compose(requests -> {
 			return Future.succeededFuture(requests.stream()
 					.filter(r -> r.getRequested_by().equals(userId))
+					.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
 					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_COLLABORATOR));
 		});
     }
     
-    public Future<Boolean> hasGreenHouseRequest(String token) {
+	public Future<Boolean> hasGreenHouseRequest(String token) {
 		Integer userId = JWTManager.getInstance().getUserId(token);
-		
+
 		return getAll().compose(requests -> {
 			return Future.succeededFuture(requests.stream()
 					.filter(r -> r.getRequested_by().equals(userId))
+					.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
 					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_GREENHOUSE));
 		});
 	}
