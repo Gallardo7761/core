@@ -57,8 +57,18 @@ public class PreUserService {
 		});
 	}
 	
+	public Future<PreUserEntity> validatePreUser(String json) {
+	    PreUserEntity preUser = Constants.GSON.fromJson(json, PreUserEntity.class);
+	    return preUserValidator.validate(preUser, false).compose(validation -> {
+	        if (!validation.isValid()) {
+	            return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+	        }
+	        return Future.succeededFuture(preUser);
+	    });
+	}
+	
 	public Future<PreUserEntity> create(PreUserEntity preUser) {
-		return preUserValidator.validate(preUser).compose(validation -> {
+		return preUserValidator.validate(preUser, true).compose(validation -> {
 			if (!validation.isValid()) {
 			    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
 			}
@@ -68,7 +78,7 @@ public class PreUserService {
 	
 	public Future<PreUserEntity> update(PreUserEntity preUser) {
 		return getById(preUser.getPre_user_id()).compose(existing -> {
-			return preUserValidator.validate(preUser).compose(validation -> {
+			return preUserValidator.validate(preUser, true).compose(validation -> {
 				if (!validation.isValid()) {
 				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
 				}

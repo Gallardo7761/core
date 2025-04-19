@@ -7,7 +7,7 @@ import net.miarma.api.huertos.entities.PreUserEntity;
 
 public class PreUserValidator {
 
-    public Future<ValidationResult> validate(PreUserEntity preUser) {
+    public Future<ValidationResult> validate(PreUserEntity preUser, boolean checkRequestId) {
         ValidationResult result = new ValidationResult();
 
         if (preUser == null) {
@@ -60,7 +60,7 @@ public class PreUserValidator {
             result.addError("status", "El estado del usuario es obligatorio");
         }
 
-        if (preUser.getRequest_id() == null) {
+        if (checkRequestId && preUser.getRequest_id() == null) {
             result.addError("request_id", "El ID de solicitud es obligatorio");
         }
 

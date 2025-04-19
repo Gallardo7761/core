@@ -54,6 +54,7 @@ public class HuertosEndpoints {
 	// pre-socios -> GET, POST, PUT, DELETE
 	public static final String PRE_USERS = Constants.HUERTOS_PREFIX + "/pre_users";
 	public static final String PRE_USER = Constants.HUERTOS_PREFIX + "/pre_users/:pre_user_id";	
+	public static final String PRE_USER_VALIDATE = Constants.HUERTOS_PREFIX + "/pre_users/validate"; // POST validar pre-socio
 	
 	// solicitud + pre-socio -> GET
 	public static final String REQUESTS_WITH_PRE_USERS = Constants.HUERTOS_PREFIX + "/requests-full";

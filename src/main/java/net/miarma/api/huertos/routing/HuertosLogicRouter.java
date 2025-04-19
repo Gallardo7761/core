@@ -46,6 +46,6 @@ public class HuertosLogicRouter {
 		router.get(HuertosEndpoints.MEMBER_HAS_COLLABORATOR_REQUEST).handler(AuthGuard.check()).handler(hMemberLogic::hasCollaboratorRequest);
 		router.get(HuertosEndpoints.MEMBER_HAS_GREENHOUSE).handler(AuthGuard.check()).handler(hMemberLogic::hasGreenHouse);
 		router.get(HuertosEndpoints.MEMBER_HAS_GREENHOUSE_REQUEST).handler(AuthGuard.check()).handler(hMemberLogic::hasGreenHouseRequest);
-		
+		router.post(HuertosEndpoints.PRE_USER_VALIDATE).handler(hMemberLogic::validatePreUser);
 	}
 }

@@ -17,6 +17,7 @@ import net.miarma.api.huertos.routing.HuertosDataRouter;
 import net.miarma.api.huertos.services.BalanceService;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
+import net.miarma.api.huertos.services.PreUserService;
 import net.miarma.api.huertos.services.RequestService;
 import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.NameCensorer;
@@ -29,7 +30,8 @@ public class HuertosDataVerticle extends AbstractVerticle {
     private IncomeService incomeService;
     private BalanceService balanceService;
     private RequestService requestService;
-
+    private PreUserService preUserService;
+    
     @Override
     public void start(Promise<Void> startPromise) {
         configManager = ConfigManager.getInstance();
@@ -39,6 +41,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
         incomeService = new IncomeService(pool);
         balanceService = new BalanceService(pool);
         requestService = new RequestService(pool);
+        preUserService = new PreUserService(pool);
         
         Router router = Router.router(vertx);
         RouterUtil.attachLogger(router);
@@ -253,6 +256,13 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					.onFailure(EventBusUtil.fail(message));
                 }
                 
+                case "validatePreUser" -> preUserService.validatePreUser(body.getString("preUser"))
+	                .onSuccess(preUser -> {
+	                    String preUserJson = Constants.GSON.toJson(preUser);
+	                    message.reply(new JsonObject(preUserJson));
+	                })
+	                .onFailure(EventBusUtil.fail(message));
+                					
                 default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
             }
         });

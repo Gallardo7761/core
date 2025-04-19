@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
+import net.miarma.api.huertos.entities.PreUserEntity;
 import net.miarma.api.util.JsonUtil;
 
 public class MemberLogicHandler {
@@ -178,5 +179,28 @@ public class MemberLogicHandler {
 			else handleError(ctx, ar.cause(), "Member not found");
 		});
     }
+    
+    public void validatePreUser(RoutingContext ctx) {
+        PreUserEntity preUser = Constants.GSON.fromJson(ctx.body().asJsonObject().encode(), PreUserEntity.class);
+        JsonObject request = new JsonObject()
+            .put("action", "validatePreUser")
+            .put("preUser", Constants.GSON.toJson(preUser));
+
+        vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
+            if (ar.succeeded()) {
+                JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+            } else {
+                Throwable cause = ar.cause();
+
+                if (cause instanceof io.vertx.core.eventbus.ReplyException replyEx && replyEx.failureCode() == 400) {
+                    JsonObject errors = new JsonObject(replyEx.getMessage());
+                    JsonUtil.sendJson(ctx, ApiStatus.BAD_REQUEST, null, errors.encode());
+                } else {
+                    handleError(ctx, cause, "Error validating pre-user");
+                }
+            }
+        });
+    }
+
     
 }
