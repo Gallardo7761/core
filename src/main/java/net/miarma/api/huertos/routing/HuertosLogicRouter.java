@@ -42,5 +42,10 @@ public class HuertosLogicRouter {
 		router.put(HuertosEndpoints.REJECT_REQUEST).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestLogic::rejectRequest);
 		router.put(HuertosEndpoints.CHANGE_MEMBER_STATUS).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::changeMemberStatus);
 		router.put(HuertosEndpoints.CHANGE_MEMBER_TYPE).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberLogic::changeMemberType);
+		router.get(HuertosEndpoints.MEMBER_HAS_COLLABORATOR).handler(AuthGuard.check()).handler(hMemberLogic::hasCollaborator);
+		router.get(HuertosEndpoints.MEMBER_HAS_COLLABORATOR_REQUEST).handler(AuthGuard.check()).handler(hMemberLogic::hasCollaboratorRequest);
+		router.get(HuertosEndpoints.MEMBER_HAS_GREENHOUSE).handler(AuthGuard.check()).handler(hMemberLogic::hasGreenHouse);
+		router.get(HuertosEndpoints.MEMBER_HAS_GREENHOUSE_REQUEST).handler(AuthGuard.check()).handler(hMemberLogic::hasGreenHouseRequest);
+		
 	}
 }
