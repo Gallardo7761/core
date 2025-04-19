@@ -1,6 +1,7 @@
 package net.miarma.api.huertos.validators;
 
 import io.vertx.core.Future;
+import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.validation.ValidationResult;
 import net.miarma.api.huertos.entities.RequestEntity;
 
@@ -22,7 +23,7 @@ public class RequestValidator {
             result.addError("status", "El estado de la solicitud es obligatorio");
         }
 
-        if (request.getRequested_by() == null) {
+        if (request.getRequested_by() == null && request.getType() != HuertosRequestType.REGISTER) {
             result.addError("requested_by", "El solicitante es obligatorio");
         }
 
