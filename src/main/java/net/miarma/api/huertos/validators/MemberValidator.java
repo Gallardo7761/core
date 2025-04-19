@@ -25,9 +25,16 @@ public class MemberValidator {
             result.addError("display_name", "El nombre es obligatorio");
         }
 
-        if (member.getPhone() == null || member.getPhone() <= 0) {
+        if (member.getPhone() == null || member.getPhone() <= 0 || 
+        		member.getPhone().toString().length() != 9) {
             result.addError("phone", "El teléfono es obligatorio y debe ser válido");
         }
+        
+        if (member.getEmail() != null && !member.getEmail().isBlank()) {
+			if (!member.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+				result.addError("email", "El correo electrónico no es válido");
+			}
+		}
 
         if (member.getUser_name() == null || member.getUser_name().isBlank()) {
             result.addError("user_name", "El nombre de usuario es obligatorio");

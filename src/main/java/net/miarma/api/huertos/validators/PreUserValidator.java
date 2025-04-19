@@ -29,7 +29,14 @@ public class PreUserValidator {
             result.addError("user_name", "El nombre de usuario es obligatorio");
         }
 
-        if (preUser.getPhone() == null || preUser.getPhone() <= 0) {
+        if (preUser.getEmail() != null && !preUser.getEmail().isBlank()) {
+			if (!preUser.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+				result.addError("email", "El correo electrónico no es válido");
+			}
+		}
+        
+        if (preUser.getPhone() == null || preUser.getPhone() <= 0 || 
+        		preUser.getPhone().toString().length() != 9) {
             result.addError("phone", "El teléfono es obligatorio y debe ser válido");
         }
 
@@ -37,7 +44,7 @@ public class PreUserValidator {
             result.addError("address", "La dirección es obligatoria");
         }
 
-        if (preUser.getZip_code() == null || preUser.getZip_code().isBlank()) {
+        if (preUser.getZip_code() == null || preUser.getZip_code().isBlank() || preUser.getZip_code().length() != 5) {
             result.addError("zip_code", "El código postal es obligatorio");
         }
 

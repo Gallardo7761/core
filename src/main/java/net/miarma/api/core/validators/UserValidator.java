@@ -21,9 +21,11 @@ public class UserValidator {
             result.addError("display_name", "El nombre para mostrar es obligatorio");
         }
 
-        if (user.getEmail() != null && !user.getEmail().matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
-            result.addError("email", "Formato de correo electrónico no válido");
-        }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+			if (!user.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+				result.addError("email", "El correo electrónico no es válido");
+			}
+		}
 
         if (user.getPassword() == null || user.getPassword().isBlank()) {
             result.addError("password", "La contraseña es obligatoria");
