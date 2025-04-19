@@ -53,10 +53,11 @@ public class CoreDataVerticle extends AbstractVerticle {
             switch (action) {
                 case "login" -> {
                 	String email = body.getString("email");
+                	String userName = body.getString("userName");
                 	String password = body.getString("password");
                 	boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
                 	
-                	userService.login(email, password, keepLoggedIn)
+                	userService.login(email != null ? email : userName, password, keepLoggedIn)
 		                .onSuccess(message::reply)
 		                .onFailure(EventBusUtil.fail(message));
                 }
