@@ -79,7 +79,10 @@ public class CoreDataVerticle extends AbstractVerticle {
                 	String newPassword = body.getString("newPassword");
                 	
                 	userService.changePassword(userId, newPassword)
-		                .onSuccess(message::reply)
+		                .onSuccess(user -> {
+		                	String userJson = Constants.GSON.toJson(user);
+		                	message.reply(new JsonObject(userJson));
+		                })
 		                .onFailure(EventBusUtil.fail(message));
                 }
 

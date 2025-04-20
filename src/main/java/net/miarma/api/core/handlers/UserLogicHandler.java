@@ -91,7 +91,7 @@ public class UserLogicHandler {
 
         vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) {
-                JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
+                JsonUtil.sendJson(ctx, ApiStatus.OK, true, "Updated");
             } else {
                 handleError(ctx, ar.cause());
             }
