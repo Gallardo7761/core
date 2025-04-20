@@ -30,6 +30,7 @@ public class CoreEndpoints {
 	 * DE NEGOCIO DEL SSO
 	 */
     public static final String LOGIN = Constants.AUTH_PREFIX + "/login"; // POST
+    public static final String LOGIN_VALID = Constants.AUTH_PREFIX + "/login/validate"; // POST
     public static final String REGISTER = Constants.AUTH_PREFIX + "/register"; // POST
     public static final String CHANGE_PASSWORD = Constants.AUTH_PREFIX + "/change-password"; // POST
     public static final String VALIDATE_TOKEN = Constants.AUTH_PREFIX + "/validate-token"; // POST

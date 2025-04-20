@@ -54,6 +54,20 @@ public class UserService {
             return Future.succeededFuture(response);
         });
     }
+    
+    public Future<JsonObject> loginValidate(Integer userId, String password) {
+		return getById(userId).compose(user -> {
+			if (user == null) {
+				return Future.failedFuture("User not found");
+			}
+			if (!PasswordHasher.verify(password, user.getPassword())) {
+				return Future.failedFuture("Invalid credentials");
+			}
+			JsonObject response = new JsonObject()
+				.put("valid", true);
+			return Future.succeededFuture(response);
+		});
+	}
 
     public Future<UserEntity> register(UserEntity user) {
         return getByEmail(user.getEmail()).compose(existing -> {

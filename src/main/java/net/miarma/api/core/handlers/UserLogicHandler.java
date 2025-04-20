@@ -44,6 +44,23 @@ public class UserLogicHandler {
             }
         });
     }
+    
+    public void loginValidate(RoutingContext ctx) {
+		JsonObject body = ctx.body().asJsonObject();
+
+		JsonObject request = new JsonObject()
+				.put("action", "loginValidate")
+				.put("userId", body.getInteger("userId"))
+				.put("password", body.getString("password"));
+
+		vertx.eventBus().request(Constants.AUTH_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) {
+				JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			} else {
+				handleError(ctx, ar.cause());
+			}
+		});
+	}
 
     public void register(RoutingContext ctx) {
         JsonObject body = ctx.body().asJsonObject();

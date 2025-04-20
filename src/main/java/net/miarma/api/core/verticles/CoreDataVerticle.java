@@ -173,6 +173,18 @@ public class CoreDataVerticle extends AbstractVerticle {
 						message.reply(new JsonObject(userJson));
 					})
 					.onFailure(EventBusUtil.fail(message));
+                
+                case "loginValidate" -> {
+					Integer userId = body.getInteger("userId");
+					String password = body.getString("password");
+					
+					userService.loginValidate(userId, password)
+						.onSuccess(user -> {
+							String userJson = Constants.GSON.toJson(user);
+							message.reply(new JsonObject(userJson));
+						})
+						.onFailure(EventBusUtil.fail(message));
+				}
 
                 default -> EventBusUtil.fail(message);
             }

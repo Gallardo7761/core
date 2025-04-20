@@ -19,6 +19,7 @@ public class CoreLogicRouter {
 		router.get(CoreEndpoints.USER_INFO).handler(AuthGuard.check()).handler(hUserLogic::getInfo);
         router.post(CoreEndpoints.REGISTER).handler(hUserLogic::register);
         router.post(CoreEndpoints.CHANGE_PASSWORD).handler(AuthGuard.check()).handler(hUserLogic::changePassword);
+        router.post(CoreEndpoints.LOGIN_VALID).handler(hUserLogic::loginValidate);
         router.get(CoreEndpoints.VALIDATE_TOKEN).handler(hUserLogic::validateToken);
         router.get(CoreEndpoints.REFRESH_TOKEN).handler(hUserLogic::refreshToken);
 		
