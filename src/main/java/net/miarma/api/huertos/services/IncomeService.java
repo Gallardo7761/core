@@ -29,6 +29,10 @@ public class IncomeService {
 	public Future<List<IncomeEntity>> getAll(QueryParams params) {
 		return incomeDAO.getAll(params);
 	}
+	
+	public Future<List<ViewIncomesWithFullNames>> getIncomesWithNames(QueryParams params) {
+		return incomeDAO.getAllWithNames(params);
+	}
 
 	public Future<IncomeEntity> getById(Integer id) {
 		return incomeDAO.getAll().compose(incomes -> {
@@ -108,7 +112,5 @@ public class IncomeService {
 		});
 	}
 
-	public Future<List<ViewIncomesWithFullNames>> getIncomesWithNames() {
-		return incomeDAO.getAllWithNames();
-	}
+	
 }

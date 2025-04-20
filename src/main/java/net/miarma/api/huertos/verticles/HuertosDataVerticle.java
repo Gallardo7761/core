@@ -145,15 +145,6 @@ public class HuertosDataVerticle extends AbstractVerticle {
                     .onSuccess(last -> message.reply(new JsonObject().put("lastMemberNumber", last)))
                     .onFailure(EventBusUtil.fail(message));
                 
-                case "getIncomesWithNames" -> incomeService.getIncomesWithNames()
-                    .onSuccess(incomes -> {
-                    	String incomesJson = incomes.stream()
-								.map(income -> Constants.GSON.toJson(income))
-								.collect(Collectors.joining(",", "[", "]"));
-						message.reply(new JsonArray(incomesJson));
-                    })
-                    .onFailure(EventBusUtil.fail(message));
-                
                 case "getBalanceWithTotals" -> balanceService.getBalanceWithTotals()
                     .onSuccess(balance -> {
                     	String balanceJson = Constants.GSON.toJson(balance);

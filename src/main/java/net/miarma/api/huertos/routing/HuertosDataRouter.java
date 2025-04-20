@@ -49,6 +49,7 @@ public class HuertosDataRouter {
 		router.post(HuertosEndpoints.INCOMES).handler(AuthGuard.huertosAdmin(memberService)).handler(hIncomeData::create);
 		router.put(HuertosEndpoints.INCOME).handler(AuthGuard.huertosAdmin(memberService)).handler(hIncomeData::update);
 		router.delete(HuertosEndpoints.INCOME).handler(AuthGuard.huertosAdmin(memberService)).handler(hIncomeData::delete);
+		router.get(HuertosEndpoints.INCOMES_WITH_NAMES).handler(AuthGuard.huertosAdmin(memberService)).handler(hIncomeData::getIncomesWithNames);
 		
 		router.get(HuertosEndpoints.MEMBERS).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberData::getAll);
 		router.get(HuertosEndpoints.MEMBER).handler(AuthGuard.huertosAdmin(memberService)).handler(hMemberData::getById);

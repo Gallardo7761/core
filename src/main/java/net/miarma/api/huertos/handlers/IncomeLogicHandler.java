@@ -19,14 +19,6 @@ public class IncomeLogicHandler {
 		JsonUtil.sendJson(ctx, status, null, notFoundMsg);
 	}
 	
-	public void getIncomesWithNames(RoutingContext ctx) {
-		JsonObject request = new JsonObject().put("action", "getIncomesWithNames");
-		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
-			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Incomes not found");
-		});
-	}
-	
 	public void getMyIncomes(RoutingContext ctx) {
 		String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
 		JsonObject request = new JsonObject().put("action", "getMyIncomes").put("token", token);

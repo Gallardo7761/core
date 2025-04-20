@@ -1,5 +1,6 @@
 package net.miarma.api.huertos.handlers;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
@@ -24,6 +25,14 @@ public class IncomeDataHandler {
             .onSuccess(incomes -> JsonUtil.sendJson(ctx, ApiStatus.OK, incomes))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }
+    
+    public void getIncomesWithNames(RoutingContext ctx) {
+		QueryParams params = QueryParams.from(ctx);
+
+		incomeService.getIncomesWithNames(params)
+			.onSuccess(incomes -> JsonUtil.sendJson(ctx, ApiStatus.OK, incomes))
+			.onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+	}
 
     public void getById(RoutingContext ctx) {
         Integer incomeId = Integer.parseInt(ctx.pathParam("income_id"));

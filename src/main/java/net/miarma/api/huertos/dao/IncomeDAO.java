@@ -46,9 +46,17 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
     }
     
     public Future<List<ViewIncomesWithFullNames>> getAllWithNames() {
+		return getAllWithNames(new QueryParams(Map.of(), new QueryFilters()));
+	}
+    
+    public Future<List<ViewIncomesWithFullNames>> getAllWithNames(QueryParams params) {
 		Promise<List<ViewIncomesWithFullNames>> promise = Promise.promise();
 		String query = QueryBuilder
 						.select(ViewIncomesWithFullNames.class)
+						.where(params.getFilters())
+						.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+						.limit(params.getQueryFilters().getLimit())
+						.offset(params.getQueryFilters().getOffset())
 						.build();
 		
 		db.execute(query, ViewIncomesWithFullNames.class,
