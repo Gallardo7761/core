@@ -1,6 +1,7 @@
 package net.miarma.api.huertos.services;
 
 import java.util.List;
+import java.util.Objects;
 
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
@@ -97,22 +98,21 @@ public class RequestService {
 	}
 	
 	public Future<Boolean> hasCollaboratorRequest(String token) {
-    	Integer userId = JWTManager.getInstance().getUserId(token);
-    	
-    	return getAll().compose(requests -> {
-			return Future.succeededFuture(requests.stream()
-					.filter(r -> r.getRequested_by().equals(userId))
-					.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
-					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_COLLABORATOR));
-		});
-    }
+	    Integer userId = JWTManager.getInstance().getUserId(token);
+	    return getAll().compose(requests -> {
+	        boolean result = requests.stream()
+	            .filter(r -> Objects.equals(r.getRequested_by(), userId))
+	            .filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
+	            .anyMatch(r -> r.getType() == HuertosRequestType.ADD_COLLABORATOR);
+	        return Future.succeededFuture(result);
+	    });
+	}
     
 	public Future<Boolean> hasGreenHouseRequest(String token) {
 		Integer userId = JWTManager.getInstance().getUserId(token);
-
 		return getAll().compose(requests -> {
 			return Future.succeededFuture(requests.stream()
-					.filter(r -> r.getRequested_by().equals(userId))
+					.filter(r -> Objects.equals(r.getRequested_by(), userId))
 					.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
 					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_GREENHOUSE));
 		});
