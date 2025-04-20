@@ -203,9 +203,7 @@ public class MemberService {
     public Future<Boolean> hasGreenHouse(String token) {
     	Integer userId = JWTManager.getInstance().getUserId(token);
 
-    	return getById(userId).map(user -> 
-	        user.getType() == HuertosUserType.WITH_GREENHOUSE
-	    );
+    	return getById(userId).map(user -> user.getType() == HuertosUserType.WITH_GREENHOUSE);
     }
 
     public Future<MemberEntity> updateRole(Integer userId, HuertosUserRole role) {

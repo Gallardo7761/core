@@ -206,11 +206,11 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					.onFailure(EventBusUtil.fail(message));
                 
                 case "hasGreenHouse" -> memberService.hasGreenHouse(body.getString("token"))
-					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenhouse", result)))
+					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenHouse", result)))
 					.onFailure(EventBusUtil.fail(message));
                 
                 case "hasGreenHouseRequest" -> requestService.hasGreenHouseRequest(body.getString("token"))
-					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenhouseRequest", result)))
+					.onSuccess(result -> message.reply(new JsonObject().put("hasGreenHouseRequest", result)))
 					.onFailure(EventBusUtil.fail(message));
                 
                 case "acceptRequest" -> requestService.acceptRequest(body.getInteger("requestId"))
