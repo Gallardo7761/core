@@ -68,11 +68,19 @@ public class MemberService {
     }
     
     public Future<List<MemberEntity>> getAll() {
-		return memberDAO.getAll();
+		return memberDAO.getAll().compose(list -> {
+			return Future.succeededFuture(list.stream()
+					.filter(m -> !m.getType().equals(HuertosUserType.DEVELOPER))
+					.toList());
+	        });
 	}
 
     public Future<List<MemberEntity>> getAll(QueryParams params) {
-        return memberDAO.getAll(params);
+        return memberDAO.getAll(params).compose(list -> {
+			return Future.succeededFuture(list.stream()
+				.filter(m -> !m.getType().equals(HuertosUserType.DEVELOPER))
+				.toList());
+        });
     }
 
     public Future<MemberEntity> getById(Integer id) {
