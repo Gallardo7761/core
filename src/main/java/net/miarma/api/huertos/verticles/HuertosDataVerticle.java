@@ -18,6 +18,7 @@ import net.miarma.api.huertos.services.BalanceService;
 import net.miarma.api.huertos.services.IncomeService;
 import net.miarma.api.huertos.services.MemberService;
 import net.miarma.api.huertos.services.PreUserService;
+import net.miarma.api.huertos.services.ProfileService;
 import net.miarma.api.huertos.services.RequestService;
 import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.NameCensorer;
@@ -31,6 +32,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
     private BalanceService balanceService;
     private RequestService requestService;
     private PreUserService preUserService;
+    private ProfileService profileService;
     
     @Override
     public void start(Promise<Void> startPromise) {
@@ -42,6 +44,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
         balanceService = new BalanceService(pool);
         requestService = new RequestService(pool);
         preUserService = new PreUserService(pool);
+        profileService = new ProfileService(pool);
         
         Router router = Router.router(vertx);
         RouterUtil.attachLogger(router);
@@ -168,7 +171,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
 					})
 					.onFailure(EventBusUtil.fail(message));
                 
-                case "getProfile" -> memberService.getProfile(body.getString("token"))
+                case "getProfile" -> profileService.getProfile(body.getString("token"))
                 	.onSuccess(profile -> {
 						String profileJson = Constants.GSON.toJson(profile);
 						message.reply(new JsonObject(profileJson));

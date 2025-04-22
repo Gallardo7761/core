@@ -2,11 +2,11 @@ package net.miarma.api.huertos.services;
 
 import java.util.List;
 
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
-import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
@@ -21,6 +21,7 @@ import net.miarma.api.huertos.dao.MemberDAO;
 import net.miarma.api.huertos.dao.UserMetadataDAO;
 import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.PreUserEntity;
+import net.miarma.api.huertos.entities.ProfileDTO;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 import net.miarma.api.huertos.validators.MemberValidator;
 import net.miarma.api.util.MessageUtil;
@@ -171,16 +172,6 @@ public class MemberService {
                 .max(Integer::compareTo)
                 .orElse(0)
         );
-    }
-    
-    public Future<MemberEntity> getProfile(String token) {
-    	Integer userId = JWTManager.getInstance().getUserId(token);
-    	return getById(userId).compose(member -> {
-			if (member.getStatus() == HuertosUserStatus.INACTIVE) {
-				return Future.failedFuture(MessageUtil.notFound("Member", "inactive"));
-			}
-			return Future.succeededFuture(member);
-		});
     }
     
     public Future<Boolean> hasCollaborator(String token) {
