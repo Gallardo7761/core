@@ -40,6 +40,7 @@ public class UserService {
             }
             return Future.succeededFuture(user);
         }).compose(user -> {
+        	
         	if (user == null) {
 				return Future.failedFuture(new BadRequestException("Invalid credentials"));
 			}

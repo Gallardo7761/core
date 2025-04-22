@@ -48,17 +48,13 @@ public class MemberService {
         return userService.login(emailOrUserName, password, keepLoggedIn).compose(json -> {
             JsonObject loggedUserJson = json.getJsonObject("loggedUser");
             UserEntity user = Constants.GSON.fromJson(loggedUserJson.encode(), UserEntity.class);
-
+            
             if (user == null) {
 				return Future.failedFuture(new BadRequestException("Invalid credentials"));
 			}
             
             if (user.getGlobal_status() != Constants.CoreUserGlobalStatus.ACTIVE) {
             	return Future.failedFuture(new ForbiddenException("User is not active"));
-            }
-            
-            if (!PasswordHasher.verify(password, user.getPassword())) {
-                return Future.failedFuture(new BadRequestException("Invalid credentials"));
             }
             
             return userMetadataDAO.getAll().compose(metadataList -> {
