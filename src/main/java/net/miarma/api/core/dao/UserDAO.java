@@ -48,7 +48,7 @@ public class UserDAO implements DataAccessObject<UserEntity> {
     public Future<UserEntity> insert(UserEntity user) {
         Promise<UserEntity> promise = Promise.promise();
         String query = QueryBuilder.insert(user).build();
-
+        
         db.executeOne(query, UserEntity.class,
             result -> promise.complete(result),
             promise::fail

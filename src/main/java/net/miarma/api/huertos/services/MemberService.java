@@ -227,22 +227,29 @@ public class MemberService {
     }
 
     public Future<MemberEntity> create(MemberEntity member) {
-    	return memberValidator.validate(member).compose(validation -> {
-    		if (!validation.isValid()) {
-    			return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
-    		}
+        return memberValidator.validate(member).compose(validation -> {
+            if (!validation.isValid()) {
+                return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+            }
 
-    		member.setPassword(PasswordHasher.hash(member.getPassword()));
+            member.setPassword(PasswordHasher.hash(member.getPassword()));
 
-    		return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
-    			UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);
-    			metadata.setUser_id(user.getUser_id());
+            return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
+                UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);
+                metadata.setUser_id(user.getUser_id());
 
-    			return userMetadataDAO.insert(metadata)
-    				.map(meta -> new MemberEntity(user, meta));
-    		});
-    	});
+                return userMetadataDAO.insert(metadata).compose(meta -> {
+                    String baseName = member.getDisplay_name().split(" ")[0].toLowerCase();
+                    String userName = baseName + member.getMember_number();
+
+                    user.setUser_name(userName);
+
+                    return userDAO.update(user).map(updatedUser -> new MemberEntity(updatedUser, meta));
+                });
+            });
+        });
     }
+
     
     public Future<MemberEntity> createFromPreUser(PreUserEntity preUser) {
 		MemberEntity memberFromPreUser = MemberEntity.fromPreUser(preUser);
