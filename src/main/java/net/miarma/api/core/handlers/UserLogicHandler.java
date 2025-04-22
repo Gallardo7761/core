@@ -9,6 +9,7 @@ import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.core.entities.UserEntity;
+import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.JsonUtil;
 
 public class UserLogicHandler {
@@ -17,11 +18,6 @@ public class UserLogicHandler {
 
     public UserLogicHandler(Vertx vertx) {
         this.vertx = vertx;
-    }
-
-    private void handleError(RoutingContext ctx, Throwable err) {
-        ApiStatus status = ApiStatus.fromException(err);
-        JsonUtil.sendJson(ctx, status, null, err.getMessage());
     }
 
     public void login(RoutingContext ctx) {
@@ -40,7 +36,7 @@ public class UserLogicHandler {
                 result.put("tokenTime", System.currentTimeMillis());
                 JsonUtil.sendJson(ctx, ApiStatus.OK, result);
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -57,7 +53,7 @@ public class UserLogicHandler {
 			if (ar.succeeded()) {
 				JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
 			} else {
-				handleError(ctx, ar.cause());
+				EventBusUtil.handleReplyError(ctx, ar.cause());
 			}
 		});
 	}
@@ -76,7 +72,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.CREATED, null);
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -93,7 +89,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.OK, true, "Updated");
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -185,7 +181,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -201,7 +197,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -217,7 +213,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -233,7 +229,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -249,7 +245,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -266,7 +262,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }
@@ -283,7 +279,7 @@ public class UserLogicHandler {
             if (ar.succeeded()) {
                 JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
             } else {
-                handleError(ctx, ar.cause());
+                EventBusUtil.handleReplyError(ctx, ar.cause());
             }
         });
     }

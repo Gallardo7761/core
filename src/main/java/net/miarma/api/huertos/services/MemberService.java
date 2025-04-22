@@ -2,7 +2,6 @@ package net.miarma.api.huertos.services;
 
 import java.util.List;
 
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
@@ -10,6 +9,9 @@ import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.exceptions.BadRequestException;
+import net.miarma.api.common.exceptions.ForbiddenException;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
@@ -21,7 +23,6 @@ import net.miarma.api.huertos.dao.MemberDAO;
 import net.miarma.api.huertos.dao.UserMetadataDAO;
 import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.PreUserEntity;
-import net.miarma.api.huertos.entities.ProfileDTO;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 import net.miarma.api.huertos.validators.MemberValidator;
 import net.miarma.api.util.MessageUtil;
@@ -48,14 +49,30 @@ public class MemberService {
             JsonObject loggedUserJson = json.getJsonObject("loggedUser");
             UserEntity user = Constants.GSON.fromJson(loggedUserJson.encode(), UserEntity.class);
 
+            if (user == null) {
+				return Future.failedFuture(new BadRequestException("Invalid credentials"));
+			}
+            
+            if (user.getGlobal_status() != Constants.CoreUserGlobalStatus.ACTIVE) {
+            	return Future.failedFuture(new ForbiddenException("User is not active"));
+            }
+            
+            if (!PasswordHasher.verify(password, user.getPassword())) {
+                return Future.failedFuture(new BadRequestException("Invalid credentials"));
+            }
+            
             return userMetadataDAO.getAll().compose(metadataList -> {
                 UserMetadataEntity metadata = metadataList.stream()
                     .filter(meta -> meta.getUser_id().equals(user.getUser_id()))
                     .findFirst()
                     .orElse(null);
+                
+                if (metadata.getStatus() != HuertosUserStatus.ACTIVE) {
+					return Future.failedFuture(new ForbiddenException("User is not active"));
+				}
 
                 if (metadata == null) {
-                    return Future.failedFuture(MessageUtil.notFound("Metadata", "for user"));
+                    return Future.failedFuture(new NotFoundException("User metadata not found"));
                 }
 
                 MemberEntity member = new MemberEntity(user, metadata);
@@ -92,7 +109,7 @@ public class MemberService {
                 .orElse(null);
             return member != null ?
                 Future.succeededFuture(member) :
-                Future.failedFuture(MessageUtil.notFound("Member", "with id " + id));
+                Future.failedFuture(new NotFoundException("Member with id " + id));
         });
     }
 
@@ -104,7 +121,7 @@ public class MemberService {
                 .orElse(null);
             return member != null ?
                 Future.succeededFuture(member) :
-                Future.failedFuture(MessageUtil.notFound("Member", "with number " + memberNumber));
+                Future.failedFuture(new NotFoundException("Member with number " + memberNumber));
         });
     }
 
@@ -116,7 +133,7 @@ public class MemberService {
                 .orElse(null);
             return member != null ?
                 Future.succeededFuture(member) :
-                Future.failedFuture(MessageUtil.notFound("Member", "with plot number " + plotNumber));
+                Future.failedFuture(new NotFoundException("Member with plot number " + plotNumber));
         });
     }
 
@@ -128,7 +145,7 @@ public class MemberService {
                 .orElse(null);
             return member != null ?
                 Future.succeededFuture(member) :
-                Future.failedFuture(MessageUtil.notFound("Member", "with email " + email));
+                Future.failedFuture(new NotFoundException("Member with email " + email));
         });
     }
 
@@ -140,7 +157,7 @@ public class MemberService {
                 .orElse(null);
             return member != null ?
                 Future.succeededFuture(member) :
-                Future.failedFuture(MessageUtil.notFound("Member", "with DNI " + dni));
+                Future.failedFuture(new NotFoundException("Member with dni " + dni));
         });
     }
 
@@ -152,7 +169,7 @@ public class MemberService {
                 .orElse(null);
             return member != null ?
                 Future.succeededFuture(member) :
-                Future.failedFuture(MessageUtil.notFound("Member", "with phone " + phone));
+                Future.failedFuture(new NotFoundException("Member with phone " + phone));
         });
     }
 
@@ -253,7 +270,7 @@ public class MemberService {
     public Future<MemberEntity> update(MemberEntity member) {
     	return getById(member.getUser_id()).compose(existing -> {
     		if (existing == null) {
-    			return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
+    			return Future.failedFuture(new NotFoundException("Member in the database"));
     		}
 
     		return memberValidator.validate(member).compose(validation -> {

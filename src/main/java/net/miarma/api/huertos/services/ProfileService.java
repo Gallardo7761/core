@@ -3,9 +3,9 @@ package net.miarma.api.huertos.services;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants.HuertosUserStatus;
+import net.miarma.api.common.exceptions.UnauthorizedException;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.entities.ProfileDTO;
-import net.miarma.api.util.MessageUtil;
 
 public class ProfileService {
 	private MemberService memberService;
@@ -24,7 +24,7 @@ public class ProfileService {
     	
     	return memberService.getById(userId).compose(member -> {
 			if (member.getStatus() == HuertosUserStatus.INACTIVE) {
-				return Future.failedFuture(MessageUtil.notFound("Member", "inactive"));
+				return Future.failedFuture(new UnauthorizedException("Member is inactive"));
 			}
 			
 			dto.setMember(member);

@@ -5,12 +5,12 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.ExpenseDAO;
 import net.miarma.api.huertos.entities.ExpenseEntity;
 import net.miarma.api.huertos.validators.ExpenseValidator;
-import net.miarma.api.util.MessageUtil;
 
 public class ExpenseService {
 
@@ -33,7 +33,7 @@ public class ExpenseService {
 				.findFirst()
 				.orElse(null);
 			if (expense == null) {
-				return Future.failedFuture(MessageUtil.notFound("Expense", "in the database"));
+				return Future.failedFuture(new NotFoundException("Expense with id " + id + " not found"));
 			}
 			return Future.succeededFuture(expense);
 		});
@@ -51,7 +51,7 @@ public class ExpenseService {
 	public Future<ExpenseEntity> update(ExpenseEntity expense) {
 		return getById(expense.getExpense_id()).compose(existing -> {
 			if (existing == null) {
-				return Future.failedFuture(MessageUtil.notFound("Expense", "to update"));
+				return Future.failedFuture(new NotFoundException("Expense not found"));
 			}
 			
 			return expenseValidator.validate(expense).compose(validation -> {
@@ -66,7 +66,7 @@ public class ExpenseService {
 	public Future<ExpenseEntity> delete(Integer id) {
 		return getById(id).compose(existing -> {
 			if (existing == null) {
-				return Future.failedFuture(MessageUtil.notFound("Expense", "to delete"));
+				return Future.failedFuture(new NotFoundException("Expense not found"));
 			}
 			return expenseDAO.delete(id);
 		});

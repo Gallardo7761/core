@@ -5,6 +5,7 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.PreUserDAO;
@@ -35,7 +36,7 @@ public class PreUserService {
 				.orElse(null);
 
 			if (preUser == null) {
-				return Future.failedFuture(MessageUtil.notFound("PreUser", "with id " + id));
+				return Future.failedFuture(new NotFoundException("PreUser with id " + id));
 			}
 
 			return Future.succeededFuture(preUser);
@@ -50,7 +51,7 @@ public class PreUserService {
 				.orElse(null);
 
 			if (preUser == null) {
-				return Future.failedFuture(MessageUtil.notFound("PreUser", "with request id " + requestId));
+				return Future.failedFuture(new NotFoundException("PreUser with request id " + requestId));
 			}
 
 			return Future.succeededFuture(preUser);

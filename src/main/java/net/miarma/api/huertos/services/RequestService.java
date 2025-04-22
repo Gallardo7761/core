@@ -10,6 +10,7 @@ import net.miarma.api.common.Constants.HuertosRequestStatus;
 import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.Constants.HuertosUserStatus;
 import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
@@ -51,7 +52,7 @@ public class RequestService {
 				.orElse(null);
 
 			if (request == null) {
-				return Future.failedFuture(MessageUtil.notFound("Request", "with id " + id));
+				return Future.failedFuture(new NotFoundException("Request with id " + id));
 			}
 
 			return Future.succeededFuture(request);
@@ -70,7 +71,7 @@ public class RequestService {
 				.orElse(null);
 
 			if (request == null) {
-				return Future.failedFuture(MessageUtil.notFound("Request", "with id " + id));
+				return Future.failedFuture(new NotFoundException("Request with id " + id));
 			}
 
 			return Future.succeededFuture(request);

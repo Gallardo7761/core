@@ -6,6 +6,7 @@ import io.vertx.ext.web.RoutingContext;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.huertos.entities.PreUserEntity;
+import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.JsonUtil;
 
 public class MemberLogicHandler {
@@ -13,11 +14,6 @@ public class MemberLogicHandler {
 
     public MemberLogicHandler(Vertx vertx) {
         this.vertx = vertx;
-    }
-
-    private void handleError(RoutingContext ctx, Throwable err, String notFoundMsg) {
-        ApiStatus status = ApiStatus.fromException(err);
-        JsonUtil.sendJson(ctx, status, null, notFoundMsg);
     }
 
     public void login(RoutingContext ctx) {
@@ -35,7 +31,7 @@ public class MemberLogicHandler {
                 result.put("tokenTime", System.currentTimeMillis());
                 JsonUtil.sendJson(ctx, ApiStatus.OK, result);
             } else {
-                handleError(ctx, ar.cause(), "The member is inactive or banned");
+                EventBusUtil.handleReplyError(ctx, ar.cause(), "The member is inactive or banned");
             }
         });
     }
@@ -45,7 +41,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "getByMemberNumber").put("memberNumber", memberNumber);
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Member not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
         });
     }
 
@@ -54,7 +50,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "getByPlotNumber").put("plotNumber", plotNumber);
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Member not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
         });
     }
 
@@ -63,7 +59,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "getByDNI").put("dni", dni);
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Member not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
         });
     }
 
@@ -72,7 +68,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "getUserPayments").put("memberNumber", memberNumber);
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Member not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
         });
     }
 
@@ -81,7 +77,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "hasPaid").put("memberNumber", memberNumber);
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Member not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
         });
     }
 
@@ -89,7 +85,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "getWaitlist");
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Waitlist not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Waitlist not found");
         });
     }
     
@@ -97,7 +93,7 @@ public class MemberLogicHandler {
 		JsonObject request = new JsonObject().put("action", "getLimitedWaitlist");
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Waitlist not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Waitlist not found");
 		});
 	}
 
@@ -105,7 +101,7 @@ public class MemberLogicHandler {
         JsonObject request = new JsonObject().put("action", "getLastMemberNumber");
         vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else handleError(ctx, ar.cause(), "Last member number not found");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Last member number not found");
         });
     }
     
@@ -114,7 +110,7 @@ public class MemberLogicHandler {
 		JsonObject request = new JsonObject().put("action", "getProfile").put("token", token);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Profile not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Profile not found");
 		});
 	}
     
@@ -123,7 +119,7 @@ public class MemberLogicHandler {
 		JsonObject request = new JsonObject().put("action", "hasCollaborator").put("token", token);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Profile not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Profile not found");
 		});
 	}
     
@@ -132,7 +128,7 @@ public class MemberLogicHandler {
 		JsonObject request = new JsonObject().put("action", "hasCollaboratorRequest").put("token", token);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Profile not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Profile not found");
 		});
 	}
     
@@ -141,7 +137,7 @@ public class MemberLogicHandler {
     	JsonObject request = new JsonObject().put("action", "hasGreenHouse").put("token", token);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Profile not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Profile not found");
 		});
     }
     
@@ -150,7 +146,7 @@ public class MemberLogicHandler {
 		JsonObject request = new JsonObject().put("action", "hasGreenHouseRequest").put("token", token);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Profile not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Profile not found");
 		});
     }
     
@@ -163,7 +159,7 @@ public class MemberLogicHandler {
 			.put("status", status);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Member not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
 		});
 	}
     
@@ -176,7 +172,7 @@ public class MemberLogicHandler {
 			.put("type", type);
 		vertx.eventBus().request(Constants.HUERTOS_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-			else handleError(ctx, ar.cause(), "Member not found");
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Member not found");
 		});
     }
     
@@ -196,7 +192,7 @@ public class MemberLogicHandler {
                     JsonObject errors = new JsonObject(replyEx.getMessage());
                     JsonUtil.sendJson(ctx, ApiStatus.BAD_REQUEST, null, errors.encode());
                 } else {
-                    handleError(ctx, cause, "Error validating pre-user");
+                    EventBusUtil.handleReplyError(ctx, cause, "Error validating pre-user");
                 }
             }
         });

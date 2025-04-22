@@ -5,6 +5,7 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
@@ -12,7 +13,6 @@ import net.miarma.api.huertos.dao.IncomeDAO;
 import net.miarma.api.huertos.entities.IncomeEntity;
 import net.miarma.api.huertos.entities.ViewIncomesWithFullNames;
 import net.miarma.api.huertos.validators.IncomeValidator;
-import net.miarma.api.util.MessageUtil;
 
 public class IncomeService {
 
@@ -41,7 +41,7 @@ public class IncomeService {
 				.findFirst()
 				.orElse(null);
 			if (income == null) {
-				return Future.failedFuture(MessageUtil.notFound("Income", "in the database"));
+				return Future.failedFuture(new NotFoundException("Income with id " + id + " not found"));
 			}
 			return Future.succeededFuture(income);
 		});
@@ -51,7 +51,7 @@ public class IncomeService {
 		Integer userId = JWTManager.getInstance().getUserId(token);
 		return memberService.getById(userId).compose(memberEntity -> {
 			if (memberEntity == null) {
-				return Future.failedFuture(MessageUtil.notFound("Member", "in the database"));
+				return Future.failedFuture(new NotFoundException("Member with id " + userId + " not found"));
 			}
 			return incomeDAO.getAll().compose(incomes -> {
 				List<IncomeEntity> myIncomes = incomes.stream()
@@ -91,7 +91,7 @@ public class IncomeService {
 	public Future<IncomeEntity> update(IncomeEntity income) {
 		return getById(income.getIncome_id()).compose(existing -> {
 			if (existing == null) {
-				return Future.failedFuture(MessageUtil.notFound("Income", "to update"));
+				return Future.failedFuture(new NotFoundException("Income in the database"));
 			}
 			
 			return incomeValidator.validate(income).compose(validation -> {
@@ -106,7 +106,7 @@ public class IncomeService {
 	public Future<IncomeEntity> delete(Integer id) {
 		return getById(id).compose(existing -> {
 			if (existing == null) {
-				return Future.failedFuture(MessageUtil.notFound("Income", "to delete"));
+				return Future.failedFuture(new NotFoundException("Income in the database"));
 			}
 			return incomeDAO.delete(id);
 		});

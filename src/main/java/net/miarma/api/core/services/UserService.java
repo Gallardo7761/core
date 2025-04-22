@@ -8,6 +8,11 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
+import net.miarma.api.common.exceptions.AlreadyExistsException;
+import net.miarma.api.common.exceptions.BadRequestException;
+import net.miarma.api.common.exceptions.ForbiddenException;
+import net.miarma.api.common.exceptions.NotFoundException;
+import net.miarma.api.common.exceptions.UnauthorizedException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
@@ -15,7 +20,6 @@ import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.validators.UserValidator;
-import net.miarma.api.util.MessageUtil;
 
 public class UserService {
 
@@ -36,12 +40,16 @@ public class UserService {
             }
             return Future.succeededFuture(user);
         }).compose(user -> {
-            if (user == null || user.getGlobal_status() != CoreUserGlobalStatus.ACTIVE) {
-                return Future.failedFuture("Invalid credentials");
+        	if (user == null) {
+				return Future.failedFuture(new BadRequestException("Invalid credentials"));
+			}
+            
+            if (user.getGlobal_status() != Constants.CoreUserGlobalStatus.ACTIVE) {
+            	return Future.failedFuture(new ForbiddenException("User is not active"));
             }
 
             if (!PasswordHasher.verify(plainPassword, user.getPassword())) {
-                return Future.failedFuture("Invalid credentials");
+                return Future.failedFuture(new BadRequestException("Invalid credentials"));
             }
 
             JWTManager jwtManager = JWTManager.getInstance();
@@ -58,10 +66,10 @@ public class UserService {
     public Future<JsonObject> loginValidate(Integer userId, String password) {
 		return getById(userId).compose(user -> {
 			if (user == null) {
-				return Future.failedFuture("User not found");
+				return Future.failedFuture(new NotFoundException("User not found"));
 			}
 			if (!PasswordHasher.verify(password, user.getPassword())) {
-				return Future.failedFuture("Invalid credentials");
+				return Future.failedFuture(new BadRequestException("Invalid credentials"));
 			}
 			JsonObject response = new JsonObject()
 				.put("valid", true);
@@ -72,7 +80,7 @@ public class UserService {
     public Future<UserEntity> register(UserEntity user) {
         return getByEmail(user.getEmail()).compose(existing -> {
             if (existing != null) {
-                return Future.failedFuture("User with this email already exists");
+                return Future.failedFuture(new AlreadyExistsException("Email already exists"));
             }
 
             user.setPassword(PasswordHasher.hash(user.getPassword()));
@@ -91,7 +99,7 @@ public class UserService {
     public Future<UserEntity> changePassword(int userId, String newPassword) {
         return getById(userId).compose(user -> {
             if (user == null) {
-                return Future.failedFuture("User not found");
+                return Future.failedFuture(new NotFoundException("User not found"));
             }
 
             user.setPassword(PasswordHasher.hash(newPassword));
@@ -103,7 +111,7 @@ public class UserService {
         JWTManager jwtManager = JWTManager.getInstance();
         return jwtManager.isValid(token) ?
             Future.succeededFuture(true) :
-            Future.failedFuture("Invalid token");
+            Future.failedFuture(new UnauthorizedException("Invalid token"));
     }
 
     /* USERS OPERATIONS */
@@ -145,7 +153,7 @@ public class UserService {
     public Future<UserEntity> updateRole(Integer userId, CoreUserRole role) {
         return getById(userId).compose(user -> {
             if (user == null) {
-                return Future.failedFuture("User not found in the database");
+                return Future.failedFuture(new NotFoundException("User not found in the database"));
             }
             user.setRole(role);
             return userDAO.update(user);
@@ -155,7 +163,7 @@ public class UserService {
     public Future<UserEntity> updateStatus(Integer userId, CoreUserGlobalStatus status) {
         return getById(userId).compose(user -> {
             if (user == null) {
-                return Future.failedFuture("User not found in the database");
+                return Future.failedFuture(new NotFoundException("User not found in the database"));
             }
             user.setGlobal_status(status);
             return userDAO.update(user);
@@ -185,7 +193,7 @@ public class UserService {
     public Future<UserEntity> delete(Integer id) {
         return getById(id).compose(user -> {
             if (user == null) {
-                return Future.failedFuture(MessageUtil.notFound("User", "in the database"));
+                return Future.failedFuture(new NotFoundException("User not found in the database"));
             }
             return userDAO.delete(id);
         });

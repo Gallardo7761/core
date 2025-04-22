@@ -11,12 +11,12 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.OSType;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.core.dao.FileDAO;
 import net.miarma.api.core.entities.FileEntity;
 import net.miarma.api.core.validators.FileValidator;
-import net.miarma.api.util.MessageUtil;
 
 public class FileService {
 
@@ -40,7 +40,7 @@ public class FileService {
                 .orElse(null)
         ).compose(file -> {
             if (file == null) {
-                return Future.failedFuture(MessageUtil.notFound("File", "in the storage"));
+                return Future.failedFuture(new NotFoundException("File not found"));
             }
             return Future.succeededFuture(file);
         });

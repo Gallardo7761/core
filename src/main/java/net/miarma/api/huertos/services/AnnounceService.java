@@ -5,12 +5,12 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ValidationException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.AnnounceDAO;
 import net.miarma.api.huertos.entities.AnnounceEntity;
 import net.miarma.api.huertos.validators.AnnounceValidator;
-import net.miarma.api.util.MessageUtil;
 
 public class AnnounceService {
 
@@ -49,7 +49,7 @@ public class AnnounceService {
 	public Future<AnnounceEntity> update(AnnounceEntity announce) {
 		return getById(announce.getAnnounce_id()).compose(existing -> {
 			if (existing == null) {
-				return Future.failedFuture(MessageUtil.notFound("Announce", "in the database"));
+				return Future.failedFuture(new NotFoundException("Announce not found in the database"));
 			}
 			return announceValidator.validate(announce).compose(validation -> {
 				if (!validation.isValid()) {
@@ -63,7 +63,7 @@ public class AnnounceService {
 	public Future<AnnounceEntity> delete(Integer id) {
 		return getById(id).compose(existing -> {
 			if (existing == null) {
-				return Future.failedFuture(MessageUtil.notFound("Announce", "in the database"));
+				return Future.failedFuture(new NotFoundException("Announce not found in the database"));
 			}
 			return announceDAO.delete(id);
 		});
