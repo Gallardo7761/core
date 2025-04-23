@@ -233,6 +233,52 @@ public class QueryBuilder {
         qb.query.append(setJoiner).append(" WHERE ").append(whereJoiner);
         return qb;
     }
+    
+    public static <T> QueryBuilder updateWithNulls(T object) {
+        if (object == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+
+        QueryBuilder qb = new QueryBuilder();
+        String table = getTableName(object.getClass());
+        qb.query.append("UPDATE ").append(table).append(" SET ");
+
+        StringJoiner setJoiner = new StringJoiner(", ");
+        StringJoiner whereJoiner = new StringJoiner(" AND ");
+
+        Field idField = null;
+
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                String fieldName = field.getName();
+                Object fieldValue = field.get(object);
+
+                if (fieldName.endsWith("_id")) {
+                    idField = field;
+                    Object value = extractValue(fieldValue);
+                    whereJoiner.add(fieldName + " = " + (value instanceof String || value instanceof LocalDateTime ? "'" + value + "'" : value));
+                    continue;
+                }
+
+                if (fieldValue == null) {
+                    setJoiner.add(fieldName + " = NULL"); // ✅ esto lo borra en la BD
+                } else {
+                    Object value = extractValue(fieldValue);
+                    setJoiner.add(fieldName + " = " + (value instanceof String || value instanceof LocalDateTime ? "'" + value + "'" : value));
+                }
+            } catch (Exception e) {
+                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+            }
+        }
+
+        if (idField == null) {
+            throw new IllegalArgumentException("No ID field (ending with _id) found for WHERE clause");
+        }
+
+        qb.query.append(setJoiner).append(" WHERE ").append(whereJoiner);
+        return qb;
+    }
 
 
     public static <T> QueryBuilder delete(T object) {

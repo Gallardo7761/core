@@ -43,7 +43,7 @@ public class MemberService {
         this.userService = new UserService(pool);
         this.memberValidator = new MemberValidator();
     }
-
+    
     public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {
         return userService.login(emailOrUserName, password, keepLoggedIn).compose(json -> {
             JsonObject loggedUserJson = json.getJsonObject("loggedUser");
@@ -281,12 +281,15 @@ public class MemberService {
     				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
     			}
 
-    			if (member.getPassword() != null) {
+    			if (member.getPassword() != null && !member.getPassword().isEmpty() && 
+						!member.getPassword().equals(existing.getPassword())) {
     				member.setPassword(PasswordHasher.hash(member.getPassword()));
+    			} else {
+    				member.setPassword(existing.getPassword());
     			}
 
     			return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
-    				return userMetadataDAO.update(UserMetadataEntity.fromMemberEntity(member))
+    				return userMetadataDAO.updateWithNulls(UserMetadataEntity.fromMemberEntity(member))
     						.map(meta -> new MemberEntity(user, meta));
     			});
     		});

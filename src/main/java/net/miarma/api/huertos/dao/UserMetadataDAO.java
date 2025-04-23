@@ -69,6 +69,18 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 
 		return promise.future();
 	}
+	
+	public Future<UserMetadataEntity> updateWithNulls(UserMetadataEntity user) {
+		Promise<UserMetadataEntity> promise = Promise.promise();
+		String query = QueryBuilder.updateWithNulls(user).build();
+
+		db.executeOne(query, UserMetadataEntity.class,
+            _ -> promise.complete(user),
+            promise::fail
+        );
+
+		return promise.future();
+	}
 
 	@Override
 	public Future<UserMetadataEntity> delete(Integer id) {

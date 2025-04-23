@@ -34,7 +34,7 @@ public class UserService {
     /* AUTHENTICATION */
 
     public Future<JsonObject> login(String emailOrUsername, String plainPassword, boolean keepLoggedIn) {
-        return getByEmail(emailOrUsername).compose(user -> {
+    	return getByEmail(emailOrUsername).compose(user -> {
             if (user == null) {
                 return getByUserName(emailOrUsername);
             }
@@ -186,6 +186,9 @@ public class UserService {
     	return userValidator.validate(user).compose(validation -> {
 			if (!validation.isValid()) {
 				return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+			}
+			if (user.getPassword() == null || user.getPassword().isEmpty()) {
+				user.setPassword(null);
 			}
 			return userDAO.update(user);
 		});
