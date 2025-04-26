@@ -1,5 +1,9 @@
 package net.miarma.api.miarmacraft.entities;
 
-public class SuggestionVoteEntity {
+import net.miarma.api.common.annotations.Table;
+import net.miarma.api.common.db.AbstractEntity;
+
+@Table("miarmacraft_suggestion_votes")
+public class SuggestionVoteEntity extends AbstractEntity {
 
 }

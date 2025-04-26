@@ -3,7 +3,7 @@ package net.miarma.api.miarmacraft.entities;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
-@Table("miarmacraft_suggestion_tags")
-public class SuggestionTagEntity extends AbstractEntity {
+@Table("miarmacraft_players")
+public class PlayerEntity extends AbstractEntity {
 
 }
