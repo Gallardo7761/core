@@ -22,7 +22,7 @@ public class MMCLogicVerticle extends AbstractVerticle {
 		
 		vertx.createHttpServer()
 			.requestHandler(router)
-			.listen(configManager.getIntProperty("miarmacraft.logic.port"), res -> {
+			.listen(configManager.getIntProperty("mmc.logic.port"), res -> {
 				if (res.succeeded()) startPromise.complete();
 	            else startPromise.fail(res.cause());
 		});
