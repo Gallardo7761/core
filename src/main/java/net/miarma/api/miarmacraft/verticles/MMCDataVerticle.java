@@ -18,7 +18,6 @@ import net.miarma.api.util.RouterUtil;
 
 public class MMCDataVerticle extends AbstractVerticle {
 	private ConfigManager configManager;
-	private ModService modService;
 	private PlayerService playerService;
 	
 	@Override
@@ -26,7 +25,6 @@ public class MMCDataVerticle extends AbstractVerticle {
 		configManager = ConfigManager.getInstance();
 		Pool pool = DatabaseProvider.createPool(vertx, configManager);
 		
-		modService = new ModService(pool);
 		playerService = new PlayerService(pool);
 		
 		Router router = Router.router(vertx);
@@ -48,6 +46,17 @@ public class MMCDataVerticle extends AbstractVerticle {
 			String action = body.getString("action");
 			
 			switch(action) {
+				case "login" -> {
+					String email = body.getString("email", null);
+                    String userName = body.getString("userName", null);
+                    String password = body.getString("password");
+                    boolean keepLoggedIn = body.getBoolean("keepLoggedIn", false);
+
+                    playerService.login(email != null ? email : userName, password, keepLoggedIn)
+                        .onSuccess(message::reply)
+                        .onFailure(EventBusUtil.fail(message));
+				}
+			
 				case "getStatus" -> {
 					playerService.getStatus(body.getInteger("playerId"))
 						.onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))

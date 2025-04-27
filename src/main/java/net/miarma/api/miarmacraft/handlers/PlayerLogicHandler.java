@@ -15,6 +15,26 @@ public class PlayerLogicHandler {
 		this.vertx = vertx;
 	}
 	
+	public void login(RoutingContext ctx) {
+		JsonObject body = ctx.body().asJsonObject();
+		JsonObject request = new JsonObject()
+			.put("action", "login")
+			.put("email", body.getString("email", null))
+			.put("userName", body.getString("userName", null))
+			.put("password", body.getString("password"))
+			.put("keepLoggedIn", body.getBoolean("keepLoggedIn", false));
+
+		vertx.eventBus().request(Constants.MMC_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) {
+				JsonObject result = (JsonObject) ar.result().body();
+				result.put("tokenTime", System.currentTimeMillis());
+				JsonUtil.sendJson(ctx, ApiStatus.OK, result);
+			} else {
+				EventBusUtil.handleReplyError(ctx, ar.cause(), "The player is inactive or banned");
+			}
+		});
+	}
+	
 	public void getStatus(RoutingContext ctx) {
 		Integer playerId = Integer.parseInt(ctx.request().getParam("player_id"));
 		JsonObject request = new JsonObject().put("action", "getStatus").put("playerId", playerId);

@@ -3,6 +3,8 @@ package net.miarma.api.miarmacraft.routing;
 import net.miarma.api.common.Constants;
 
 public class MMCEndpoints {
+	public static final String LOGIN = Constants.MMC_PREFIX + "/login"; // POST
+	
 	public static final String MODS = Constants.MMC_PREFIX + "/mods"; // GET, POST, PUT, DELETE
 	public static final String MOD = Constants.MMC_PREFIX + "/mods/:mod_id"; // GET, PUT, DELETE
 	public static final String MOD_STATUS = Constants.MMC_PREFIX + "/mods/:mod_id/status"; // GET, PUT
