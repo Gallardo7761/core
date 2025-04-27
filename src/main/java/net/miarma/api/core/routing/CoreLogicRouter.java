@@ -1,10 +1,14 @@
 package net.miarma.api.core.routing;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.http.ApiResponse;
+import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.middlewares.AuthGuard;
+import net.miarma.api.common.security.SusPather;
 import net.miarma.api.core.handlers.FileLogicHandler;
 import net.miarma.api.core.handlers.UserLogicHandler;
 
@@ -14,6 +18,20 @@ public class CoreLogicRouter {
 		FileLogicHandler hFileLogic = new FileLogicHandler(vertx);
         
 		router.route().handler(BodyHandler.create());
+		
+		// teapot :P
+		router.route().handler(ctx -> {
+			String path = ctx.request().path();
+			ApiResponse<JsonObject> response = new ApiResponse<JsonObject>(ApiStatus.IM_A_TEAPOT, "I'm a teapot", null);
+			JsonObject jsonResponse = new JsonObject().put("status", response.getStatus()).put("message",
+					response.getMessage());
+			if (SusPather.isSusPath(path)) {
+				ctx.response().setStatusCode(response.getStatus()).putHeader("Content-Type", "application/json")
+						.end(jsonResponse.encode());
+			} else {
+				ctx.next();
+			}
+		});
 		
 		router.post(CoreEndpoints.LOGIN).handler(hUserLogic::login);
 		router.get(CoreEndpoints.USER_INFO).handler(AuthGuard.check()).handler(hUserLogic::getInfo);

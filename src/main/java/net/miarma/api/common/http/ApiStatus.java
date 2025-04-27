@@ -5,6 +5,7 @@ import net.miarma.api.common.exceptions.ConflictException;
 import net.miarma.api.common.exceptions.ForbiddenException;
 import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.exceptions.ServiceUnavailableException;
+import net.miarma.api.common.exceptions.TeapotException;
 import net.miarma.api.common.exceptions.UnauthorizedException;
 import net.miarma.api.common.exceptions.UnprocessableEntityException;
 import net.miarma.api.common.exceptions.UnsupportedMediaTypeException;
@@ -20,6 +21,7 @@ public enum ApiStatus {
     FORBIDDEN(403),
     NOT_FOUND(404),
     CONFLICT(409),
+    IM_A_TEAPOT(418),
     UNPROCESSABLE_ENTITY(422),
     UNSUPPORTED_MEDIA_TYPE(415),
     INTERNAL_SERVER_ERROR(500),
@@ -46,6 +48,7 @@ public enum ApiStatus {
 			case FORBIDDEN -> "Forbidden";
 			case NOT_FOUND -> "Not Found";
 			case CONFLICT -> "Conflict";
+			case IM_A_TEAPOT -> "The server refuses the attempt to brew coffee with a teapot";
 			case UNPROCESSABLE_ENTITY -> "Unprocessable Entity";
 			case UNSUPPORTED_MEDIA_TYPE -> "Unsupported Media Type";
 			case INTERNAL_SERVER_ERROR -> "Internal Server Error";
@@ -59,6 +62,7 @@ public enum ApiStatus {
 		if (t instanceof UnauthorizedException) return ApiStatus.UNAUTHORIZED;
 		if (t instanceof ForbiddenException) return ApiStatus.FORBIDDEN;
 		if (t instanceof ConflictException) return ApiStatus.CONFLICT;
+		if (t instanceof TeapotException) return ApiStatus.IM_A_TEAPOT;
 		if (t instanceof ServiceUnavailableException) return ApiStatus.SERVICE_UNAVAILABLE;
 		if (t instanceof UnprocessableEntityException) return ApiStatus.UNPROCESSABLE_ENTITY;
 		if (t instanceof UnsupportedMediaTypeException) return ApiStatus.UNSUPPORTED_MEDIA_TYPE;
@@ -77,6 +81,7 @@ public enum ApiStatus {
 			case 403 -> FORBIDDEN;
 			case 404 -> NOT_FOUND;
 			case 409 -> CONFLICT;
+			case 418 -> IM_A_TEAPOT;
 			case 422 -> UNPROCESSABLE_ENTITY;
 			case 415 -> UNSUPPORTED_MEDIA_TYPE;
 			case 500 -> INTERNAL_SERVER_ERROR;

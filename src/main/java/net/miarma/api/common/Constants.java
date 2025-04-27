@@ -54,6 +54,7 @@ public class Constants {
 			.registerTypeAdapter(MMCUserStatus.class, new ValuableEnumDeserializer())
 			.registerTypeAdapter(MMCUserRole.class, new ValuableEnumDeserializer())
 			.registerTypeAdapter(CoreFileContext.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(MMCModStatus.class, new ValuableEnumDeserializer())
 			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
 			.create();
     
@@ -381,6 +382,30 @@ public class Constants {
 	    }
 	}
 	
+	public enum MMCModStatus implements ValuableEnum {
+		ACTIVE(0),
+		INACTIVE(1);
+		
+		private final int value;
+		
+		MMCModStatus(int value) {
+			this.value = value;
+		}
+		
+		@Override
+		public int getValue() {
+			return value;
+		}
+		
+		public static MMCModStatus fromInt(int i) {
+			for (MMCModStatus status : values()) {
+				if (status.value == i) return status;
+			}
+			throw new IllegalArgumentException("Invalid MiarmacraftModStatus value: " + i);
+		}
+	}
+
+	// Private constructor to prevent instantiation 
 	private Constants() {
         throw new AssertionError("Utility class cannot be instantiated.");
     }

@@ -9,6 +9,7 @@ import net.miarma.api.common.annotations.APIDontReturn;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 import net.miarma.api.huertos.entities.MemberEntity;
+import net.miarma.api.miarmacraft.entities.PlayerEntity;
 
 @Table("users")
 public class UserEntity extends AbstractEntity {
@@ -60,6 +61,19 @@ public class UserEntity extends AbstractEntity {
     	user.setRole(member.getGlobal_role());
     	return user;
     }
+    
+    public static UserEntity fromPlayerEntity(PlayerEntity player) {
+		UserEntity user = new UserEntity();
+		user.setUser_id(player.getUser_id());
+		user.setUser_name(player.getUser_name());
+		user.setDisplay_name(player.getDisplay_name());
+		user.setEmail(player.getEmail());
+		user.setPassword(player.getPassword());
+		user.setAvatar(player.getAvatar());
+		user.setGlobal_status(player.getGlobal_status());
+		user.setRole(player.getGlobal_role());
+		return user;
+	}
 
     
 }
