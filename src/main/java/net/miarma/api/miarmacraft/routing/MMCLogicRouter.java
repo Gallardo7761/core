@@ -30,6 +30,7 @@ public class MMCLogicRouter {
 			}
 		});
 		
+		router.post(MMCEndpoints.LOGIN).handler(hPlayerLogic::login);
 		router.get(MMCEndpoints.PLAYER_STATUS).handler(AuthGuard.admin()).handler(hPlayerLogic::getStatus);
 		router.put(MMCEndpoints.PLAYER_STATUS).handler(AuthGuard.admin()).handler(hPlayerLogic::updateStatus);
 		router.get(MMCEndpoints.PLAYER_ROLE).handler(AuthGuard.admin()).handler(hPlayerLogic::getRole);

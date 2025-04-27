@@ -6,7 +6,7 @@ import net.miarma.api.common.Constants.MMCUserStatus;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
-@Table("miarmacraft_players")
+@Table("miarmacraft_user_metadata")
 public class UserMetadataEntity extends AbstractEntity {
 	private Integer user_id;
 	private MMCUserRole role;
