@@ -337,7 +337,8 @@ public class Constants {
 
 	
 	public enum MMCUserRole implements ValuableEnum {
-	    PLAYER(0);
+	    PLAYER(0),
+		ADMIN(1);
 
 	    private final int value;
 

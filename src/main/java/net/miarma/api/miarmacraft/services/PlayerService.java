@@ -27,118 +27,111 @@ public class PlayerService {
 	private PlayerDAO playerDAO;
 	private UserMetadataDAO userMetadataDAO;
 	private UserService userService;
-	
+
 	public PlayerService(Pool pool) {
 		this.userDAO = new UserDAO(pool);
 		this.playerDAO = new PlayerDAO(pool);
 		this.userMetadataDAO = new UserMetadataDAO(pool);
 		this.userService = new UserService(pool);
 	}
-	
-	@SuppressWarnings("unused")
+
 	public Future<JsonObject> login(String emailOrUserName, String password, boolean keepLoggedIn) {
 		return userService.login(emailOrUserName, password, keepLoggedIn).compose(json -> {
-            JsonObject loggedUserJson = json.getJsonObject("loggedUser");
-            UserEntity user = Constants.GSON.fromJson(loggedUserJson.encode(), UserEntity.class);
-            
-            if (user == null) {
+			JsonObject loggedUserJson = json.getJsonObject("loggedUser");
+			UserEntity user = Constants.GSON.fromJson(loggedUserJson.encode(), UserEntity.class);
+
+			if (user == null) {
 				return Future.failedFuture(new BadRequestException("Invalid credentials"));
 			}
-            
-            if (user.getGlobal_status() != Constants.CoreUserGlobalStatus.ACTIVE) {
-            	return Future.failedFuture(new ForbiddenException("User is not active"));
-            }
-            
-            return userMetadataDAO.getAll().compose(metadataList -> {
-            	UserMetadataEntity userMetadata = metadataList.stream()
-					.filter(metadata -> metadata.getUser_id().equals(user.getUser_id()))
-					.findFirst()
-					.orElse(null);
-            	
-            	if (userMetadata.getStatus() != MMCUserStatus.ACTIVE) {
-            		return Future.failedFuture(new ForbiddenException("User is not active"));
-            	}
-            	
-            	if (userMetadata == null) {
-            		return Future.failedFuture(new NotFoundException("User metadata not found"));
-            	}
-            	
-            	PlayerEntity player = new PlayerEntity(user, userMetadata);
-            	
-            	return Future.succeededFuture(new JsonObject()
-					.put("token", json.getString("token"))
-					.put("loggedUser", Constants.GSON.toJsonTree(player).getAsJsonObject())
+
+			if (user.getGlobal_status() != Constants.CoreUserGlobalStatus.ACTIVE) {
+				return Future.failedFuture(new ForbiddenException("User is not active"));
+			}
+
+			return userMetadataDAO.getAll().compose(metadataList -> {
+				UserMetadataEntity userMetadata = metadataList.stream()
+				    .filter(metadata -> metadata.getUser_id().equals(user.getUser_id()))
+				    .findFirst()
+				    .orElse(null);
+
+				if (userMetadata == null) {
+				    return Future.failedFuture(new NotFoundException("User metadata not found"));
+				}
+
+				if (userMetadata.getStatus() != MMCUserStatus.ACTIVE) {
+				    return Future.failedFuture(new ForbiddenException("User is not active"));
+				}
+
+				PlayerEntity player = new PlayerEntity(user, userMetadata);
+
+				return Future.succeededFuture(new JsonObject()
+						.put("token", json.getString("token"))
+						.put("loggedUser", new JsonObject(Constants.GSON.toJson(player)))
 				);
-            	
-            });
+
+			});
 		});
 	}
-	
+
 	public Future<List<PlayerEntity>> getAll() {
 		return playerDAO.getAll();
 	}
-	
+
 	public Future<List<PlayerEntity>> getAll(QueryParams queryParams) {
 		return playerDAO.getAll(queryParams);
 	}
-	
+
 	public Future<PlayerEntity> getById(Integer id) {
 		return getAll().compose(players -> {
-			return Future.succeededFuture(players.stream()
-				.filter(player -> player.getUser_id().equals(id))
-				.findFirst()
-				.orElse(null));
+			return Future.succeededFuture(
+					players.stream().filter(player -> player.getUser_id().equals(id)).findFirst().orElse(null));
 		});
 	}
-	
+
 	public Future<PlayerEntity> getByUserName(String username) {
 		return getAll().compose(players -> {
-			return Future.succeededFuture(players.stream()
-				.filter(player -> player.getUser_name().equals(username))
-				.findFirst()
-				.orElse(null));
+			return Future.succeededFuture(
+					players.stream().filter(player -> player.getUser_name().equals(username)).findFirst().orElse(null));
 		});
 	}
-	
+
 	public Future<PlayerEntity> getByEmail(String email) {
 		return getAll().compose(players -> {
-			return Future.succeededFuture(players.stream()
-				.filter(player -> player.getEmail().equals(email))
-				.findFirst()
-				.orElse(null));
+			return Future.succeededFuture(
+					players.stream().filter(player -> player.getEmail().equals(email)).findFirst().orElse(null));
 		});
 	}
-	
+
 	public Future<MMCUserStatus> getStatus(Integer id) {
 		return getById(id).compose(player -> {
 			if (player == null) {
 				return Future.failedFuture(new NotFoundException("Player not found"));
 			}
-			
+
 			return Future.succeededFuture(player.getStatus());
 		});
 	}
-	
+
 	public Future<MMCUserRole> getRole(Integer id) {
 		return getById(id).compose(player -> {
 			if (player == null) {
 				return Future.failedFuture(new NotFoundException("Player not found"));
 			}
-			
+
 			return Future.succeededFuture(player.getRole());
 		});
 	}
-	
+
 	public Future<String> getAvatar(Integer id) {
 		return getById(id).compose(player -> {
 			if (player == null) {
 				return Future.failedFuture(new NotFoundException("Player not found"));
 			}
-			
+
 			return Future.succeededFuture(player.getAvatar());
 		});
 	}
-	
+
 	public Future<PlayerEntity> updateStatus(Integer id, MMCUserStatus status) {
 		PlayerEntity player = new PlayerEntity();
 		player.setUser_id(id);
@@ -147,7 +140,7 @@ public class PlayerService {
 			return Future.succeededFuture(updatedPlayer);
 		});
 	}
-	
+
 	public Future<PlayerEntity> updateRole(Integer id, MMCUserRole role) {
 		PlayerEntity player = new PlayerEntity();
 		player.setUser_id(id);
@@ -156,7 +149,7 @@ public class PlayerService {
 			return Future.succeededFuture(updatedPlayer);
 		});
 	}
-	
+
 	public Future<PlayerEntity> updateAvatar(Integer id, String avatar) {
 		PlayerEntity player = new PlayerEntity();
 		player.setUser_id(id);
@@ -165,46 +158,44 @@ public class PlayerService {
 			return Future.succeededFuture(updatedPlayer);
 		});
 	}
-		
+
 	public Future<PlayerEntity> create(PlayerEntity player) {
 		return getById(player.getUser_id()).compose(existingPlayer -> {
 			if (existingPlayer != null) {
 				return Future.failedFuture(new AlreadyExistsException("Player already exists"));
 			}
-			
+
 			player.setPassword(PasswordHasher.hash(player.getPassword()));
-			
+
 			return userDAO.insert(UserEntity.fromPlayerEntity(player)).compose(user -> {
 				UserMetadataEntity userMetadata = UserMetadataEntity.fromPlayerEntity(player);
-				return userMetadataDAO.insert(userMetadata)
-					.map(_ -> {
-						player.setUser_id(user.getUser_id());
-						return player;
-					});
+				return userMetadataDAO.insert(userMetadata).map(_ -> {
+					player.setUser_id(user.getUser_id());
+					return player;
+				});
 			});
 		});
 	}
-	
+
 	public Future<PlayerEntity> update(PlayerEntity player) {
 		return getById(player.getUser_id()).compose(existingPlayer -> {
 			if (existingPlayer == null) {
 				return Future.failedFuture(new NotFoundException("Player does not exist"));
 			}
-			
+
 			return userDAO.update(UserEntity.fromPlayerEntity(player)).compose(user -> {
 				UserMetadataEntity userMetadata = UserMetadataEntity.fromPlayerEntity(player);
-				return userMetadataDAO.update(userMetadata)
-					.map(_ -> player);
+				return userMetadataDAO.update(userMetadata).map(_ -> player);
 			});
 		});
 	}
-	
+
 	public Future<PlayerEntity> delete(Integer id) {
 		return getById(id).compose(existingPlayer -> {
 			if (existingPlayer == null) {
 				return Future.failedFuture(new NotFoundException("Player does not exist"));
 			}
-			
+
 			return userDAO.delete(id).compose(_ -> {
 				return userMetadataDAO.delete(id).map(_ -> existingPlayer);
 			});
