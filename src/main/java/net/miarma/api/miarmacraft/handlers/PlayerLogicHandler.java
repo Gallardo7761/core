@@ -94,4 +94,23 @@ public class PlayerLogicHandler {
 			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Player not found");
 		});
 	}
+	
+	public void getInfo(RoutingContext ctx) {
+		String token = ctx.request().getHeader("Authorization");
+		JsonObject request = new JsonObject().put("action", "getInfo").put("token", token);
+		vertx.eventBus().request(Constants.MMC_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Player not found");
+		});
+	}
+	
+	public void playerExists(RoutingContext ctx) {
+		Integer playerId = Integer.parseInt(ctx.request().getParam("player_id"));
+		JsonObject request = new JsonObject().put("action", "playerExists").put("playerId", playerId);
+		vertx.eventBus().request(Constants.MMC_EVENT_BUS, request, ar -> {
+			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
+			else EventBusUtil.handleReplyError(ctx, ar.cause(), "Player not found");
+		});
+	}
+	
 }

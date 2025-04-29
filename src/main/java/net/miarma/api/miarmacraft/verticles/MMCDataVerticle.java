@@ -95,6 +95,18 @@ public class MMCDataVerticle extends AbstractVerticle {
 						.onSuccess(result -> message.reply(new JsonObject(Constants.GSON.toJson(result))))
 						.onFailure(EventBusUtil::fail);
 				}
+				
+				case "playerExists" -> {
+					playerService.playerExists(body.getInteger("playerId"))
+						.onSuccess(exists -> message.reply(new JsonObject(Constants.GSON.toJson(exists))))
+						.onFailure(EventBusUtil::fail);
+				}
+				
+				case "getInfo" -> {
+					playerService.getInfo(body.getString("token"))
+						.onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
+						.onFailure(EventBusUtil::fail);
+				}
 		
 				default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
 			}

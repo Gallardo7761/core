@@ -2,6 +2,8 @@ package net.miarma.api.miarmacraft.services;
 
 import java.util.List;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
@@ -13,6 +15,7 @@ import net.miarma.api.common.exceptions.BadRequestException;
 import net.miarma.api.common.exceptions.ForbiddenException;
 import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.http.QueryParams;
+import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
@@ -199,6 +202,26 @@ public class PlayerService {
 			return userDAO.delete(id).compose(_ -> {
 				return userMetadataDAO.delete(id).map(_ -> existingPlayer);
 			});
+		});
+	}
+	
+	public Future<Boolean> playerExists(Integer id) {
+		return getById(id).compose(player -> {
+			if (player == null) {
+				return Future.succeededFuture(false);
+			}
+			return Future.succeededFuture(true);
+		});
+	}
+	
+	public Future<PlayerEntity> getInfo(String token) {
+		Integer userId = JWTManager.getInstance().getUserId(token);
+		return getById(userId).compose(player -> {
+			if (player == null) {
+				return Future.failedFuture(new NotFoundException("Player not found"));
+			}
+
+			return Future.succeededFuture(player);
 		});
 	}
 }

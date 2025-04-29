@@ -37,5 +37,7 @@ public class MMCLogicRouter {
 		router.put(MMCEndpoints.PLAYER_ROLE).handler(AuthGuard.admin()).handler(hPlayerLogic::updateRole);
 		router.get(MMCEndpoints.PLAYER_AVATAR).handler(AuthGuard.check()).handler(hPlayerLogic::getAvatar);
 		router.put(MMCEndpoints.PLAYER_AVATAR).handler(AuthGuard.check()).handler(hPlayerLogic::updateAvatar);
+		router.get(MMCEndpoints.PLAYER_INFO).handler(AuthGuard.check()).handler(hPlayerLogic::getInfo);
+		router.get(MMCEndpoints.PLAYER_EXISTS).handler(AuthGuard.check()).handler(hPlayerLogic::playerExists);
 	}
 }
