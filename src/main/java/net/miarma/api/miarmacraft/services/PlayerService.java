@@ -171,9 +171,9 @@ public class PlayerService {
 			player.setPassword(PasswordHasher.hash(player.getPassword()));
 
 			return userDAO.insert(UserEntity.fromPlayerEntity(player)).compose(user -> {
-				UserMetadataEntity userMetadata = UserMetadataEntity.fromPlayerEntity(player);
-				return userMetadataDAO.insert(userMetadata).map(_ -> {
-					player.setUser_id(user.getUser_id());
+				UserMetadataEntity metadata = UserMetadataEntity.fromPlayerEntity(player);
+				metadata.setUser_id(user.getUser_id());
+				return userMetadataDAO.insert(metadata).map(_ -> {
 					return player;
 				});
 			});
