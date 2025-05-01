@@ -34,7 +34,7 @@ public class MMCDataRouter {
 		
 		router.get(MMCEndpoints.MODS).handler(AuthGuard.check()).handler(hModData::getAll);
 		router.get(MMCEndpoints.MOD).handler(AuthGuard.check()).handler(hModData::getById);
-		router.post(MMCEndpoints.MODS).handler(AuthGuard.admin()).handler(hModData::create); 
+		router.post(MMCEndpoints.MODS).handler(BodyHandler.create().setBodyLimit(100 * 1024 * 1024)).handler(AuthGuard.admin()).handler(hModData::create); 
 		router.put(MMCEndpoints.MOD).handler(AuthGuard.admin()).handler(hModData::update);
 		router.delete(MMCEndpoints.MOD).handler(AuthGuard.admin()).handler(hModData::delete);
 		

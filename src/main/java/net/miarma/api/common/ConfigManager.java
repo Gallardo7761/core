@@ -67,6 +67,10 @@ public class ConfigManager {
 									null);
     }
     
+    public String getModsDir() {
+    	return getFilesDir("miarmacraft") + "mods/";
+    }
+    
     public String getWebRoot() {
 		return config.getProperty("web.root") != null ? 
 				config.getProperty("web.root") : 

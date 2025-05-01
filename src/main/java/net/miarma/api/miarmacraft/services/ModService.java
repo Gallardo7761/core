@@ -51,12 +51,12 @@ public class ModService {
 		});
 	}
 	
-	public Future<Void> delete(Integer id) {
-		return modDAO.delete(id).compose(deleted -> {
-			if (deleted == null) {
+	public Future<ModEntity> delete(Integer id) {
+		return getById(id).compose(mod -> {
+			if (mod == null) {
 				return Future.failedFuture(new NotFoundException("Mod with id " + id));
 			}
-			return Future.succeededFuture();
+			return modDAO.delete(id);
 		});
 	}
 }
