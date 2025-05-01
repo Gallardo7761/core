@@ -96,7 +96,7 @@ public class PlayerLogicHandler {
 	}
 	
 	public void getInfo(RoutingContext ctx) {
-		String token = ctx.request().getHeader("Authorization");
+		String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
 		JsonObject request = new JsonObject().put("action", "getInfo").put("token", token);
 		vertx.eventBus().request(Constants.MMC_EVENT_BUS, request, ar -> {
 			if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());

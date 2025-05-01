@@ -11,7 +11,6 @@ import net.miarma.api.common.Constants.MMCUserRole;
 import net.miarma.api.common.Constants.MMCUserStatus;
 import net.miarma.api.common.db.DatabaseProvider;
 import net.miarma.api.miarmacraft.routing.MMCDataRouter;
-import net.miarma.api.miarmacraft.services.ModService;
 import net.miarma.api.miarmacraft.services.PlayerService;
 import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.RouterUtil;
@@ -60,52 +59,52 @@ public class MMCDataVerticle extends AbstractVerticle {
 				case "getStatus" -> {
 					playerService.getStatus(body.getInteger("playerId"))
 						.onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "getRole" -> {
 					playerService.getRole(body.getInteger("playerId"))
 						.onSuccess(role -> message.reply(new JsonObject(Constants.GSON.toJson(role))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "getAvatar" -> {
 					playerService.getAvatar(body.getInteger("playerId"))
 						.onSuccess(avatar -> message.reply(new JsonObject(Constants.GSON.toJson(avatar))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "updateStatus" -> {
 					MMCUserStatus status = MMCUserStatus.fromInt(body.getInteger("status"));
 					playerService.updateStatus(body.getInteger("playerId"), status)
 						.onSuccess(result -> message.reply(new JsonObject(Constants.GSON.toJson(result))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "updateRole" -> {
 					MMCUserRole role = MMCUserRole.fromInt(body.getInteger("role"));
 					playerService.updateRole(body.getInteger("playerId"), role)
 						.onSuccess(result -> message.reply(new JsonObject(Constants.GSON.toJson(result))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "updateAvatar" -> {
 					String avatar = body.getString("avatar");
 					playerService.updateAvatar(body.getInteger("playerId"), avatar)
 						.onSuccess(result -> message.reply(new JsonObject(Constants.GSON.toJson(result))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "playerExists" -> {
 					playerService.playerExists(body.getInteger("playerId"))
 						.onSuccess(exists -> message.reply(new JsonObject(Constants.GSON.toJson(exists))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 				
 				case "getInfo" -> {
 					playerService.getInfo(body.getString("token"))
 						.onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
-						.onFailure(EventBusUtil::fail);
+						.onFailure(EventBusUtil.fail(message));
 				}
 		
 				default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
