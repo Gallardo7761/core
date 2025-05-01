@@ -37,12 +37,7 @@ public class ModService {
 	}
 	
 	public Future<ModEntity> update(ModEntity mod) {
-		return modDAO.update(mod).compose(updatedMod -> {
-			if (updatedMod == null) {
-				return Future.failedFuture(new NotFoundException("Mod with id " + mod.getMod_id()));
-			}
-			return Future.succeededFuture(updatedMod);
-		});
+		return modDAO.update(mod);
 	}
 	
 	public Future<ModEntity> create(ModEntity mod) {
