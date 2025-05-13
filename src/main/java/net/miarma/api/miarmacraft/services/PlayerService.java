@@ -2,8 +2,6 @@ package net.miarma.api.miarmacraft.services;
 
 import java.util.List;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
-
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
@@ -26,10 +24,10 @@ import net.miarma.api.miarmacraft.entities.PlayerEntity;
 import net.miarma.api.miarmacraft.entities.UserMetadataEntity;
 
 public class PlayerService {
-	private UserDAO userDAO;
-	private PlayerDAO playerDAO;
-	private UserMetadataDAO userMetadataDAO;
-	private UserService userService;
+	private final UserDAO userDAO;
+	private final PlayerDAO playerDAO;
+	private final UserMetadataDAO userMetadataDAO;
+	private final UserService userService;
 
 	public PlayerService(Pool pool) {
 		this.userDAO = new UserDAO(pool);

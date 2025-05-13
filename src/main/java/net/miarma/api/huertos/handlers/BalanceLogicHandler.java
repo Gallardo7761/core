@@ -9,7 +9,7 @@ import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.JsonUtil;
 
 public class BalanceLogicHandler {
-	private Vertx vertx;
+	private final Vertx vertx;
 	
 	public BalanceLogicHandler(Vertx vertx) {
 		this.vertx = vertx;

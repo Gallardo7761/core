@@ -233,6 +233,7 @@ public class MemberService {
             }
 
             member.setPassword(PasswordHasher.hash(member.getPassword()));
+            if (member.getEmail().isBlank()) member.setEmail(null);
 
             return userDAO.insert(UserEntity.fromMemberEntity(member)).compose(user -> {
                 UserMetadataEntity metadata = UserMetadataEntity.fromMemberEntity(member);

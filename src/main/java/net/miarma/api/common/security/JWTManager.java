@@ -13,7 +13,7 @@ import net.miarma.api.core.entities.UserEntity;
 
 public class JWTManager {
 
-	private ConfigManager config = ConfigManager.getInstance();
+	private final ConfigManager config = ConfigManager.getInstance();
     private final Algorithm algorithm; 
     private final JWTVerifier verifier;
     private static JWTManager instance;
@@ -31,7 +31,7 @@ public class JWTManager {
 	}
     
     public String generateToken(UserEntity user, boolean keepLoggedIn) {
-    	final long EXPIRATION_TIME_MS = 1000 * (keepLoggedIn ? config.getIntProperty("jwt.expiration") : config.getIntProperty("jwt.expiration.short"));
+    	final long EXPIRATION_TIME_MS = 1000L * (keepLoggedIn ? config.getIntProperty("jwt.expiration") : config.getIntProperty("jwt.expiration.short"));
     	return JWT.create()
     	        .withSubject(user.getUser_name())
     	        .withClaim("userId", user.getUser_id())

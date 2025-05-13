@@ -73,9 +73,9 @@ public class IncomeEntity extends AbstractEntity {
 	
 	public boolean isPaid() {
 		if(frequency == HuertosPaymentFrequency.BIYEARLY) {
-			return (System.currentTimeMillis() - created_at.toEpochSecond(ZoneOffset.UTC)) > 6 * 30 * 24 * 60 * 60 * 1000;
+			return (System.currentTimeMillis() - created_at.toEpochSecond(ZoneOffset.UTC)) > 6L * 30 * 24 * 60 * 60 * 1000;
 		} else if(frequency == HuertosPaymentFrequency.YEARLY) {
-			return (System.currentTimeMillis() - created_at.toEpochSecond(ZoneOffset.UTC)) > 12 * 30 * 24 * 60 * 60 * 1000;
+			return (System.currentTimeMillis() - created_at.toEpochSecond(ZoneOffset.UTC)) > 12L * 30 * 24 * 60 * 60 * 1000;
 		} else {
 			return false;
 		}

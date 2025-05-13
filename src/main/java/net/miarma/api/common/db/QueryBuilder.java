@@ -16,7 +16,7 @@ import net.miarma.api.common.Constants;
 import net.miarma.api.common.annotations.Table;
 
 public class QueryBuilder {
-    private StringBuilder query;
+    private final StringBuilder query;
     private String sort;
     private String order;
     private String limit;

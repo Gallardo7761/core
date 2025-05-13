@@ -9,7 +9,7 @@ import net.miarma.api.miarmacraft.services.PlayerService;
 import net.miarma.api.util.JsonUtil;
 
 public class PlayerDataHandler {
-	private PlayerService playerService;
+	private final PlayerService playerService;
 	
 	public PlayerDataHandler(Pool pool) {
 		this.playerService = new PlayerService(pool);

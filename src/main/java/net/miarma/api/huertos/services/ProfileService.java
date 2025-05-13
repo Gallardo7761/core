@@ -8,9 +8,9 @@ import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.huertos.entities.ProfileDTO;
 
 public class ProfileService {
-	private MemberService memberService;
-	private RequestService requestService;
-	private IncomeService incomeService;
+	private final MemberService memberService;
+	private final RequestService requestService;
+	private final IncomeService incomeService;
 	
 	public ProfileService(Pool pool) {
 		this.memberService = new MemberService(pool);
