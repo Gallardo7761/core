@@ -35,4 +35,5 @@ public class CoreEndpoints {
     public static final String CHANGE_PASSWORD = Constants.AUTH_PREFIX + "/change-password"; // POST
     public static final String VALIDATE_TOKEN = Constants.AUTH_PREFIX + "/validate-token"; // POST
     public static final String REFRESH_TOKEN = Constants.AUTH_PREFIX + "/refresh-token"; // POST
+    public static final String SCREENSHOT = Constants.CORE_PREFIX + "/screenshot"; // GET
 }

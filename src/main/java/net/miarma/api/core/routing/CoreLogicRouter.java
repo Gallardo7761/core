@@ -10,12 +10,14 @@ import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.middlewares.AuthGuard;
 import net.miarma.api.common.security.SusPather;
 import net.miarma.api.core.handlers.FileLogicHandler;
+import net.miarma.api.core.handlers.ScreenshotHandler;
 import net.miarma.api.core.handlers.UserLogicHandler;
 
 public class CoreLogicRouter {
 	public static void mount(Router router, Vertx vertx, Pool pool) {
 		UserLogicHandler hUserLogic = new UserLogicHandler(vertx);
 		FileLogicHandler hFileLogic = new FileLogicHandler(vertx);
+		ScreenshotHandler hScreenshot = new ScreenshotHandler(vertx);
         
 		router.route().handler(BodyHandler.create());
 		
@@ -50,5 +52,7 @@ public class CoreLogicRouter {
 		
 		router.get(CoreEndpoints.FILE_DOWNLOAD).handler(AuthGuard.check()).handler(hFileLogic::downloadFile);
 		router.get(CoreEndpoints.USER_FILES).handler(AuthGuard.check()).handler(hFileLogic::getUserFiles);
+		
+		router.get(CoreEndpoints.SCREENSHOT).handler(hScreenshot::getScreenshot);
 	}
 }
