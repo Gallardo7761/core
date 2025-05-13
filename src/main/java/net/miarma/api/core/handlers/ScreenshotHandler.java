@@ -29,13 +29,15 @@ public class ScreenshotHandler {
 	    String microserviceUrl = "http://localhost:7000/screenshot?url=" + encodedUrl;
 	    
 	    webClient.getAbs(microserviceUrl)
-	      .send(ar -> {
-	        if (ar.succeeded()) {
-	        	JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-	        } else {
-	        	JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, "Could not generate the screenshot");
-	        }
-	      });
+        .send(ar -> {
+            if (ar.succeeded()) {
+                ctx.response()
+                    .putHeader("Content-Type", "image/png")
+                    .end(ar.result().body());
+            } else {
+                JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, "Could not generate the screenshot");
+            }
+        });
 	    
 	}
 	
