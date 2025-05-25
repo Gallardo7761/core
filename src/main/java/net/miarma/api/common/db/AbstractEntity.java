@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
+import net.miarma.api.common.Constants;
 import net.miarma.api.common.ValuableEnum;
 import net.miarma.api.common.annotations.APIDontReturn;
 
@@ -38,15 +39,11 @@ public abstract class AbstractEntity {
                     }
                 } else {
                 	value = switch (type.getSimpleName()) {
-	                    case "Integer" -> row.getInteger(name);
+	                    case "Integer", "int" -> row.getInteger(name);
 	                    case "String" -> row.getString(name);
-	                    case "Double" -> row.getDouble(name);
-	                    case "Long" -> row.getLong(name);
-	                    case "Boolean" -> row.getBoolean(name);
-	                    case "int" -> row.getInteger(name);
-	                    case "double" -> row.getDouble(name);
-	                    case "long" -> row.getLong(name);
-	                    case "boolean" -> row.getBoolean(name);
+                        case "double", "Double" -> row.getDouble(name);
+	                    case "long", "Long" -> row.getLong(name);
+	                    case "boolean", "Boolean" -> row.getBoolean(name);
 	                    case "LocalDateTime" -> row.getLocalDateTime(name);
 	                    case "BigDecimal" -> {
 	                        try {
@@ -57,7 +54,7 @@ public abstract class AbstractEntity {
 	                        }
 	                    }
 	                    default -> {
-	                        System.err.println("Type not supported yet: " + type.getName() + " for field " + name);
+                            Constants.LOGGER.error("Type not supported yet: {} for field {}", type.getName(), name);
 	                        yield null;
 	                    }
 	                };
@@ -66,7 +63,7 @@ public abstract class AbstractEntity {
 
                 field.set(this, value);
             } catch (Exception e) {
-                e.printStackTrace();
+                Constants.LOGGER.error("Error populating field {}: {}", field.getName(), e.getMessage());
             }
         }
     }
@@ -89,7 +86,7 @@ public abstract class AbstractEntity {
                         json.put(field.getName(), value);
                     }
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    Constants.LOGGER.error("Error accessing field {}: {}", field.getName(), e.getMessage());
                 }
             }
             clazz = clazz.getSuperclass();
@@ -107,8 +104,8 @@ public abstract class AbstractEntity {
 			try {
 				sb.append(field.getName()).append("= ").append(field.get(this)).append(", ");
 			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
+				Constants.LOGGER.error("Error stringing field {}: {}", field.getName(), e.getMessage());
+            }
 		}
 		sb.append("]");
 		return sb.toString();

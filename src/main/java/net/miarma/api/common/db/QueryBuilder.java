@@ -348,6 +348,7 @@ public class QueryBuilder {
         if (limit != null && !limit.isEmpty()) {
             query.append(limit);
         }
+        System.out.println(query);
         return query.toString().trim() + ";";
     }
 }

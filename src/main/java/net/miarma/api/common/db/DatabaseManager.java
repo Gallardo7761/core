@@ -46,7 +46,7 @@ public class DatabaseManager {
 					results.add(constructor.newInstance(row));
 				} catch (NoSuchMethodException | InstantiationException | IllegalAccessException
 						| InvocationTargetException e) {
-					Constants.LOGGER.error("Error instantiating class: " + e.getMessage());
+                    Constants.LOGGER.error("Error instantiating class: {}", e.getMessage());
 				}
 			}
 			return results;

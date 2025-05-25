@@ -27,8 +27,6 @@ public class Constants {
     public static final String CORE_EVENT_BUS = "core.eventbus";
     public static final String HUERTOS_EVENT_BUS = "huertos.eventbus";
     public static final String MMC_EVENT_BUS = "mmc.eventbus";
-
-	public static final String WEBHOOK_URL = "https://discord.com/api/webhooks/1369327246434893975/JxloNeIYt4WTbjVEMAdjO4i5-xOBtCxAIvF1JohqzdwtxD-nGd2prCzcash3PKyrJC8a";
     
     public static Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
     

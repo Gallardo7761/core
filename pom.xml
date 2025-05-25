@@ -96,6 +96,7 @@
   </dependencies>
   
   <build>
+	  <finalName>MiarmaEcosystem</finalName>
         <plugins>
             <!-- Maven Shade Plugin -->
             <plugin>
@@ -112,7 +113,7 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>net.miarma.core.MainVerticle</mainClass>
+                                    <mainClass>net.miarma.api.MainVerticle</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
