@@ -1,15 +1,11 @@
 package net.miarma.api.huertos.entities;
 
-import java.time.LocalDateTime;
-
 import io.vertx.sqlclient.Row;
-import net.miarma.api.common.Constants.HuertosRequestStatus;
-import net.miarma.api.common.Constants.HuertosRequestType;
-import net.miarma.api.common.Constants.HuertosUserRole;
-import net.miarma.api.common.Constants.HuertosUserStatus;
-import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.Constants.*;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
+
+import java.time.LocalDateTime;
 
 @Table("v_requests_with_pre_users")
 public class ViewRequestsWithPreUsers extends AbstractEntity {

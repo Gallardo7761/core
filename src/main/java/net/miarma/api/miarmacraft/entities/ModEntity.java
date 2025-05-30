@@ -1,11 +1,11 @@
 package net.miarma.api.miarmacraft.entities;
 
-import java.time.LocalDateTime;
-
 import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.MMCModStatus;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
+
+import java.time.LocalDateTime;
 
 @Table("miarmacraft_mods")
 public class ModEntity extends AbstractEntity {

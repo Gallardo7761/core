@@ -1,8 +1,8 @@
 package net.miarma.api.common.http;
 
-import java.util.Optional;
-
 import io.vertx.ext.web.RoutingContext;
+
+import java.util.Optional;
 
 public class QueryFilters {
 

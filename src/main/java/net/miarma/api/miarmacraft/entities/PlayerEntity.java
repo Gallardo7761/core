@@ -1,7 +1,5 @@
 package net.miarma.api.miarmacraft.entities;
 
-import java.time.LocalDateTime;
-
 import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
@@ -11,6 +9,8 @@ import net.miarma.api.common.annotations.APIDontReturn;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 import net.miarma.api.core.entities.UserEntity;
+
+import java.time.LocalDateTime;
 
 @Table("v_miarmacraft_players")
 public class PlayerEntity extends AbstractEntity{

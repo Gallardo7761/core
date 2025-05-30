@@ -1,12 +1,12 @@
 package net.miarma.api.common.db;
 
-import java.lang.reflect.Field;
-
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.ValuableEnum;
 import net.miarma.api.common.annotations.APIDontReturn;
+
+import java.lang.reflect.Field;
 
 public abstract class AbstractEntity {
 	

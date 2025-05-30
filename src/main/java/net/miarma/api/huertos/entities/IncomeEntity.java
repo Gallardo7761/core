@@ -1,14 +1,14 @@
 package net.miarma.api.huertos.entities;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
 import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosPaymentFrequency;
 import net.miarma.api.common.Constants.HuertosPaymentType;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Table("huertos_incomes")
 public class IncomeEntity extends AbstractEntity {

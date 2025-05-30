@@ -1,8 +1,5 @@
 package net.miarma.api.huertos.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
@@ -12,6 +9,9 @@ import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryFilters;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
+
+import java.util.List;
+import java.util.Map;
 
 public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 	

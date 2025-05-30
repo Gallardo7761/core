@@ -5,7 +5,6 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.http.QueryParams;
-import net.miarma.api.common.http.SingleJsonResponse;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.services.UserService;
 import net.miarma.api.util.JsonUtil;

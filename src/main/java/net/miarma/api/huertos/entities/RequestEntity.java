@@ -1,12 +1,12 @@
 package net.miarma.api.huertos.entities;
 
-import java.time.LocalDateTime;
-
 import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.HuertosRequestStatus;
 import net.miarma.api.common.Constants.HuertosRequestType;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
+
+import java.time.LocalDateTime;
 
 @Table("huertos_requests")
 public class RequestEntity extends AbstractEntity {

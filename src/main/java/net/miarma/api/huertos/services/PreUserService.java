@@ -1,7 +1,5 @@
 package net.miarma.api.huertos.services;
 
-import java.util.List;
-
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
@@ -11,7 +9,8 @@ import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.huertos.dao.PreUserDAO;
 import net.miarma.api.huertos.entities.PreUserEntity;
 import net.miarma.api.huertos.validators.PreUserValidator;
-import net.miarma.api.util.MessageUtil;
+
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class PreUserService {

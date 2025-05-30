@@ -1,13 +1,13 @@
 package net.miarma.api.core.handlers;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.util.JsonUtil;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class ScreenshotHandler {
 	

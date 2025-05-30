@@ -1,7 +1,5 @@
 package net.miarma.api.huertos.services;
 
-import java.util.List;
-
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
@@ -25,7 +23,8 @@ import net.miarma.api.huertos.entities.MemberEntity;
 import net.miarma.api.huertos.entities.PreUserEntity;
 import net.miarma.api.huertos.entities.UserMetadataEntity;
 import net.miarma.api.huertos.validators.MemberValidator;
-import net.miarma.api.util.MessageUtil;
+
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class MemberService {

@@ -1,25 +1,20 @@
 package net.miarma.api.core.services;
 
-import java.util.List;
-
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.CoreUserGlobalStatus;
 import net.miarma.api.common.Constants.CoreUserRole;
-import net.miarma.api.common.exceptions.AlreadyExistsException;
-import net.miarma.api.common.exceptions.BadRequestException;
-import net.miarma.api.common.exceptions.ForbiddenException;
-import net.miarma.api.common.exceptions.NotFoundException;
-import net.miarma.api.common.exceptions.UnauthorizedException;
-import net.miarma.api.common.exceptions.ValidationException;
+import net.miarma.api.common.exceptions.*;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.core.dao.UserDAO;
 import net.miarma.api.core.entities.UserEntity;
 import net.miarma.api.core.validators.UserValidator;
+
+import java.util.List;
 
 public class UserService {
 

@@ -1,13 +1,13 @@
 package net.miarma.api.common.http;
 
+import io.vertx.ext.web.RoutingContext;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import io.vertx.ext.web.RoutingContext;
 
 public class QueryParams {
 

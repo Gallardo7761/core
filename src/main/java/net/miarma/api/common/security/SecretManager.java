@@ -1,12 +1,14 @@
 package net.miarma.api.common.security;
 
-import java.io.*;
+import net.miarma.api.common.ConfigManager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Properties;
-
-import net.miarma.api.common.ConfigManager;
 
 public class SecretManager {
 

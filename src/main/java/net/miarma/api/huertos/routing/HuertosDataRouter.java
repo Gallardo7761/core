@@ -9,13 +9,7 @@ import net.miarma.api.common.http.ApiResponse;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.middlewares.AuthGuard;
 import net.miarma.api.common.security.SusPather;
-import net.miarma.api.huertos.handlers.AnnounceDataHandler;
-import net.miarma.api.huertos.handlers.BalanceDataHandler;
-import net.miarma.api.huertos.handlers.ExpenseDataHandler;
-import net.miarma.api.huertos.handlers.IncomeDataHandler;
-import net.miarma.api.huertos.handlers.MemberDataHandler;
-import net.miarma.api.huertos.handlers.PreUserDataHandler;
-import net.miarma.api.huertos.handlers.RequestDataHandler;
+import net.miarma.api.huertos.handlers.*;
 import net.miarma.api.huertos.services.MemberService;
 
 public class HuertosDataRouter {

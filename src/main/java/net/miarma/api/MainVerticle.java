@@ -1,11 +1,5 @@
 package net.miarma.api;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Launcher;
 import io.vertx.core.Promise;
@@ -18,6 +12,12 @@ import net.miarma.api.huertos.verticles.HuertosMainVerticle;
 import net.miarma.api.miarmacraft.verticles.MMCMainVerticle;
 import net.miarma.api.util.DeploymentUtil;
 import net.miarma.api.util.MessageUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class MainVerticle extends AbstractVerticle {
 	private ConfigManager configManager;

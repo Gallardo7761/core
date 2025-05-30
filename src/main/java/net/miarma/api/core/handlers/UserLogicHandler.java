@@ -1,7 +1,6 @@
 package net.miarma.api.core.handlers;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;

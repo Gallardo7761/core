@@ -1,15 +1,14 @@
 package net.miarma.api.common.security;
 
-import java.util.Date;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.core.entities.UserEntity;
+
+import java.util.Date;
 
 public class JWTManager {
 

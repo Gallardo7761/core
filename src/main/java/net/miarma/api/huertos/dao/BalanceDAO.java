@@ -1,7 +1,5 @@
 package net.miarma.api.huertos.dao;
 
-import java.util.List;
-
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
@@ -10,6 +8,8 @@ import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.huertos.entities.BalanceEntity;
 import net.miarma.api.huertos.entities.ViewBalanceWithTotals;
+
+import java.util.List;
 
 public class BalanceDAO implements DataAccessObject<BalanceEntity> {
 

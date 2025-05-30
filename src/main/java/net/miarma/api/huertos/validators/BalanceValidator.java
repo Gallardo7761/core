@@ -1,11 +1,11 @@
 package net.miarma.api.huertos.validators;
 
-import java.math.BigDecimal;
-
 import io.vertx.core.Future;
 import net.miarma.api.common.validation.ValidationResult;
 import net.miarma.api.common.validation.Validator;
 import net.miarma.api.huertos.entities.BalanceEntity;
+
+import java.math.BigDecimal;
 
 public class BalanceValidator implements Validator<BalanceEntity> {
 

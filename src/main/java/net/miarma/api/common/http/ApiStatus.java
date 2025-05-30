@@ -1,15 +1,6 @@
 package net.miarma.api.common.http;
 
-import net.miarma.api.common.exceptions.BadRequestException;
-import net.miarma.api.common.exceptions.ConflictException;
-import net.miarma.api.common.exceptions.ForbiddenException;
-import net.miarma.api.common.exceptions.NotFoundException;
-import net.miarma.api.common.exceptions.ServiceUnavailableException;
-import net.miarma.api.common.exceptions.TeapotException;
-import net.miarma.api.common.exceptions.UnauthorizedException;
-import net.miarma.api.common.exceptions.UnprocessableEntityException;
-import net.miarma.api.common.exceptions.UnsupportedMediaTypeException;
-import net.miarma.api.common.exceptions.ValidationException;
+import net.miarma.api.common.exceptions.*;
 
 public enum ApiStatus {
     OK(200),

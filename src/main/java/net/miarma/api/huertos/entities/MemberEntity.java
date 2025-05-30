@@ -1,17 +1,13 @@
 package net.miarma.api.huertos.entities;
 
-import java.time.LocalDateTime;
-
 import io.vertx.sqlclient.Row;
-import net.miarma.api.common.Constants.CoreUserGlobalStatus;
-import net.miarma.api.common.Constants.CoreUserRole;
-import net.miarma.api.common.Constants.HuertosUserRole;
-import net.miarma.api.common.Constants.HuertosUserStatus;
-import net.miarma.api.common.Constants.HuertosUserType;
+import net.miarma.api.common.Constants.*;
 import net.miarma.api.common.annotations.APIDontReturn;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 import net.miarma.api.core.entities.UserEntity;
+
+import java.time.LocalDateTime;
 
 @Table("v_huertos_members")
 public class MemberEntity extends AbstractEntity {

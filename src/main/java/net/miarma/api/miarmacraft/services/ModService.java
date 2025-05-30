@@ -1,11 +1,8 @@
 package net.miarma.api.miarmacraft.services;
 
-import java.util.List;
-
 import com.eduardomcb.discord.webhook.WebhookClient;
 import com.eduardomcb.discord.webhook.WebhookManager;
 import com.eduardomcb.discord.webhook.models.Message;
-
 import io.vertx.core.Future;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
@@ -14,6 +11,8 @@ import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.miarmacraft.dao.ModDAO;
 import net.miarma.api.miarmacraft.entities.ModEntity;
+
+import java.util.List;
 
 public class ModService {
 	private final ModDAO modDAO;

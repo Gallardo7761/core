@@ -1,8 +1,5 @@
 package net.miarma.api.core.verticles;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -19,6 +16,9 @@ import net.miarma.api.core.services.FileService;
 import net.miarma.api.core.services.UserService;
 import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.RouterUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class CoreDataVerticle extends AbstractVerticle {

@@ -1,8 +1,8 @@
 package net.miarma.api.common.db;
 
-import java.util.List;
-
 import io.vertx.core.Future;
+
+import java.util.List;
 
 public interface DataAccessObject<T> {	
 	Future<List<T>> getAll();

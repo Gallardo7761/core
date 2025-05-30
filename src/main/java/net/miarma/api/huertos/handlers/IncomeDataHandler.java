@@ -1,6 +1,5 @@
 package net.miarma.api.huertos.handlers;
 
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;

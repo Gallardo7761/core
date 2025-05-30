@@ -1,11 +1,11 @@
 package net.miarma.api.core.entities;
 
-import java.time.LocalDateTime;
-
 import io.vertx.sqlclient.Row;
 import net.miarma.api.common.Constants.CoreFileContext;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
+
+import java.time.LocalDateTime;
 
 @Table("files")
 public class FileEntity extends AbstractEntity {

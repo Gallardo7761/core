@@ -1,9 +1,5 @@
 package net.miarma.api.miarmacraft.handlers;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.ConfigManager;
@@ -12,6 +8,10 @@ import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.miarmacraft.entities.ModEntity;
 import net.miarma.api.miarmacraft.services.ModService;
 import net.miarma.api.util.JsonUtil;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class ModDataHandler {
 	ModService modService;
