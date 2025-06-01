@@ -2,11 +2,14 @@ package net.miarma.api.common.middlewares;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
+import net.miarma.api.common.Constants;
 import net.miarma.api.common.Constants.HuertosUserRole;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.security.JWTManager;
-import net.miarma.api.huertos.entities.MemberEntity;
-import net.miarma.api.huertos.services.MemberService;
+import net.miarma.api.microservices.huertos.entities.MemberEntity;
+import net.miarma.api.microservices.huertos.services.MemberService;
+import net.miarma.api.microservices.huertosdecine.entities.ViewerEntity;
+import net.miarma.api.microservices.huertosdecine.services.ViewerService;
 import net.miarma.api.util.JsonUtil;
 
 public class AuthGuard {
@@ -67,6 +70,38 @@ public class AuthGuard {
 						ctx.next();
 					} else {
 						JsonUtil.sendJson(ctx, ApiStatus.FORBIDDEN, "You are not a huertos administrator");
+					}
+				} else {
+					JsonUtil.sendJson(ctx, ApiStatus.FORBIDDEN, "You are not registered in the system");
+				}
+			});
+		};
+	}
+
+	public static Handler<RoutingContext> cineAdmin (ViewerService viewerService) {
+		return ctx -> {
+			String authHeader = ctx.request().getHeader("Authorization");
+			if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+				JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, "Invalid or missing token");
+				return;
+			}
+
+			String token = authHeader.substring(7);
+			if (!JWTManager.getInstance().isValid(token)) {
+				JsonUtil.sendJson(ctx, ApiStatus.UNAUTHORIZED, "Invalid or missing token");
+				return;
+			}
+
+			int userId = JWTManager.getInstance().extractUserId(token);
+
+			viewerService.getById(userId).onComplete(ar -> {
+				if (ar.succeeded() && ar.result() != null) {
+					ViewerEntity viewer = ar.result();
+					if (viewer.getRole() == Constants.CineUserRole.ADMIN) {
+						ctx.put("viewer", viewer);
+						ctx.next();
+					} else {
+						JsonUtil.sendJson(ctx, ApiStatus.FORBIDDEN, "You are not a cine administrator");
 					}
 				} else {
 					JsonUtil.sendJson(ctx, ApiStatus.FORBIDDEN, "You are not registered in the system");

@@ -7,9 +7,10 @@ import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.security.SecretManager;
 import net.miarma.api.common.vertx.VertxJacksonConfig;
-import net.miarma.api.core.verticles.CoreMainVerticle;
-import net.miarma.api.huertos.verticles.HuertosMainVerticle;
-import net.miarma.api.miarmacraft.verticles.MMCMainVerticle;
+import net.miarma.api.microservices.core.verticles.CoreMainVerticle;
+import net.miarma.api.microservices.huertos.verticles.HuertosMainVerticle;
+import net.miarma.api.microservices.huertosdecine.verticles.CineMainVerticle;
+import net.miarma.api.microservices.miarmacraft.verticles.MMCMainVerticle;
 import net.miarma.api.util.DeploymentUtil;
 import net.miarma.api.util.MessageUtil;
 
@@ -80,6 +81,16 @@ public class MainVerticle extends AbstractVerticle {
 			} else {
 				Constants.LOGGER.error(
 						DeploymentUtil.failMessage(MMCMainVerticle.class, result.cause()));
+			}
+		});
+
+		vertx.deployVerticle(new CineMainVerticle(), result -> {
+			if (result.succeeded()) {
+				Constants.LOGGER.info(
+						DeploymentUtil.successMessage(CineMainVerticle.class));
+			} else {
+				Constants.LOGGER.error(
+						DeploymentUtil.failMessage(CineMainVerticle.class, result.cause()));
 			}
 		});
 	}

@@ -6,7 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
-import net.miarma.api.core.entities.UserEntity;
+import net.miarma.api.microservices.core.entities.UserEntity;
 
 import java.util.Date;
 

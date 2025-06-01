@@ -16,12 +16,14 @@ public class Constants {
 	public static final String AUTH_PREFIX = "/auth/v1";
 	public static final String HUERTOS_PREFIX = BASE_PREFIX + "/huertos/v1";
 	public static final String MMC_PREFIX = BASE_PREFIX + "/mmc/v1";
-	
+	public static final String CINE_PREFIX = BASE_PREFIX + "/cine/v1";
+
     public static final String AUTH_EVENT_BUS = "auth.eventbus";
     public static final String CORE_EVENT_BUS = "core.eventbus";
     public static final String HUERTOS_EVENT_BUS = "huertos.eventbus";
     public static final String MMC_EVENT_BUS = "mmc.eventbus";
-    
+    public static final String CINE_EVENT_BUS = "cine.eventbus";
+
     public static Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
     
 	public static final Integer CORE_LOGIC_PORT = 8080;
@@ -49,6 +51,8 @@ public class Constants {
 			.registerTypeAdapter(MMCUserRole.class, new ValuableEnumDeserializer())
 			.registerTypeAdapter(CoreFileContext.class, new ValuableEnumDeserializer())
 			.registerTypeAdapter(MMCModStatus.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(CineUserRole.class, new ValuableEnumDeserializer())
+			.registerTypeAdapter(CineUserStatus.class, new ValuableEnumDeserializer())
 			.addSerializationExclusionStrategy(new APIDontReturnExclusionStrategy())
 			.create();
     
@@ -397,6 +401,52 @@ public class Constants {
 				if (status.value == i) return status;
 			}
 			throw new IllegalArgumentException("Invalid MiarmacraftModStatus value: " + i);
+		}
+	}
+
+	public enum CineUserStatus implements ValuableEnum {
+		ACTIVE(0),
+		INACTIVE(1);
+
+		private final int value;
+
+		CineUserStatus(int value) {
+			this.value = value;
+		}
+
+		@Override
+		public int getValue() {
+			return value;
+		}
+
+		public static CineUserStatus fromInt(int i) {
+			for (CineUserStatus status : values()) {
+				if (status.value == i) return status;
+			}
+			throw new IllegalArgumentException("Invalid CineUserStatus value: " + i);
+		}
+	}
+
+	public enum CineUserRole implements ValuableEnum {
+		USER(0),
+		ADMIN(1);
+
+		private final int value;
+
+		CineUserRole(int value) {
+			this.value = value;
+		}
+
+		@Override
+		public int getValue() {
+			return value;
+		}
+
+		public static CineUserRole fromInt(int i) {
+			for (CineUserRole role : values()) {
+				if (role.value == i) return role;
+			}
+			throw new IllegalArgumentException("Invalid CineUserRole value: " + i);
 		}
 	}
 

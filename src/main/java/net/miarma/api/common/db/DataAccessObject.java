@@ -4,9 +4,10 @@ import io.vertx.core.Future;
 
 import java.util.List;
 
-public interface DataAccessObject<T> {	
+public interface DataAccessObject<T> {
 	Future<List<T>> getAll();
 	Future<T> insert(T t);
 	Future<T> update(T t);
 	Future<T> delete(Integer id);
+	Future<T> deleteDoubleId(Integer id1, Integer id2);
 }
