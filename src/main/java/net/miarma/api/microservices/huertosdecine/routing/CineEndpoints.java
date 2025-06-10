@@ -5,7 +5,7 @@ import net.miarma.api.common.Constants;
 public class CineEndpoints {
     /* OK */ public static final String LOGIN = Constants.CINE_PREFIX + "/login";
 
-    /* OK */ public static final String MOVIES = Constants.CINE_PREFIX + "/movies"; // GET, POST, PUT, DELETE
+    /* OK */ public static final String MOVIES = Constants.CINE_PREFIX + "/movies"; // GET, POST
     /* OK */ public static final String MOVIE = Constants.CINE_PREFIX + "/movies/:movie_id"; // GET, PUT, DELETE
 
     /* OK */ public static final String VIEWERS = Constants.CINE_PREFIX + "/viewers"; // GET, POST, PUT, DELETE

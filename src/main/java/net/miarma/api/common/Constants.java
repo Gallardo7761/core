@@ -99,7 +99,8 @@ public class Constants {
 	public enum CoreFileContext implements ValuableEnum {
 		CORE(0),
 		HUERTOS(1),
-		MMC(2);
+		MMC(2),
+		CINE(3);
 		
 		private final int value;
 		
@@ -117,6 +118,7 @@ public class Constants {
 				case CORE -> "core";
 				case HUERTOS -> "huertos";
 				case MMC -> "miarmacraft";
+				case CINE -> "cine";
 			};
 		}
 		

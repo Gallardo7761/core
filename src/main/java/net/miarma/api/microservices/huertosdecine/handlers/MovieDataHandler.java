@@ -2,12 +2,16 @@ package net.miarma.api.microservices.huertosdecine.handlers;
 
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Pool;
+import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.microservices.huertosdecine.entities.MovieEntity;
 import net.miarma.api.microservices.huertosdecine.services.MovieService;
 import net.miarma.api.util.JsonUtil;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MovieDataHandler {
     private MovieService movieService;
@@ -41,18 +45,57 @@ public class MovieDataHandler {
     }
 
     public void update(RoutingContext ctx) {
-        MovieEntity movie = Constants.GSON.fromJson(ctx.body().asString(), MovieEntity.class);
+        MovieEntity movieFromBody = Constants.GSON.fromJson(ctx.body().asString(), MovieEntity.class);
 
-        movieService.update(movie)
-            .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
-            .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+        movieService.getById(movieFromBody.getMovie_id())
+            .onSuccess(existingMovie -> {
+                String newCover = movieFromBody.getCover();
+                String oldCover = existingMovie.getCover();
+
+                if (newCover != null && !newCover.isEmpty() && !newCover.equals(oldCover)) {
+                    String cineFiles = ConfigManager.getInstance().getFilesDir("cine");
+                    String filename = Paths.get(existingMovie.getCover()).getFileName().toString();
+                    Path fullPath = Paths.get(cineFiles, filename);
+
+                    ctx.vertx().fileSystem().delete(fullPath.toString(), fileRes -> {
+                        if (fileRes.failed()) {
+                            Constants.LOGGER.warn("No se pudo eliminar el archivo de portada: " + fullPath, fileRes.cause());
+                        }
+
+                        movieService.update(movieFromBody)
+                                .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
+                                .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+                    });
+                } else {
+                    movieService.update(movieFromBody)
+                            .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
+                            .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+                }
+            })
+            .onFailure(err -> {
+                JsonUtil.sendJson(ctx, ApiStatus.NOT_FOUND, null, "Película no encontrada");
+            });
     }
 
     public void delete(RoutingContext ctx) {
         Integer movieId = Integer.parseInt(ctx.pathParam("movie_id"));
 
-        movieService.delete(movieId)
-            .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
-            .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+        movieService.getById(movieId).onSuccess(movie -> {
+            String cineFiles = ConfigManager.getInstance().getFilesDir("cine");
+            String filename = Paths.get(movie.getCover()).getFileName().toString();
+            Path fullPath = Paths.get(cineFiles, filename);
+
+            ctx.vertx().fileSystem().delete(fullPath.toString(), fileRes -> {
+                if (fileRes.failed()) {
+                    Constants.LOGGER.warn("No se pudo eliminar el archivo de portada: " + fullPath, fileRes.cause());
+                }
+
+                movieService.delete(movieId)
+                        .onSuccess(_ -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
+                        .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
+            });
+        }).onFailure(err -> {
+            JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage());
+        });
     }
 }
