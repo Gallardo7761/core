@@ -39,27 +39,11 @@ public class VoteLogicHandler {
         });
     }
 
-    public void updateVote(RoutingContext ctx) {
-        Integer movieId = Integer.parseInt(ctx.request().getParam("movie_id"));
-        VoteEntity vote = Constants.GSON.fromJson(ctx.body().asString(), VoteEntity.class);
-        JsonObject request = new JsonObject()
-                .put("action", "updateVote")
-                .put("user_id", vote.getUser_id())
-                .put("movie_id", movieId)
-                .put("vote", vote.getVote());
-        vertx.eventBus().request(Constants.CINE_EVENT_BUS, request, ar -> {
-            if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else EventBusUtil.handleReplyError(ctx, ar.cause(), "Error updating vote for this movie");
-        });
-    }
-
     public void deleteVote(RoutingContext ctx) {
-        Integer movieId = Integer.parseInt(ctx.request().getParam("movie_id"));
         VoteEntity vote = Constants.GSON.fromJson(ctx.body().asString(), VoteEntity.class);
         JsonObject request = new JsonObject()
                 .put("action", "deleteVote")
-                .put("user_id", vote.getUser_id())
-                .put("movie_id", movieId);
+                .put("user_id", vote.getUser_id());
         vertx.eventBus().request(Constants.CINE_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null);
             else EventBusUtil.handleReplyError(ctx, ar.cause(), "Error deleting vote for this movie");
@@ -68,11 +52,10 @@ public class VoteLogicHandler {
 
     public void getVoteSelf(RoutingContext ctx) {
         String token = ctx.request().getHeader("Authorization").substring("Bearer ".length());
-        Integer movieId = Integer.parseInt(ctx.request().getParam("movie_id"));
-        JsonObject request = new JsonObject().put("action", "getVoteSelf").put("token", token).put("movie_id", movieId);
+        JsonObject request = new JsonObject().put("action", "getVoteSelf").put("token", token);
         vertx.eventBus().request(Constants.CINE_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());
-            else EventBusUtil.handleReplyError(ctx, ar.cause(), "No vote found for this movie and viewer");
+            else EventBusUtil.handleReplyError(ctx, ar.cause(), "No vote found for this viewer");
         });
     }
 }

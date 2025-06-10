@@ -85,9 +85,4 @@ public class PreUserDAO implements DataAccessObject<PreUserEntity> {
 
         return promise.future();
     }
-
-    @Override
-    public Future<PreUserEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("This method is not supported for PreUserDAO");
-    }
 }

@@ -35,11 +35,10 @@ public class CineLogicRouter {
         });
 
         router.post(CineEndpoints.LOGIN).handler(hViewerLogic::login);
-        router.get(CineEndpoints.SELF_VOTE).handler(AuthGuard.check()).handler(hVoteLogic::getVoteSelf);
         router.get(CineEndpoints.VIEWER_VOTES_BY_MOVIE).handler(AuthGuard.cineAdmin(viewerService)).handler(hViewerLogic::getVotesOnMovieByUserId);
         router.get(CineEndpoints.MOVIE_VOTES).handler(AuthGuard.cineAdmin(viewerService)).handler(hVoteLogic::getVotes);
         router.post(CineEndpoints.MOVIE_VOTES).handler(AuthGuard.check()).handler(hVoteLogic::addVote);
-        router.put(CineEndpoints.MOVIE_VOTES).handler(AuthGuard.check()).handler(hVoteLogic::updateVote);
         router.delete(CineEndpoints.MOVIE_VOTES).handler(AuthGuard.check()).handler(hVoteLogic::deleteVote);
+        router.get(CineEndpoints.SELF_VOTES).handler(AuthGuard.check()).handler(hVoteLogic::getVoteSelf);
     }
 }

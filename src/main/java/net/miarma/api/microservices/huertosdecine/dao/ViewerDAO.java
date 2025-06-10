@@ -29,16 +29,16 @@ public class ViewerDAO implements DataAccessObject<ViewerEntity> {
     public Future<List<ViewerEntity>> getAll(QueryParams params) {
         Promise<List<ViewerEntity>> promise = Promise.promise();
         String query = QueryBuilder
-            .select(ViewerEntity.class)
-            .where(params.getFilters())
-            .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-            .limit(params.getQueryFilters().getLimit())
-            .offset(params.getQueryFilters().getOffset())
-            .build();
+                .select(ViewerEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, ViewerEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
@@ -56,11 +56,6 @@ public class ViewerDAO implements DataAccessObject<ViewerEntity> {
 
     @Override
     public Future<ViewerEntity> delete(Integer id) {
-        throw new UnsupportedOperationException("Delete not supported on view-based DAO");
-    }
-
-    @Override
-    public Future<ViewerEntity> deleteDoubleId(Integer id1, Integer id2) {
         throw new UnsupportedOperationException("Delete not supported on view-based DAO");
     }
 }

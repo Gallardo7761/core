@@ -30,16 +30,16 @@ public class MovieDAO implements DataAccessObject<MovieEntity> {
     public Future<List<MovieEntity>> getAll(QueryParams params) {
         Promise<List<MovieEntity>> promise = Promise.promise();
         String query = QueryBuilder
-            .select(MovieEntity.class)
-            .where(params.getFilters())
-            .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-            .limit(params.getQueryFilters().getLimit())
-            .offset(params.getQueryFilters().getOffset())
-            .build();
+                .select(MovieEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, MovieEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
@@ -49,12 +49,12 @@ public class MovieDAO implements DataAccessObject<MovieEntity> {
     public Future<MovieEntity> insert(MovieEntity movieEntity) {
         Promise<MovieEntity> promise = Promise.promise();
         String query = QueryBuilder
-            .insert(movieEntity)
-            .build();
+                .insert(movieEntity)
+                .build();
 
         db.executeOne(query, MovieEntity.class,
-            _ -> promise.complete(movieEntity),
-            promise::fail
+                _ -> promise.complete(movieEntity),
+                promise::fail
         );
 
         return promise.future();
@@ -64,12 +64,12 @@ public class MovieDAO implements DataAccessObject<MovieEntity> {
     public Future<MovieEntity> update(MovieEntity movieEntity) {
         Promise<MovieEntity> promise = Promise.promise();
         String query = QueryBuilder
-            .update(movieEntity)
-            .build();
+                .update(movieEntity)
+                .build();
 
         db.executeOne(query, MovieEntity.class,
-            _ -> promise.complete(movieEntity),
-            promise::fail
+                _ -> promise.complete(movieEntity),
+                promise::fail
         );
 
         return promise.future();
@@ -78,12 +78,12 @@ public class MovieDAO implements DataAccessObject<MovieEntity> {
     public Future<MovieEntity> updateWithNulls(MovieEntity movieEntity) {
         Promise<MovieEntity> promise = Promise.promise();
         String query = QueryBuilder
-            .updateWithNulls(movieEntity)
-            .build();
+                .updateWithNulls(movieEntity)
+                .build();
 
         db.executeOne(query, MovieEntity.class,
-            _ -> promise.complete(movieEntity),
-            promise::fail
+                _ -> promise.complete(movieEntity),
+                promise::fail
         );
 
         return promise.future();
@@ -96,19 +96,14 @@ public class MovieDAO implements DataAccessObject<MovieEntity> {
         movieEntity.setMovie_id(id);
 
         String query = QueryBuilder
-            .delete(movieEntity)
-            .build();
+                .delete(movieEntity)
+                .build();
 
         db.executeOne(query, MovieEntity.class,
-            _ -> promise.complete(movieEntity),
-            promise::fail
+                _ -> promise.complete(movieEntity),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<MovieEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Not supported for MovieEntity. Use delete instead.");
     }
 }

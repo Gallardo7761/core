@@ -9,8 +9,12 @@ import net.miarma.api.common.http.ApiStatus;
 public class EventBusUtil {
 	public static <T> Handler<Throwable> fail(Message<T> msg) {
 	    return err -> {
-	        ApiStatus status = ApiStatus.fromException(err);
-	        msg.fail(status.getCode(), err.getMessage());
+	        if(err instanceof ReplyException re) {
+                msg.fail(re.failureCode(), re.getMessage());
+            } else {
+                ApiStatus status = ApiStatus.fromException(err);
+                msg.fail(status.getCode(), err.getMessage());
+            }
 	    };
 	}
 	

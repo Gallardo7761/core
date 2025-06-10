@@ -25,20 +25,20 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
     public Future<List<ExpenseEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
     }
-    
+
     public Future<List<ExpenseEntity>> getAll(QueryParams params) {
         Promise<List<ExpenseEntity>> promise = Promise.promise();
         String query = QueryBuilder
-        		.select(ExpenseEntity.class)
-        		.where(params.getFilters())
-				.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-				.limit(params.getQueryFilters().getLimit())
-				.offset(params.getQueryFilters().getOffset())
-				.build();
+                .select(ExpenseEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, ExpenseEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
@@ -50,8 +50,8 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
         String query = QueryBuilder.insert(expense).build();
 
         db.execute(query, ExpenseEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                promise::fail
         );
 
         return promise.future();
@@ -63,8 +63,8 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
         String query = QueryBuilder.update(expense).build();
 
         db.executeOne(query, ExpenseEntity.class,
-            _ -> promise.complete(expense),
-            promise::fail
+                _ -> promise.complete(expense),
+                promise::fail
         );
 
         return promise.future();
@@ -79,15 +79,10 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
         String query = QueryBuilder.delete(expense).build();
 
         db.executeOne(query, ExpenseEntity.class,
-            _ -> promise.complete(expense),
-            promise::fail
+                _ -> promise.complete(expense),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<ExpenseEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Method not implemented for ExpenseDAO");
     }
 }

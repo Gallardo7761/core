@@ -26,38 +26,38 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
     public Future<List<RequestEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
     }
-    
+
     public Future<List<RequestEntity>> getAll(QueryParams params) {
         Promise<List<RequestEntity>> promise = Promise.promise();
         String query = QueryBuilder
-        		.select(RequestEntity.class)
-        		.where(params.getFilters())
-				.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-				.limit(params.getQueryFilters().getLimit())
-				.offset(params.getQueryFilters().getOffset())
-				.build();
+                .select(RequestEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, RequestEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
     }
-    
+
     public Future<List<ViewRequestsWithPreUsers>> getRequestsWithPreUsers() {
-		Promise<List<ViewRequestsWithPreUsers>> promise = Promise.promise();
-		String query = QueryBuilder
-				.select(ViewRequestsWithPreUsers.class)
-				.build();
+        Promise<List<ViewRequestsWithPreUsers>> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(ViewRequestsWithPreUsers.class)
+                .build();
 
-		db.execute(query, ViewRequestsWithPreUsers.class,
-			list -> promise.complete(list.isEmpty() ? List.of() : list),
-			promise::fail
-		);
+        db.execute(query, ViewRequestsWithPreUsers.class,
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
+        );
 
-		return promise.future();
-	}
+        return promise.future();
+    }
 
     @Override
     public Future<RequestEntity> insert(RequestEntity request) {
@@ -65,8 +65,8 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
         String query = QueryBuilder.insert(request).build();
 
         db.execute(query, RequestEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                promise::fail
         );
 
         return promise.future();
@@ -78,8 +78,8 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
         String query = QueryBuilder.update(request).build();
 
         db.executeOne(query, RequestEntity.class,
-            _ -> promise.complete(request),
-            promise::fail
+                _ -> promise.complete(request),
+                promise::fail
         );
 
         return promise.future();
@@ -94,15 +94,10 @@ public class RequestDAO implements DataAccessObject<RequestEntity> {
         String query = QueryBuilder.delete(request).build();
 
         db.executeOne(query, RequestEntity.class,
-            _ -> promise.complete(request),
-            promise::fail
+                _ -> promise.complete(request),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<RequestEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Delete by double ID is not supported for RequestEntity.");
     }
 }

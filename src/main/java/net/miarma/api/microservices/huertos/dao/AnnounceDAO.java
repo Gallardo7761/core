@@ -26,20 +26,20 @@ public class AnnounceDAO implements DataAccessObject<AnnounceEntity> {
     public Future<List<AnnounceEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
     }
-    
+
     public Future<List<AnnounceEntity>> getAll(QueryParams params) {
         Promise<List<AnnounceEntity>> promise = Promise.promise();
         String query = QueryBuilder
-        		.select(AnnounceEntity.class)
-        		.where(params.getFilters())
-				.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-				.limit(params.getQueryFilters().getLimit())
-				.offset(params.getQueryFilters().getOffset())
-				.build();
+                .select(AnnounceEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, AnnounceEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
@@ -51,8 +51,8 @@ public class AnnounceDAO implements DataAccessObject<AnnounceEntity> {
         String query = QueryBuilder.insert(announce).build();
 
         db.execute(query, AnnounceEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                promise::fail
         );
 
         return promise.future();
@@ -64,8 +64,8 @@ public class AnnounceDAO implements DataAccessObject<AnnounceEntity> {
         String query = QueryBuilder.update(announce).build();
 
         db.executeOne(query, AnnounceEntity.class,
-            _ -> promise.complete(announce),
-            promise::fail
+                _ -> promise.complete(announce),
+                promise::fail
         );
 
         return promise.future();
@@ -80,15 +80,10 @@ public class AnnounceDAO implements DataAccessObject<AnnounceEntity> {
         String query = QueryBuilder.delete(announce).build();
 
         db.executeOne(query, AnnounceEntity.class,
-            _ -> promise.complete(announce),
-            promise::fail
+                _ -> promise.complete(announce),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<AnnounceEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Delete by double ID is not supported for AnnounceEntity.");
     }
 }

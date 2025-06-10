@@ -6,6 +6,7 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.db.DataAccessObject;
 import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
+import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.http.QueryFilters;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.microservices.huertosdecine.entities.MovieEntity;
@@ -45,11 +46,49 @@ public class VoteDAO implements DataAccessObject<VoteEntity> {
         return promise.future();
     }
 
+    public Future<VoteEntity> getById(Integer userId) {
+        Promise<VoteEntity> promise = Promise.promise();
+        VoteEntity vote = new VoteEntity();
+        vote.setUser_id(userId);
+
+        String query = QueryBuilder
+            .select(VoteEntity.class)
+            .where(Map.of("user_id", String.valueOf(userId)))
+            .build();
+
+        db.executeOne(query, VoteEntity.class,
+            v -> {
+                if (v != null) {
+                    promise.complete(v);
+                } else {
+                    promise.fail(new NotFoundException("Vote not found for user ID: " + userId));
+                }
+            },
+            promise::fail
+        );
+
+        return promise.future();
+    }
+
     @Override
     public Future<VoteEntity> insert(VoteEntity voteEntity) {
         Promise<VoteEntity> promise = Promise.promise();
         String query = QueryBuilder
             .insert(voteEntity)
+            .build();
+
+        db.executeOne(query, VoteEntity.class,
+            _ -> promise.complete(voteEntity),
+            promise::fail
+        );
+
+        return promise.future();
+    }
+
+    public Future<VoteEntity> upsert(VoteEntity voteEntity) {
+        Promise<VoteEntity> promise = Promise.promise();
+        String query = QueryBuilder
+            .upsert(voteEntity, "user_id", "movie_id")
             .build();
 
         db.executeOne(query, VoteEntity.class,
@@ -90,17 +129,21 @@ public class VoteDAO implements DataAccessObject<VoteEntity> {
     }
 
     @Override
-    public Future<VoteEntity> delete(Integer id) {
-        throw new UnsupportedOperationException("Not supported for VoteEntity. Use deleteDoubleId instead.");
-    }
-
-    @Override
-    public Future<VoteEntity> deleteDoubleId(Integer userId, Integer movieId) {
+    public Future<VoteEntity> delete(Integer movieId) {
         Promise<VoteEntity> promise = Promise.promise();
         VoteEntity voteEntity = new VoteEntity();
-        voteEntity.setUser_id(userId);
         voteEntity.setMovie_id(movieId);
+
+        String query = QueryBuilder
+            .delete(voteEntity)
+            .build();
+
+        db.executeOne(query, VoteEntity.class,
+            _ -> promise.complete(voteEntity),
+            promise::fail
+        );
 
         return promise.future();
     }
+
 }

@@ -26,46 +26,46 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
     public Future<List<IncomeEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
     }
-    
+
     public Future<List<IncomeEntity>> getAll(QueryParams params) {
         Promise<List<IncomeEntity>> promise = Promise.promise();
         String query = QueryBuilder
-        		.select(IncomeEntity.class)
-				.where(params.getFilters())
-				.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-				.limit(params.getQueryFilters().getLimit())
-				.offset(params.getQueryFilters().getOffset())
-				.build();
+                .select(IncomeEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
 
         db.execute(query, IncomeEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
     }
-    
+
     public Future<List<ViewIncomesWithFullNames>> getAllWithNames() {
-		return getAllWithNames(new QueryParams(Map.of(), new QueryFilters()));
-	}
-    
+        return getAllWithNames(new QueryParams(Map.of(), new QueryFilters()));
+    }
+
     public Future<List<ViewIncomesWithFullNames>> getAllWithNames(QueryParams params) {
-		Promise<List<ViewIncomesWithFullNames>> promise = Promise.promise();
-		String query = QueryBuilder
-						.select(ViewIncomesWithFullNames.class)
-						.where(params.getFilters())
-						.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-						.limit(params.getQueryFilters().getLimit())
-						.offset(params.getQueryFilters().getOffset())
-						.build();
-		
-		db.execute(query, ViewIncomesWithFullNames.class,
-	            list -> promise.complete(list.isEmpty() ? List.of() : list),
-	            promise::fail
+        Promise<List<ViewIncomesWithFullNames>> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(ViewIncomesWithFullNames.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
+
+        db.execute(query, ViewIncomesWithFullNames.class,
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
-		
-		return promise.future();
-	}
+
+        return promise.future();
+    }
 
     @Override
     public Future<IncomeEntity> insert(IncomeEntity income) {
@@ -73,8 +73,8 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
         String query = QueryBuilder.insert(income).build();
 
         db.execute(query, IncomeEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                promise::fail
         );
 
         return promise.future();
@@ -86,8 +86,8 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
         String query = QueryBuilder.update(income).build();
 
         db.executeOne(query, IncomeEntity.class,
-            _ -> promise.complete(income),
-            promise::fail
+                _ -> promise.complete(income),
+                promise::fail
         );
 
         return promise.future();
@@ -102,15 +102,10 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
         String query = QueryBuilder.delete(income).build();
 
         db.executeOne(query, IncomeEntity.class,
-            _ -> promise.complete(income),
-            promise::fail
+                _ -> promise.complete(income),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<IncomeEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("This method is not supported for IncomeDAO");
     }
 }

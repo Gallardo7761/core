@@ -273,6 +273,51 @@ public class QueryBuilder {
         return qb;
     }
 
+    public static <T> QueryBuilder upsert(T object, String... conflictKeys) {
+        if (object == null) throw new IllegalArgumentException("Object cannot be null");
+
+        QueryBuilder qb = new QueryBuilder();
+        String table = getTableName(object.getClass());
+        qb.query.append("INSERT INTO ").append(table).append(" ");
+
+        StringJoiner columns = new StringJoiner(", ");
+        StringJoiner values = new StringJoiner(", ");
+        Map<String, String> updates = new HashMap<>();
+
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object fieldValue = field.get(object);
+                String columnName = field.getName();
+                columns.add(columnName);
+
+                Object value = extractValue(fieldValue);
+                String valueStr = value == null ? "NULL"
+                        : (value instanceof String || value instanceof LocalDateTime ? "'" + value + "'" : value.toString());
+                values.add(valueStr);
+
+                // no actualizamos la clave duplicada
+                boolean isConflictKey = Arrays.asList(conflictKeys).contains(columnName);
+                if (!isConflictKey) {
+                    updates.put(columnName, valueStr);
+                }
+
+            } catch (Exception e) {
+                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+            }
+        }
+
+        qb.query.append("(").append(columns).append(") VALUES (").append(values).append(")");
+
+        if (conflictKeys.length > 0 && !updates.isEmpty()) {
+            qb.query.append(" ON DUPLICATE KEY UPDATE ");
+            StringJoiner updateSet = new StringJoiner(", ");
+            updates.forEach((k, v) -> updateSet.add(k + " = " + v));
+            qb.query.append(updateSet);
+        }
+
+        return qb;
+    }
 
     public static <T> QueryBuilder delete(T object) {
         if (object == null) throw new IllegalArgumentException("Object cannot be null");
@@ -341,7 +386,6 @@ public class QueryBuilder {
         if (limit != null && !limit.isEmpty()) {
             query.append(limit);
         }
-        System.out.println(query);
         return query.toString().trim() + ";";
     }
 }

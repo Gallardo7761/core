@@ -25,7 +25,7 @@ public class ViewerDataHandler {
     }
 
     public void getById(RoutingContext ctx) {
-        Integer viewerId = Integer.parseInt(ctx.pathParam("user_id"));
+        Integer viewerId = Integer.parseInt(ctx.pathParam("viewer_id"));
 
         viewerService.getById(viewerId)
                 .onSuccess(viewer -> JsonUtil.sendJson(ctx, ApiStatus.OK, viewer))

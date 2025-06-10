@@ -2,6 +2,7 @@ package net.miarma.api.microservices.huertosdecine.verticles;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.sqlclient.Pool;
@@ -15,6 +16,8 @@ import net.miarma.api.microservices.huertosdecine.services.ViewerService;
 import net.miarma.api.microservices.huertosdecine.services.VoteService;
 import net.miarma.api.util.EventBusUtil;
 import net.miarma.api.util.RouterUtil;
+
+import java.util.stream.Collectors;
 
 public class CineDataVerticle extends AbstractVerticle {
     private ConfigManager configManager;
@@ -61,31 +64,32 @@ public class CineDataVerticle extends AbstractVerticle {
                         .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "getVoteSelf" -> {
-                    String token = body.getString("token");
+                case "getVotesOnMovieByUserId" -> {
                     Integer movieId = body.getInteger("movie_id");
-                    voteService.getVoteSelf(token, movieId)
-                        .onSuccess(vote -> message.reply(new JsonObject(Constants.GSON.toJson(vote))))
-                        .onFailure(EventBusUtil.fail(message));
+                    voteService.getVotesByMovieId(movieId)
+                            .onSuccess(votes -> {
+                                if (votes.isEmpty()) {
+                                    message.reply(new JsonObject().put("message", "No votes found for this movie and viewer"));
+                                } else {
+                                    String votesJson = votes.stream()
+                                            .map(Constants.GSON::toJson)
+                                            .collect(Collectors.joining(",", "[", "]"));
+                                    message.reply(new JsonArray(votesJson));
+                                }
+                            })
+                            .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "getVotesOnMovieByUserId" -> {
-                    Integer userId = body.getInteger("user_id");
-                    Integer movieId = body.getInteger("movie_id");
-                    voteService.getVotesByUserAndMovieId(userId, movieId)
-                        .onSuccess(votes -> {
-                            if (votes.isEmpty()) {
-                                message.reply(new JsonObject().put("message", "No votes found for this movie and viewer"));
-                            } else {
-                                message.reply(new JsonObject(Constants.GSON.toJson(votes)));
-                            }
-                        })
-                        .onFailure(EventBusUtil.fail(message));
-                }
 
                 case "getVotes" -> voteService.getVotesByMovieId(body.getInteger("movie_id"))
-                    .onSuccess(votes -> message.reply(new JsonObject(Constants.GSON.toJson(votes))))
-                    .onFailure(EventBusUtil.fail(message));
+                        .onSuccess(votes -> {
+                            String votesJson = votes.stream()
+                                    .map(vote -> Constants.GSON.toJson(vote))
+                                    .collect(Collectors.joining(",", "[", "]"));
+                            message.reply(new JsonArray(votesJson));
+                        })
+                        .onFailure(EventBusUtil.fail(message));
+
 
                 case "addVote" -> {
                     VoteEntity vote = Constants.GSON.fromJson(body.encode(), VoteEntity.class);
@@ -94,18 +98,17 @@ public class CineDataVerticle extends AbstractVerticle {
                         .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "updateVote" -> {
-                    VoteEntity vote = Constants.GSON.fromJson(body.encode(), VoteEntity.class);
-                    voteService.update(vote)
-                        .onSuccess(updatedVote -> message.reply(new JsonObject(Constants.GSON.toJson(updatedVote))))
+                case "deleteVote" -> {
+                    Integer userId = body.getInteger("user_id");
+                    voteService.delete(userId)
+                        .onSuccess(deletedVote -> message.reply(new JsonObject(Constants.GSON.toJson(deletedVote))))
                         .onFailure(EventBusUtil.fail(message));
                 }
 
-                case "deleteVote" -> {
-                    Integer userId = body.getInteger("user_id");
-                    Integer movieId = body.getInteger("movie_id");
-                    voteService.delete(userId, movieId)
-                        .onSuccess(deletedVote -> message.reply(new JsonObject(Constants.GSON.toJson(deletedVote))))
+                case "getVoteSelf" -> {
+                    String token = body.getString("token");
+                    voteService.getVoteSelf(token)
+                        .onSuccess(vote -> message.reply(new JsonObject(Constants.GSON.toJson(vote))))
                         .onFailure(EventBusUtil.fail(message));
                 }
 

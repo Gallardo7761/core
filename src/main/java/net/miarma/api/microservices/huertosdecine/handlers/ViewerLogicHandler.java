@@ -17,7 +17,7 @@ public class ViewerLogicHandler {
 
     public void getVotesOnMovieByUserId(RoutingContext ctx) {
         Integer movieId = Integer.parseInt(ctx.request().getParam("movie_id"));
-        Integer userId = Integer.parseInt(ctx.request().getParam("user_id"));
+        Integer userId = Integer.parseInt(ctx.request().getParam("viewer_id"));
         JsonObject request = new JsonObject().put("action", "getVotesOnMovieByUserId").put("user_id", userId).put("movie_id", movieId);
         vertx.eventBus().request(Constants.CINE_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());

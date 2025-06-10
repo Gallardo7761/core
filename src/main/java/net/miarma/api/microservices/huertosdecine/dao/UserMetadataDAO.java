@@ -37,10 +37,10 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
                 .build();
 
         db.execute(query, UserMetadataEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
-        
+
         return promise.future();
     }
 
@@ -48,14 +48,14 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
     public Future<UserMetadataEntity> insert(UserMetadataEntity metadata) {
         Promise<UserMetadataEntity> promise = Promise.promise();
         String query = QueryBuilder
-            .insert(metadata)
-            .build();
-        
+                .insert(metadata)
+                .build();
+
         db.executeOne(query, UserMetadataEntity.class,
-            _ -> promise.complete(),
-            promise::fail
+                _ -> promise.complete(),
+                promise::fail
         );
-        
+
         return promise.future();
     }
 
@@ -63,12 +63,12 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
     public Future<UserMetadataEntity> update(UserMetadataEntity metadata) {
         Promise<UserMetadataEntity> promise = Promise.promise();
         String query = QueryBuilder
-            .update(metadata)
-            .build();
+                .update(metadata)
+                .build();
 
         db.executeOne(query, UserMetadataEntity.class,
-            _ -> promise.complete(metadata),
-            promise::fail
+                _ -> promise.complete(metadata),
+                promise::fail
         );
 
         return promise.future();
@@ -95,15 +95,10 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
         String query = QueryBuilder.delete(metadata).build();
 
         db.executeOne(query, UserMetadataEntity.class,
-            _ -> promise.complete(metadata),
-            promise::fail
+                _ -> promise.complete(metadata),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<UserMetadataEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Not supported for UserMetadataEntity. Use delete instead.");
     }
 }

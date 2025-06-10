@@ -20,16 +20,16 @@ public class UserDAO implements DataAccessObject<UserEntity> {
     public UserDAO(Pool pool) {
         this.db = DatabaseManager.getInstance(pool);
     }
-    
+
     @Override
-	public Future<List<UserEntity>> getAll() {
-    	return getAll(new QueryParams(Map.of(), new QueryFilters()));
-	}
+    public Future<List<UserEntity>> getAll() {
+        return getAll(new QueryParams(Map.of(), new QueryFilters()));
+    }
 
     public Future<List<UserEntity>> getAll(QueryParams params) {
         Promise<List<UserEntity>> promise = Promise.promise();
         String query = QueryBuilder
-        		.select(UserEntity.class)
+                .select(UserEntity.class)
                 .where(params.getFilters())
                 .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
                 .limit(params.getQueryFilters().getLimit())
@@ -37,8 +37,8 @@ public class UserDAO implements DataAccessObject<UserEntity> {
                 .build();
 
         db.execute(query, UserEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
@@ -48,10 +48,10 @@ public class UserDAO implements DataAccessObject<UserEntity> {
     public Future<UserEntity> insert(UserEntity user) {
         Promise<UserEntity> promise = Promise.promise();
         String query = QueryBuilder.insert(user).build();
-        
+
         db.executeOne(query, UserEntity.class,
-            result -> promise.complete(result),
-            promise::fail
+                result -> promise.complete(result),
+                promise::fail
         );
 
         return promise.future();
@@ -61,10 +61,10 @@ public class UserDAO implements DataAccessObject<UserEntity> {
     public Future<UserEntity> update(UserEntity user) {
         Promise<UserEntity> promise = Promise.promise();
         String query = QueryBuilder.update(user).build();
-        
+
         db.executeOne(query, UserEntity.class,
-            _ -> promise.complete(user),
-            promise::fail
+                _ -> promise.complete(user),
+                promise::fail
         );
 
         return promise.future();
@@ -79,15 +79,10 @@ public class UserDAO implements DataAccessObject<UserEntity> {
         String query = QueryBuilder.delete(user).build();
 
         db.executeOne(query, UserEntity.class,
-	        _ -> promise.complete(user),
-	        promise::fail
-	    );
+                _ -> promise.complete(user),
+                promise::fail
+        );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<UserEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Method not implemented");
     }
 }

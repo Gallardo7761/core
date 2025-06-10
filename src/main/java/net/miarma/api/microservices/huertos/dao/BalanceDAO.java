@@ -25,23 +25,23 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         String query = QueryBuilder.select(BalanceEntity.class).build();
 
         db.execute(query, BalanceEntity.class,
-            list -> promise.complete(list.isEmpty() ? List.of() : list),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
         );
 
         return promise.future();
     }
-    
+
     public Future<List<ViewBalanceWithTotals>> getAllWithTotals() {
-    	Promise<List<ViewBalanceWithTotals>> promise = Promise.promise();
-    	String query = QueryBuilder.select(ViewBalanceWithTotals.class).build();
-    	
-    	db.execute(query, ViewBalanceWithTotals.class,
-			list -> promise.complete(list.isEmpty() ? List.of() : list),
-			promise::fail
-		);
-		
-		return promise.future();
+        Promise<List<ViewBalanceWithTotals>> promise = Promise.promise();
+        String query = QueryBuilder.select(ViewBalanceWithTotals.class).build();
+
+        db.execute(query, ViewBalanceWithTotals.class,
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
+        );
+
+        return promise.future();
     }
 
     @Override
@@ -50,8 +50,8 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         String query = QueryBuilder.insert(balance).build();
 
         db.execute(query, BalanceEntity.class,
-            list -> promise.complete(list.isEmpty() ? null : list.get(0)),
-            promise::fail
+                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                promise::fail
         );
 
         return promise.future();
@@ -63,8 +63,8 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         String query = QueryBuilder.update(balance).build();
 
         db.executeOne(query, BalanceEntity.class,
-            _ -> promise.complete(balance),
-            promise::fail
+                _ -> promise.complete(balance),
+                promise::fail
         );
 
         return promise.future();
@@ -79,15 +79,10 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         String query = QueryBuilder.delete(balance).build();
 
         db.executeOne(query, BalanceEntity.class,
-            _ -> promise.complete(balance),
-            promise::fail
+                _ -> promise.complete(balance),
+                promise::fail
         );
 
         return promise.future();
-    }
-
-    @Override
-    public Future<BalanceEntity> deleteDoubleId(Integer id1, Integer id2) {
-        throw new UnsupportedOperationException("Delete by double ID is not supported for BalanceEntity.");
     }
 }

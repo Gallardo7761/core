@@ -25,13 +25,6 @@ public class Constants {
     public static final String CINE_EVENT_BUS = "cine.eventbus";
 
     public static Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
-    
-	public static final Integer CORE_LOGIC_PORT = 8080;
-	public static final Integer CORE_DATA_PORT = 8081;
-	public static final Integer MMC_LOGIC_PORT = 8100;
-	public static final Integer MMC_DATA_PORT = 8101;
-	public static final Integer HUERTOS_LOGIC_PORT = 8120;
-	public static final Integer HUERTOS_DATA_PORT = 8121;
 	
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -405,8 +398,8 @@ public class Constants {
 	}
 
 	public enum CineUserStatus implements ValuableEnum {
-		ACTIVE(0),
-		INACTIVE(1);
+		ACTIVE(1),
+		INACTIVE(0);
 
 		private final int value;
 

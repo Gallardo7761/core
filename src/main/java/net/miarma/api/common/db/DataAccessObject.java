@@ -9,5 +9,4 @@ public interface DataAccessObject<T> {
 	Future<T> insert(T t);
 	Future<T> update(T t);
 	Future<T> delete(Integer id);
-	Future<T> deleteDoubleId(Integer id1, Integer id2);
 }

@@ -16,54 +16,49 @@ import java.util.Map;
 
 public class PlayerDAO implements DataAccessObject<PlayerEntity> {
 
-	private final DatabaseManager db;
-	
-	public PlayerDAO(Pool pool) {
-		this.db = DatabaseManager.getInstance(pool);
-	}
-	
-	@Override
-	public Future<List<PlayerEntity>> getAll() {
-		return getAll(new QueryParams(Map.of(), new QueryFilters()));
-	}
-	
-	public Future<List<PlayerEntity>> getAll(QueryParams params) {
-		Promise<List<PlayerEntity>> promise = Promise.promise();
-		
-		String query = QueryBuilder
-			.select(PlayerEntity.class)
-			.where(params.getFilters())
-			.orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
-			.limit(params.getQueryFilters().getLimit())
-			.offset(params.getQueryFilters().getOffset())
-			.build();
-		
-		db.execute(query, PlayerEntity.class,
-			list -> promise.complete(list.isEmpty() ? List.of() : list),
-			promise::fail
-		);
-		
-		return promise.future();
-	}
+    private final DatabaseManager db;
 
-	@Override
-	public Future<PlayerEntity> insert(PlayerEntity t) {
-		throw new UnsupportedOperationException("Insert not supported on view-based DAO");
-	}
+    public PlayerDAO(Pool pool) {
+        this.db = DatabaseManager.getInstance(pool);
+    }
 
-	@Override
-	public Future<PlayerEntity> update(PlayerEntity t) {
-		throw new UnsupportedOperationException("Insert not supported on view-based DAO");
-	}
+    @Override
+    public Future<List<PlayerEntity>> getAll() {
+        return getAll(new QueryParams(Map.of(), new QueryFilters()));
+    }
 
-	@Override
-	public Future<PlayerEntity> delete(Integer id) {
-		throw new UnsupportedOperationException("Insert not supported on view-based DAO");
-	}
+    public Future<List<PlayerEntity>> getAll(QueryParams params) {
+        Promise<List<PlayerEntity>> promise = Promise.promise();
 
-	@Override
-	public Future<PlayerEntity> deleteDoubleId(Integer id1, Integer id2) {
-		throw new UnsupportedOperationException("Delete by double ID is not supported for PlayerEntity.");
-	}
+        String query = QueryBuilder
+                .select(PlayerEntity.class)
+                .where(params.getFilters())
+                .orderBy(params.getQueryFilters().getSort(), params.getQueryFilters().getOrder())
+                .limit(params.getQueryFilters().getLimit())
+                .offset(params.getQueryFilters().getOffset())
+                .build();
+
+        db.execute(query, PlayerEntity.class,
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<PlayerEntity> insert(PlayerEntity t) {
+        throw new UnsupportedOperationException("Insert not supported on view-based DAO");
+    }
+
+    @Override
+    public Future<PlayerEntity> update(PlayerEntity t) {
+        throw new UnsupportedOperationException("Insert not supported on view-based DAO");
+    }
+
+    @Override
+    public Future<PlayerEntity> delete(Integer id) {
+        throw new UnsupportedOperationException("Insert not supported on view-based DAO");
+    }
 
 }

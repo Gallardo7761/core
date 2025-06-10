@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
-	
+
 	private final DatabaseManager db;
-	
+
 	public UserMetadataDAO(Pool pool) {
 		this.db = DatabaseManager.getInstance(pool);
 	}
@@ -25,7 +25,7 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 	public Future<List<UserMetadataEntity>> getAll() {
 		return getAll(new QueryParams(Map.of(), new QueryFilters()));
 	}
-	
+
 	public Future<List<UserMetadataEntity>> getAll(QueryParams params) {
 		Promise<List<UserMetadataEntity>> promise = Promise.promise();
 		String query = QueryBuilder
@@ -37,8 +37,8 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 				.build();
 
 		db.execute(query, UserMetadataEntity.class,
-			list -> promise.complete(list.isEmpty() ? List.of() : list),
-			promise::fail
+				list -> promise.complete(list.isEmpty() ? List.of() : list),
+				promise::fail
 		);
 
 		return promise.future();
@@ -50,9 +50,9 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		String query = QueryBuilder.insert(user).build();
 
 		db.executeOne(query, UserMetadataEntity.class,
-            result -> promise.complete(result),
-            promise::fail
-        );
+				result -> promise.complete(result),
+				promise::fail
+		);
 
 		return promise.future();
 	}
@@ -63,21 +63,21 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		String query = QueryBuilder.update(user).build();
 
 		db.executeOne(query, UserMetadataEntity.class,
-            _ -> promise.complete(user),
-            promise::fail
-        );
+				_ -> promise.complete(user),
+				promise::fail
+		);
 
 		return promise.future();
 	}
-	
+
 	public Future<UserMetadataEntity> updateWithNulls(UserMetadataEntity user) {
 		Promise<UserMetadataEntity> promise = Promise.promise();
 		String query = QueryBuilder.updateWithNulls(user).build();
 
 		db.executeOne(query, UserMetadataEntity.class,
-            _ -> promise.complete(user),
-            promise::fail
-        );
+				_ -> promise.complete(user),
+				promise::fail
+		);
 
 		return promise.future();
 	}
@@ -91,15 +91,10 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
 		String query = QueryBuilder.delete(user).build();
 
 		db.executeOne(query, UserMetadataEntity.class,
-            _ -> promise.complete(user),
-            promise::fail
-        );
+				_ -> promise.complete(user),
+				promise::fail
+		);
 
 		return promise.future();
-	}
-
-	@Override
-	public Future<UserMetadataEntity> deleteDoubleId(Integer id1, Integer id2) {
-		throw new UnsupportedOperationException("This method is not supported for UserMetadataDAO");
 	}
 }
