@@ -1,5 +1,5 @@
 /src/main/resources/.env
-/target/*
+/target/
 /bin/
 /inserts.sql
 /last_dump.sql

@@ -17,9 +17,11 @@ import net.miarma.api.microservices.huertosdecine.dao.UserMetadataDAO;
 import net.miarma.api.microservices.huertosdecine.dao.ViewerDAO;
 import net.miarma.api.microservices.huertosdecine.entities.UserMetadataEntity;
 import net.miarma.api.microservices.huertosdecine.entities.ViewerEntity;
+import net.miarma.api.util.UserNameGenerator;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.text.View;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -107,23 +109,33 @@ public class ViewerService {
 
     public Future<ViewerEntity> create(ViewerEntity viewer) {
         viewer.setPassword(PasswordHasher.hash(viewer.getPassword()));
-        if (viewer.getEmail().isBlank()) viewer.setEmail(null);
+        if (viewer.getEmail() == null || viewer.getEmail().isBlank()) viewer.setEmail(null);
+
+        String baseName = viewer.getDisplay_name().split(" ")[0].toLowerCase();
+        String userName;
+        try {
+            userName = UserNameGenerator.generateUserName(baseName, viewer.getDisplay_name(), 3);
+            viewer.setUser_name(userName);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(UserEntity.fromViewerEntity(viewer));
 
         return userDAO.insert(UserEntity.fromViewerEntity(viewer)).compose(user -> {
            UserMetadataEntity metadata = UserMetadataEntity.fromViewerEntity(viewer);
            metadata.setUser_id(user.getUser_id());
-
-            return userMetadataDAO.insert(metadata).compose(meta -> {
-                String baseName = viewer.getDisplay_name().split(" ")[0].toLowerCase();
-                char[] hash = {};
-                PasswordHasher.hash(viewer.getDisplay_name()).getChars(0, 6, hash, 0);
-                String userName = baseName + "-" + Arrays.toString(hash);
-
-                user.setUser_name(userName);
-
-                return userDAO.update(user).map(updatedUser -> new ViewerEntity(updatedUser, meta));
-            });
+           return userMetadataDAO.upsert(metadata).compose(meta ->
+                   userDAO.update(user).map(updatedUser -> new ViewerEntity(updatedUser, meta)));
         });
+    }
+
+    public Future<UserMetadataEntity> createMetadata(UserMetadataEntity userMetadata) {
+        if (userMetadata.getUser_id() == null) {
+            return Future.failedFuture(new BadRequestException("User ID is required"));
+        }
+
+        return userMetadataDAO.upsert(userMetadata).compose(Future::succeededFuture);
     }
 
     public Future<ViewerEntity> update(ViewerEntity viewer) {

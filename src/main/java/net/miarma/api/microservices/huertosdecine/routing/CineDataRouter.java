@@ -45,5 +45,6 @@ public class CineDataRouter {
         router.post(CineEndpoints.VIEWERS).handler(AuthGuard.cineAdmin(viewerService)).handler(hViewerData::create);
         router.put(CineEndpoints.VIEWER).handler(AuthGuard.cineAdmin(viewerService)).handler(hViewerData::update);
         router.delete(CineEndpoints.VIEWER).handler(AuthGuard.cineAdmin(viewerService)).handler(hViewerData::delete);
+        router.post(CineEndpoints.VIEWER_METADATA).handler(AuthGuard.cineAdmin(viewerService)).handler(hViewerData::createMetadata);
     }
 }

@@ -59,6 +59,20 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity> {
         return promise.future();
     }
 
+    public Future<UserMetadataEntity> upsert(UserMetadataEntity metadata) {
+        Promise<UserMetadataEntity> promise = Promise.promise();
+        String query = QueryBuilder
+                .upsert(metadata, "user_id")
+                .build();
+
+        db.executeOne(query, UserMetadataEntity.class,
+                _ -> promise.complete(metadata),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
     @Override
     public Future<UserMetadataEntity> update(UserMetadataEntity metadata) {
         Promise<UserMetadataEntity> promise = Promise.promise();
