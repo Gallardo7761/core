@@ -40,12 +40,7 @@ public class IncomeService {
 
 	public Future<List<IncomeEntity>> getMyIncomes(String token) {
 		Integer userId = JWTManager.getInstance().getUserId(token);
-		return memberService.getById(userId).compose(memberEntity -> {
-			if (memberEntity == null) {
-				return Future.failedFuture(new NotFoundException("Member with id " + userId + " not found"));
-			}
-			return incomeDAO.getUserIncomes(memberEntity.getMember_number());
-		});
+		return memberService.getById(userId).compose(memberEntity -> incomeDAO.getUserIncomes(memberEntity.getMember_number()));
 		
 	}
 	
@@ -85,7 +80,12 @@ public class IncomeService {
 	}
 
 	public Future<Boolean> delete(Integer id) {
-		return incomeDAO.delete(id);
+		return getById(id).compose(income -> {
+			if (income == null) {
+				return Future.failedFuture(new NotFoundException("Income with id " + id + " not found"));
+			}
+			return incomeDAO.delete(id);
+		});
 	}
 
 	

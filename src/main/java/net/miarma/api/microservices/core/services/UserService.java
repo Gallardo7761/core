@@ -194,11 +194,11 @@ public class UserService {
     }
 
     public Future<Boolean> delete(Integer id) {
-        return userDAO.delete(id).compose(deleted -> {
-            if (!deleted) {
+        return getById(id).compose(user -> {
+            if (user == null) {
                 return Future.failedFuture(new NotFoundException("User not found in the database"));
             }
-            return Future.succeededFuture(true);
+            return userDAO.delete(id);
         });
     }
 }

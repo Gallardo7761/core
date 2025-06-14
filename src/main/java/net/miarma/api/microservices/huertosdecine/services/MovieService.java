@@ -43,11 +43,11 @@ public class MovieService {
     }
 
     public Future<Boolean> delete(Integer id) {
-        return movieDAO.delete(id).compose(deleted -> {
-            if (!deleted) {
+        return getById(id).compose(existing -> {
+            if (existing == null) {
                 return Future.failedFuture(new NotFoundException("Movie not found in the database"));
             }
-            return Future.succeededFuture(true);
+            return movieDAO.delete(id);
         });
     }
 }

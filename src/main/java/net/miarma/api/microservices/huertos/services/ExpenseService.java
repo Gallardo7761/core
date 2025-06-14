@@ -64,11 +64,11 @@ public class ExpenseService {
 	}
 
 	public Future<Boolean> delete(Integer id) {
-		return expenseDAO.delete(id).compose(deleted -> {
-			if (!deleted) {
+		return getById(id).compose(expense -> {
+			if (expense == null) {
 				return Future.failedFuture(new NotFoundException("Expense with id " + id + " not found"));
 			}
-			return Future.succeededFuture(true);
+			return expenseDAO.delete(id);
 		});
 	}
 }

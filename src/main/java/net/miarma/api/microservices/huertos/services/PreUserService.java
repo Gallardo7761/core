@@ -73,11 +73,11 @@ public class PreUserService {
 	}
 
 	public Future<Boolean> delete(Integer id) {
-		return preUserDAO.delete(id).compose(deleted -> {
-			if (!deleted) {
+		return getById(id).compose(preUser -> {
+			if (preUser == null) {
 				return Future.failedFuture(new NotFoundException("PreUser with id " + id));
 			}
-			return Future.succeededFuture(true);
+			return preUserDAO.delete(id);
 		});
 	}
 }

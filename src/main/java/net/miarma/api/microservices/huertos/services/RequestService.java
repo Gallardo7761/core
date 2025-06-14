@@ -71,12 +71,7 @@ public class RequestService {
 	
 	public Future<List<RequestEntity>> getMyRequests(String token) {
 	    Integer userId = JWTManager.getInstance().getUserId(token);
-	    return requestDAO.getByUserId(userId).compose(requests -> {
-			if (requests == null || requests.isEmpty()) {
-	            return Future.failedFuture(new NotFoundException("No requests found for user with id " + userId));
-	        }
-	        return Future.succeededFuture(requests);
-	    });
+	    return requestDAO.getByUserId(userId).compose(Future::succeededFuture);
 	}
 	
 	public Future<Boolean> hasCollaboratorRequest(String token) {
@@ -113,11 +108,11 @@ public class RequestService {
 	}
 
 	public Future<Boolean> delete(Integer id) {
-		return requestDAO.delete(id).compose(deleted -> {
-			if (!deleted) {
+		return getById(id).compose(request -> {
+			if (request == null) {
 				return Future.failedFuture(new NotFoundException("Request with id " + id));
 			}
-			return Future.succeededFuture(true);
+			return requestDAO.delete(id);
 		});
 	}
 	
