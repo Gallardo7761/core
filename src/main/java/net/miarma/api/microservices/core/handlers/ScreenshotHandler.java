@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ScreenshotHandler {
 	
-	private WebClient webClient;
+	private final vWebClient webClient;
 	
 	public ScreenshotHandler(Vertx vertx) {
 		this.webClient = WebClient.create(vertx);

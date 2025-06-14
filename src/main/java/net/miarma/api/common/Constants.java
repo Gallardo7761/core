@@ -28,7 +28,7 @@ public class Constants {
     public static final String MMC_EVENT_BUS = "mmc.eventbus";
     public static final String CINE_EVENT_BUS = "cine.eventbus";
 
-    public static Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
+    public static final Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
 	
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())

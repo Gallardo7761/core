@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ModDataHandler {
-	ModService modService;
+	final ModService modService;
 	
 	public ModDataHandler(Pool pool) {
 		this.modService = new ModService(pool);
@@ -75,12 +75,12 @@ public class ModDataHandler {
 			modService.create(mod)
 				.onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))
 				.onFailure(err -> {
-					err.printStackTrace();
+					Constants.LOGGER.error(err.getMessage());
 					JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, err.getMessage());
 				});
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			Constants.LOGGER.error("Error al procesar la petición de creación de mod: {}", e.getMessage(), e);
 			JsonUtil.sendJson(ctx, ApiStatus.BAD_REQUEST, null, "Error procesando la petición: " + e.getMessage());
 		}
 	}
@@ -102,16 +102,14 @@ public class ModDataHandler {
 
 			ctx.vertx().fileSystem().delete(fullPath.toString(), fileRes -> {
 				if (fileRes.failed()) {
-					Constants.LOGGER.warn("No se pudo eliminar el archivo del mod: " + fullPath, fileRes.cause());
+                    Constants.LOGGER.warn("No se pudo eliminar el archivo del mod: {}", fullPath, fileRes.cause());
 				}
 
 				modService.delete(modId)
 					.onSuccess(_ -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
 					.onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
 			});
-		}).onFailure(err -> {
-			JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage());
-		});
+		}).onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
 	}
 
 }

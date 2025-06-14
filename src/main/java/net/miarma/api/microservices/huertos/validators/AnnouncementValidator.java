@@ -2,11 +2,11 @@ package net.miarma.api.microservices.huertos.validators;
 
 import io.vertx.core.Future;
 import net.miarma.api.common.validation.ValidationResult;
-import net.miarma.api.microservices.huertos.entities.AnnounceEntity;
+import net.miarma.api.microservices.huertos.entities.AnnouncementEntity;
 
-public class AnnounceValidator {
+public class AnnouncementValidator {
 
-    public Future<ValidationResult> validate(AnnounceEntity announce) {
+    public Future<ValidationResult> validate(AnnouncementEntity announce) {
         ValidationResult result = new ValidationResult();
 
         if (announce == null) {

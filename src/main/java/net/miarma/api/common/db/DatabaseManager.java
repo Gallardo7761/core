@@ -116,7 +116,7 @@ public class DatabaseManager {
 					Constructor<T> constructor = clazz.getConstructor(Row.class);
 					return constructor.newInstance(row);
 				} catch (Exception e) {
-					Constants.LOGGER.error("Error instantiating class: " + e.getMessage());
+                    Constants.LOGGER.error("Error instantiating class: {}", e.getMessage());
 				}
 			}
 			return null; // Si no hay filas

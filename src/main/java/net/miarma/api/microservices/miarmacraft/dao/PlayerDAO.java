@@ -8,13 +8,12 @@ import net.miarma.api.common.db.DatabaseManager;
 import net.miarma.api.common.db.QueryBuilder;
 import net.miarma.api.common.http.QueryFilters;
 import net.miarma.api.common.http.QueryParams;
-import net.miarma.api.microservices.huertos.entities.AnnounceEntity;
 import net.miarma.api.microservices.miarmacraft.entities.PlayerEntity;
 
 import java.util.List;
 import java.util.Map;
 
-public class PlayerDAO implements DataAccessObject<PlayerEntity> {
+public class PlayerDAO implements DataAccessObject<PlayerEntity, Integer> {
 
     private final DatabaseManager db;
 
@@ -25,6 +24,22 @@ public class PlayerDAO implements DataAccessObject<PlayerEntity> {
     @Override
     public Future<List<PlayerEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
+    }
+
+    @Override
+    public Future<PlayerEntity> getById(Integer integer) {
+        Promise<PlayerEntity> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(PlayerEntity.class)
+                .where(Map.of("user_id", integer))
+                .build();
+
+        db.executeOne(query, PlayerEntity.class,
+                promise::complete,
+                promise::fail
+        );
+
+        return promise.future();
     }
 
     public Future<List<PlayerEntity>> getAll(QueryParams params) {
@@ -52,13 +67,34 @@ public class PlayerDAO implements DataAccessObject<PlayerEntity> {
     }
 
     @Override
+    public Future<PlayerEntity> upsert(PlayerEntity playerEntity, String... conflictKeys) {
+        throw new UnsupportedOperationException("Upsert not supported on view-based DAO");
+    }
+
+    @Override
     public Future<PlayerEntity> update(PlayerEntity t) {
         throw new UnsupportedOperationException("Insert not supported on view-based DAO");
     }
 
     @Override
-    public Future<PlayerEntity> delete(Integer id) {
+    public Future<Boolean> delete(Integer id) {
         throw new UnsupportedOperationException("Insert not supported on view-based DAO");
+    }
+
+    @Override
+    public Future<Boolean> exists(Integer integer) {
+        Promise<Boolean> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(PlayerEntity.class)
+                .where(Map.of("user_id", integer))
+                .build();
+
+        db.executeOne(query, PlayerEntity.class,
+                result -> promise.complete(result != null),
+                promise::fail
+        );
+
+        return promise.future();
     }
 
 }

@@ -49,14 +49,11 @@ public class ModService {
 	}
 	
 	public Future<ModEntity> getById(Integer id) {
-		return getAll().compose(mods -> {
-			ModEntity mod = mods.stream()
-	                .filter(m -> m.getMod_id().equals(id))
-	                .findFirst()
-	                .orElse(null);
-	            return mod != null ?
-	                Future.succeededFuture(mod) :
-	                Future.failedFuture(new NotFoundException("Mod with id " + id));
+		return modDAO.getById(id).compose(mod -> {
+			if (mod == null) {
+				return Future.failedFuture(new NotFoundException("Mod with id " + id));
+			}
+			return Future.succeededFuture(mod);
 		});
 	}
 	
@@ -73,7 +70,7 @@ public class ModService {
 		});
 	}
 
-	public Future<ModEntity> delete(Integer id) {
+	public Future<Boolean> delete(Integer id) {
 		return getById(id).compose(mod -> {
 			if (mod == null) {
 				return Future.failedFuture(new NotFoundException("Mod with id " + id));

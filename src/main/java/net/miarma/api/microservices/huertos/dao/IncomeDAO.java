@@ -14,7 +14,7 @@ import net.miarma.api.microservices.huertos.entities.ViewIncomesWithFullNames;
 import java.util.List;
 import java.util.Map;
 
-public class IncomeDAO implements DataAccessObject<IncomeEntity> {
+public class IncomeDAO implements DataAccessObject<IncomeEntity, Integer> {
 
     private final DatabaseManager db;
 
@@ -25,6 +25,22 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
     @Override
     public Future<List<IncomeEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
+    }
+
+    @Override
+    public Future<IncomeEntity> getById(Integer id) {
+        Promise<IncomeEntity> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(IncomeEntity.class)
+                .where(Map.of("income_id", id))
+                .build();
+
+        db.executeOne(query, IncomeEntity.class,
+                promise::complete,
+                promise::fail
+        );
+
+        return promise.future();
     }
 
     public Future<List<IncomeEntity>> getAll(QueryParams params) {
@@ -67,13 +83,41 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
         return promise.future();
     }
 
+    public Future<List<IncomeEntity>> getUserIncomes(Integer memberNumber) {
+        Promise<List<IncomeEntity>> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(IncomeEntity.class)
+                .where(Map.of("member_number", memberNumber))
+                .build();
+
+        db.execute(query, IncomeEntity.class,
+                list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
     @Override
     public Future<IncomeEntity> insert(IncomeEntity income) {
         Promise<IncomeEntity> promise = Promise.promise();
         String query = QueryBuilder.insert(income).build();
 
         db.execute(query, IncomeEntity.class,
-                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                list -> promise.complete(list.isEmpty() ? null : list.getFirst()),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<IncomeEntity> upsert(IncomeEntity incomeEntity, String... conflictKeys) {
+        Promise<IncomeEntity> promise = Promise.promise();
+        String query = QueryBuilder.upsert(incomeEntity, conflictKeys).build();
+
+        db.executeOne(query, IncomeEntity.class,
+                promise::complete,
                 promise::fail
         );
 
@@ -94,15 +138,31 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity> {
     }
 
     @Override
-    public Future<IncomeEntity> delete(Integer id) {
-        Promise<IncomeEntity> promise = Promise.promise();
+    public Future<Boolean> delete(Integer id) {
+        Promise<Boolean> promise = Promise.promise();
         IncomeEntity income = new IncomeEntity();
         income.setIncome_id(id);
 
         String query = QueryBuilder.delete(income).build();
 
         db.executeOne(query, IncomeEntity.class,
-                _ -> promise.complete(income),
+                result -> promise.complete(result != null),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<Boolean> exists(Integer id) {
+        Promise<Boolean> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(IncomeEntity.class)
+                .where(Map.of("income_id", id))
+                .build();
+
+        db.executeOne(query, IncomeEntity.class,
+                result -> promise.complete(result != null),
                 promise::fail
         );
 

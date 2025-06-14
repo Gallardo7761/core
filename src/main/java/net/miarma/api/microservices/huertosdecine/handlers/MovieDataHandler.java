@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class MovieDataHandler {
-    private MovieService movieService;
+    private final MovieService movieService;
 
     public MovieDataHandler(Pool pool) {
         this.movieService = new MovieService(pool);
@@ -59,7 +59,7 @@ public class MovieDataHandler {
 
                     ctx.vertx().fileSystem().delete(fullPath.toString(), fileRes -> {
                         if (fileRes.failed()) {
-                            Constants.LOGGER.warn("No se pudo eliminar el archivo de portada: " + fullPath, fileRes.cause());
+                            Constants.LOGGER.warn("No se pudo eliminar el archivo de portada: {}", fullPath, fileRes.cause());
                         }
 
                         movieService.update(movieFromBody)
@@ -72,9 +72,7 @@ public class MovieDataHandler {
                             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
                 }
             })
-            .onFailure(err -> {
-                JsonUtil.sendJson(ctx, ApiStatus.NOT_FOUND, null, "Película no encontrada");
-            });
+            .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.NOT_FOUND, null, "Película no encontrada"));
     }
 
     public void delete(RoutingContext ctx) {
@@ -87,15 +85,13 @@ public class MovieDataHandler {
 
             ctx.vertx().fileSystem().delete(fullPath.toString(), fileRes -> {
                 if (fileRes.failed()) {
-                    Constants.LOGGER.warn("No se pudo eliminar el archivo de portada: " + fullPath, fileRes.cause());
+                    Constants.LOGGER.warn("No se pudo eliminar el archivo de portada: {}", fullPath, fileRes.cause());
                 }
 
                 movieService.delete(movieId)
                         .onSuccess(_ -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
                         .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
             });
-        }).onFailure(err -> {
-            JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage());
-        });
+        }).onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }
 }

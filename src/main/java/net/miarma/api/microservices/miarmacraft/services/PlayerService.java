@@ -49,21 +49,16 @@ public class PlayerService {
 				return Future.failedFuture(new ForbiddenException("User is not active"));
 			}
 
-			return userMetadataDAO.getAll().compose(metadataList -> {
-				UserMetadataEntity userMetadata = metadataList.stream()
-				    .filter(metadata -> metadata.getUser_id().equals(user.getUser_id()))
-				    .findFirst()
-				    .orElse(null);
-
-				if (userMetadata == null) {
+			return userMetadataDAO.getById(user.getUser_id()).compose(metadata -> {
+				if (metadata == null) {
 				    return Future.failedFuture(new NotFoundException("User metadata not found"));
 				}
 
-				if (userMetadata.getStatus() != MMCUserStatus.ACTIVE) {
+				if (metadata.getStatus() != MMCUserStatus.ACTIVE) {
 				    return Future.failedFuture(new ForbiddenException("User is not active"));
 				}
 
-				PlayerEntity player = new PlayerEntity(user, userMetadata);
+				PlayerEntity player = new PlayerEntity(user, metadata);
 
 				return Future.succeededFuture(new JsonObject()
 						.put("token", json.getString("token"))
@@ -83,23 +78,12 @@ public class PlayerService {
 	}
 
 	public Future<PlayerEntity> getById(Integer id) {
-		return getAll().compose(players -> {
-			return Future.succeededFuture(
-					players.stream().filter(player -> player.getUser_id().equals(id)).findFirst().orElse(null));
-		});
-	}
+		return playerDAO.getById(id).compose(player -> {
+			if (player == null) {
+				return Future.failedFuture(new NotFoundException("Player not found"));
+			}
 
-	public Future<PlayerEntity> getByUserName(String username) {
-		return getAll().compose(players -> {
-			return Future.succeededFuture(
-					players.stream().filter(player -> player.getUser_name().equals(username)).findFirst().orElse(null));
-		});
-	}
-
-	public Future<PlayerEntity> getByEmail(String email) {
-		return getAll().compose(players -> {
-			return Future.succeededFuture(
-					players.stream().filter(player -> player.getEmail().equals(email)).findFirst().orElse(null));
+			return Future.succeededFuture(player);
 		});
 	}
 
@@ -137,27 +121,21 @@ public class PlayerService {
 		PlayerEntity player = new PlayerEntity();
 		player.setUser_id(id);
 		player.setStatus(status);
-		return update(player).compose(updatedPlayer -> {
-			return Future.succeededFuture(updatedPlayer);
-		});
+		return update(player);
 	}
 
 	public Future<PlayerEntity> updateRole(Integer id, MMCUserRole role) {
 		PlayerEntity player = new PlayerEntity();
 		player.setUser_id(id);
 		player.setRole(role);
-		return update(player).compose(updatedPlayer -> {
-			return Future.succeededFuture(updatedPlayer);
-		});
+		return update(player);
 	}
 
 	public Future<PlayerEntity> updateAvatar(Integer id, String avatar) {
 		PlayerEntity player = new PlayerEntity();
 		player.setUser_id(id);
 		player.setAvatar(avatar);
-		return update(player).compose(updatedPlayer -> {
-			return Future.succeededFuture(updatedPlayer);
-		});
+		return update(player);
 	}
 
 	public Future<PlayerEntity> create(PlayerEntity player) {
@@ -171,9 +149,7 @@ public class PlayerService {
 			return userDAO.insert(UserEntity.fromPlayerEntity(player)).compose(user -> {
 				UserMetadataEntity metadata = UserMetadataEntity.fromPlayerEntity(player);
 				metadata.setUser_id(user.getUser_id());
-				return userMetadataDAO.insert(metadata).map(_ -> {
-					return player;
-				});
+				return userMetadataDAO.insert(metadata).map(_ -> player);
 			});
 		});
 	}
@@ -197,16 +173,14 @@ public class PlayerService {
 				return Future.failedFuture(new NotFoundException("Player does not exist"));
 			}
 
-			return userDAO.delete(id).compose(_ -> {
-				return userMetadataDAO.delete(id).map(_ -> existingPlayer);
-			});
+			return userDAO.delete(id).compose(_ -> userMetadataDAO.delete(id).map(_ -> existingPlayer));
 		});
 	}
 	
 	public Future<Boolean> playerExists(Integer id) {
-		return getById(id).compose(player -> {
-			if (player == null) {
-				return Future.succeededFuture(false);
+		return playerDAO.exists(id).compose(exists -> {
+			if (!exists) {
+				return Future.failedFuture(new NotFoundException("Player does not exist"));
 			}
 			return Future.succeededFuture(true);
 		});

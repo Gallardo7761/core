@@ -23,7 +23,7 @@ public class CineLogicRouter {
         // teapot :P
         router.route().handler(ctx -> {
             String path = ctx.request().path();
-            ApiResponse<JsonObject> response = new ApiResponse<JsonObject>(ApiStatus.IM_A_TEAPOT, "I'm a teapot", null);
+            ApiResponse<JsonObject> response = new ApiResponse<>(ApiStatus.IM_A_TEAPOT, "I'm a teapot", null);
             JsonObject jsonResponse = new JsonObject().put("status", response.getStatus()).put("message",
                     response.getMessage());
             if (SusPather.isSusPath(path)) {

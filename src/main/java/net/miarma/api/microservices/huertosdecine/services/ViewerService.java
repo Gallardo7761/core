@@ -12,17 +12,13 @@ import net.miarma.api.common.security.PasswordHasher;
 import net.miarma.api.microservices.core.dao.UserDAO;
 import net.miarma.api.microservices.core.entities.UserEntity;
 import net.miarma.api.microservices.core.services.UserService;
-import net.miarma.api.microservices.huertos.entities.MemberEntity;
 import net.miarma.api.microservices.huertosdecine.dao.UserMetadataDAO;
 import net.miarma.api.microservices.huertosdecine.dao.ViewerDAO;
 import net.miarma.api.microservices.huertosdecine.entities.UserMetadataEntity;
 import net.miarma.api.microservices.huertosdecine.entities.ViewerEntity;
 import net.miarma.api.util.UserNameGenerator;
-import org.mindrot.jbcrypt.BCrypt;
 
-import javax.swing.text.View;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.List;
 
 public class ViewerService {
@@ -51,18 +47,9 @@ public class ViewerService {
                 return Future.failedFuture(new ForbiddenException("User is not active"));
             }
 
-            return userMetadataDAO.getAll().compose(metadataList -> {
-                UserMetadataEntity metadata = metadataList.stream()
-                    .filter(meta -> meta.getUser_id().equals(user.getUser_id()))
-                    .findFirst()
-                    .orElse(null);
-
+            return userMetadataDAO.getById(user.getUser_id()).compose(metadata -> {
                 if (metadata.getStatus() != Constants.CineUserStatus.ACTIVE) {
                     return Future.failedFuture(new ForbiddenException("User is not active"));
-                }
-
-                if (metadata == null) {
-                    return Future.failedFuture(new NotFoundException("User metadata not found"));
                 }
 
                 ViewerEntity viewer = new ViewerEntity(user, metadata);
@@ -84,26 +71,11 @@ public class ViewerService {
     }
 
     public Future<ViewerEntity> getById(Integer id) {
-        return viewerDAO.getAll().compose(list -> {
-            ViewerEntity viewer = list.stream()
-                .filter(v -> v.getUser_id().equals(id))
-                .findFirst()
-                .orElse(null);
-            return viewer != null ?
-                Future.succeededFuture(viewer) :
-                Future.failedFuture(new NotFoundException("Viewer with id: " + id));
-        });
-    }
-
-    public Future<ViewerEntity> getByEmail(String email) {
-        return viewerDAO.getAll().compose(list -> {
-            ViewerEntity viewer = list.stream()
-                .filter(v -> v.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
-            return viewer != null ?
-                Future.succeededFuture(viewer) :
-                Future.failedFuture(new NotFoundException("Viewer with email: " + email));
+        return viewerDAO.getById(id).compose(viewer -> {
+            if (viewer == null) {
+                return Future.failedFuture(new NotFoundException("Viewer not found in the database"));
+            }
+            return Future.succeededFuture(viewer);
         });
     }
 
@@ -119,8 +91,6 @@ public class ViewerService {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println(UserEntity.fromViewerEntity(viewer));
 
         return userDAO.insert(UserEntity.fromViewerEntity(viewer)).compose(user -> {
            UserMetadataEntity metadata = UserMetadataEntity.fromViewerEntity(viewer);
@@ -151,11 +121,7 @@ public class ViewerService {
                 viewer.setPassword(existing.getPassword());
             }
 
-            return userDAO.update(UserEntity.fromViewerEntity(viewer)).compose(updatedUser -> {
-                return userMetadataDAO.update(UserMetadataEntity.fromViewerEntity(viewer)).map(updatedMeta -> {
-                    return new ViewerEntity(updatedUser, updatedMeta);
-                });
-            });
+            return userDAO.update(UserEntity.fromViewerEntity(viewer)).compose(updatedUser -> userMetadataDAO.update(UserMetadataEntity.fromViewerEntity(viewer)).map(updatedMeta -> new ViewerEntity(updatedUser, updatedMeta)));
         });
     }
 

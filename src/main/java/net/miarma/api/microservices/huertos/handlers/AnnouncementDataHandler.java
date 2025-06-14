@@ -5,54 +5,54 @@ import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiStatus;
 import net.miarma.api.common.http.QueryParams;
-import net.miarma.api.microservices.huertos.entities.AnnounceEntity;
-import net.miarma.api.microservices.huertos.services.AnnounceService;
+import net.miarma.api.microservices.huertos.entities.AnnouncementEntity;
+import net.miarma.api.microservices.huertos.services.AnnouncementService;
 import net.miarma.api.util.JsonUtil;
 
 @SuppressWarnings("unused")
-public class AnnounceDataHandler {
-    AnnounceService announceService;
+public class AnnouncementDataHandler {
+    final AnnouncementService announcementService;
 
-    public AnnounceDataHandler(Pool pool) {
-        this.announceService = new AnnounceService(pool);
+    public AnnouncementDataHandler(Pool pool) {
+        this.announcementService = new AnnouncementService(pool);
     }
 
     public void getAll(RoutingContext ctx) {
         QueryParams params = QueryParams.from(ctx);
 
-        announceService.getAll(params)
+        announcementService.getAll(params)
             .onSuccess(announces -> JsonUtil.sendJson(ctx, ApiStatus.OK, announces))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }
 
     public void getById(RoutingContext ctx) {
-        Integer announceId = Integer.parseInt(ctx.pathParam("announce_id"));
+        Integer announcementId = Integer.parseInt(ctx.pathParam("announce_id"));
 
-        announceService.getById(announceId)
+        announcementService.getById(announcementId)
             .onSuccess(announce -> JsonUtil.sendJson(ctx, ApiStatus.OK, announce))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }
 
     public void create(RoutingContext ctx) {
-        AnnounceEntity announce = Constants.GSON.fromJson(ctx.body().asString(), AnnounceEntity.class);
+        AnnouncementEntity announce = Constants.GSON.fromJson(ctx.body().asString(), AnnouncementEntity.class);
 
-        announceService.create(announce)
+        announcementService.create(announce)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }
 
     public void update(RoutingContext ctx) {
-        AnnounceEntity announce = Constants.GSON.fromJson(ctx.body().asString(), AnnounceEntity.class);
+        AnnouncementEntity announce = Constants.GSON.fromJson(ctx.body().asString(), AnnouncementEntity.class);
 
-        announceService.update(announce)
+        announcementService.update(announce)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }
 
     public void delete(RoutingContext ctx) {
-        Integer announceId = Integer.parseInt(ctx.pathParam("announce_id"));
+        Integer announcementId = Integer.parseInt(ctx.pathParam("announce_id"));
 
-        announceService.delete(announceId)
+        announcementService.delete(announcementId)
             .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, null))
             .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
     }

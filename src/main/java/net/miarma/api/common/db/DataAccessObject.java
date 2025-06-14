@@ -39,6 +39,15 @@ public interface DataAccessObject<T, ID> {
 	Future<T> insert(T t);
 
 	/**
+	 * Inserta o actualiza una entidad en la base de datos.
+	 * Si la entidad ya existe, se actualiza; si no, se inserta como nueva.
+	 *
+	 * @param t Entidad a insertar o actualizar.
+	 * @return Un {@link Future} que contiene la entidad insertada o actualizada.
+	 */
+	Future<T> upsert(T t, String... conflictKeys);
+
+	/**
 	 * Actualiza una entidad existente.
 	 *
 	 * @param t Entidad con los datos actualizados.

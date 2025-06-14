@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 
 /**
  * Clase base para todas las entidades persistentes del sistema.
- *
+ * <p>
  * Proporciona utilidades para:
  * <ul>
  *     <li>Construir una entidad a partir de una fila de base de datos ({@link Row})</li>
@@ -43,7 +43,7 @@ public abstract class AbstractEntity {
      * Rellena los campos del objeto usando reflexión a partir de una {@link Row} de Vert.x.
      * Se soportan tipos básicos (String, int, boolean, etc.), enums con método estático {@code fromInt(int)},
      * y {@link java.math.BigDecimal} (a través del tipo {@code Numeric} de Vert.x).
-     *
+     * <p>
      * Si un tipo no está soportado, se registra un error en el log y se ignora ese campo.
      *
      * @param row Fila de datos de la que extraer los valores.

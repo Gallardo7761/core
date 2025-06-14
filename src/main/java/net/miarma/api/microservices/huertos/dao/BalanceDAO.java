@@ -10,8 +10,9 @@ import net.miarma.api.microservices.huertos.entities.BalanceEntity;
 import net.miarma.api.microservices.huertos.entities.ViewBalanceWithTotals;
 
 import java.util.List;
+import java.util.Map;
 
-public class BalanceDAO implements DataAccessObject<BalanceEntity> {
+public class BalanceDAO implements DataAccessObject<BalanceEntity, Integer> {
 
     private final DatabaseManager db;
 
@@ -26,6 +27,22 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
 
         db.execute(query, BalanceEntity.class,
                 list -> promise.complete(list.isEmpty() ? List.of() : list),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<BalanceEntity> getById(Integer id) {
+        Promise<BalanceEntity> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(BalanceEntity.class)
+                .where(Map.of("id", id))
+                .build();
+
+        db.executeOne(query, BalanceEntity.class,
+                promise::complete,
                 promise::fail
         );
 
@@ -50,7 +67,20 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
         String query = QueryBuilder.insert(balance).build();
 
         db.execute(query, BalanceEntity.class,
-                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                list -> promise.complete(list.isEmpty() ? null : list.getFirst()),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<BalanceEntity> upsert(BalanceEntity balanceEntity, String... conflictKeys) {
+        Promise<BalanceEntity> promise = Promise.promise();
+        String query = QueryBuilder.upsert(balanceEntity, conflictKeys).build();
+
+        db.executeOne(query, BalanceEntity.class,
+                promise::complete,
                 promise::fail
         );
 
@@ -71,15 +101,31 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity> {
     }
 
     @Override
-    public Future<BalanceEntity> delete(Integer id) {
-        Promise<BalanceEntity> promise = Promise.promise();
+    public Future<Boolean> delete(Integer id) {
+        Promise<Boolean> promise = Promise.promise();
         BalanceEntity balance = new BalanceEntity();
         balance.setId(id);
 
         String query = QueryBuilder.delete(balance).build();
 
         db.executeOne(query, BalanceEntity.class,
-                _ -> promise.complete(balance),
+                result -> promise.complete(result != null),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<Boolean> exists(Integer id) {
+        Promise<Boolean> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(BalanceEntity.class)
+                .where(Map.of("id", id))
+                .build();
+
+        db.executeOne(query, BalanceEntity.class,
+                result -> promise.complete(result != null),
                 promise::fail
         );
 

@@ -13,7 +13,7 @@ import net.miarma.api.microservices.huertos.entities.ExpenseEntity;
 import java.util.List;
 import java.util.Map;
 
-public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
+public class ExpenseDAO implements DataAccessObject<ExpenseEntity, Integer> {
 
     private final DatabaseManager db;
 
@@ -24,6 +24,22 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
     @Override
     public Future<List<ExpenseEntity>> getAll() {
         return getAll(new QueryParams(Map.of(), new QueryFilters()));
+    }
+
+    @Override
+    public Future<ExpenseEntity> getById(Integer id) {
+        Promise<ExpenseEntity> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(ExpenseEntity.class)
+                .where(Map.of("expense_id", id))
+                .build();
+
+        db.executeOne(query, ExpenseEntity.class,
+                promise::complete,
+                promise::fail
+        );
+
+        return promise.future();
     }
 
     public Future<List<ExpenseEntity>> getAll(QueryParams params) {
@@ -50,7 +66,20 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
         String query = QueryBuilder.insert(expense).build();
 
         db.execute(query, ExpenseEntity.class,
-                list -> promise.complete(list.isEmpty() ? null : list.get(0)),
+                list -> promise.complete(list.isEmpty() ? null : list.getFirst()),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<ExpenseEntity> upsert(ExpenseEntity expenseEntity, String... conflictKeys) {
+        Promise<ExpenseEntity> promise = Promise.promise();
+        String query = QueryBuilder.upsert(expenseEntity, conflictKeys).build();
+
+        db.executeOne(query, ExpenseEntity.class,
+                promise::complete,
                 promise::fail
         );
 
@@ -71,15 +100,31 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity> {
     }
 
     @Override
-    public Future<ExpenseEntity> delete(Integer id) {
-        Promise<ExpenseEntity> promise = Promise.promise();
+    public Future<Boolean> delete(Integer id) {
+        Promise<Boolean> promise = Promise.promise();
         ExpenseEntity expense = new ExpenseEntity();
         expense.setExpense_id(id);
 
         String query = QueryBuilder.delete(expense).build();
 
         db.executeOne(query, ExpenseEntity.class,
-                _ -> promise.complete(expense),
+                result -> promise.complete(result != null),
+                promise::fail
+        );
+
+        return promise.future();
+    }
+
+    @Override
+    public Future<Boolean> exists(Integer id) {
+        Promise<Boolean> promise = Promise.promise();
+        String query = QueryBuilder
+                .select(ExpenseEntity.class)
+                .where(Map.of("expense_id", id))
+                .build();
+
+        db.executeOne(query, ExpenseEntity.class,
+                result -> promise.complete(result != null),
                 promise::fail
         );
 

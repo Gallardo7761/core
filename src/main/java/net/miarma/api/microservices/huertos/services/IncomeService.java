@@ -35,16 +35,7 @@ public class IncomeService {
 	}
 
 	public Future<IncomeEntity> getById(Integer id) {
-		return incomeDAO.getAll().compose(incomes -> {
-			IncomeEntity income = incomes.stream()
-				.filter(i -> i.getIncome_id().equals(id))
-				.findFirst()
-				.orElse(null);
-			if (income == null) {
-				return Future.failedFuture(new NotFoundException("Income with id " + id + " not found"));
-			}
-			return Future.succeededFuture(income);
-		});
+		return incomeDAO.getById(id);
 	}
 
 	public Future<List<IncomeEntity>> getMyIncomes(String token) {
@@ -53,23 +44,13 @@ public class IncomeService {
 			if (memberEntity == null) {
 				return Future.failedFuture(new NotFoundException("Member with id " + userId + " not found"));
 			}
-			return incomeDAO.getAll().compose(incomes -> {
-				List<IncomeEntity> myIncomes = incomes.stream()
-					.filter(i -> i.getMember_number().equals(memberEntity.getMember_number()))
-					.toList();
-				return Future.succeededFuture(myIncomes);
-			});
+			return incomeDAO.getUserIncomes(memberEntity.getMember_number());
 		});
 		
 	}
 	
 	public Future<List<IncomeEntity>> getUserPayments(Integer memberNumber) {
-		return incomeDAO.getAll().compose(incomes -> {
-			List<IncomeEntity> userPayments = incomes.stream()
-				.filter(i -> i.getMember_number().equals(memberNumber))
-				.toList();
-			return Future.succeededFuture(userPayments);
-		});
+		return incomeDAO.getUserIncomes(memberNumber);
 	}
 
 	public Future<Boolean> hasPaid(Integer memberNumber) {
@@ -103,13 +84,8 @@ public class IncomeService {
 		});
 	}
 
-	public Future<IncomeEntity> delete(Integer id) {
-		return getById(id).compose(existing -> {
-			if (existing == null) {
-				return Future.failedFuture(new NotFoundException("Income in the database"));
-			}
-			return incomeDAO.delete(id);
-		});
+	public Future<Boolean> delete(Integer id) {
+		return incomeDAO.delete(id);
 	}
 
 	

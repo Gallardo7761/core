@@ -24,7 +24,7 @@ public class BalanceService {
 			if (balanceList.isEmpty()) {
 				return Future.failedFuture(new NotFoundException("Balance in the database"));
 			}
-			return Future.succeededFuture(balanceList.get(0));
+			return Future.succeededFuture(balanceList.getFirst());
 		});
 	}
 	
@@ -33,7 +33,7 @@ public class BalanceService {
 			if (balanceList.isEmpty()) {
 				return Future.failedFuture(new NotFoundException("Balance in the database"));
 			}
-			return Future.succeededFuture(balanceList.get(0));
+			return Future.succeededFuture(balanceList.getFirst());
 		});
 	}
 

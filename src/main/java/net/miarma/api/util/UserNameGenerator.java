@@ -20,7 +20,7 @@ public class UserNameGenerator {
             hexHash.append(String.format("%02x", hash[i]));
         }
 
-        return baseName + "-" + hexHash.toString();
+        return baseName + "-" + hexHash;
     }
 }
 

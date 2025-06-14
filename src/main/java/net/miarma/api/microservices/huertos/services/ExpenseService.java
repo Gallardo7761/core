@@ -63,12 +63,12 @@ public class ExpenseService {
 		});
 	}
 
-	public Future<ExpenseEntity> delete(Integer id) {
-		return getById(id).compose(existing -> {
-			if (existing == null) {
-				return Future.failedFuture(new NotFoundException("Expense not found"));
+	public Future<Boolean> delete(Integer id) {
+		return expenseDAO.delete(id).compose(deleted -> {
+			if (!deleted) {
+				return Future.failedFuture(new NotFoundException("Expense with id " + id + " not found"));
 			}
-			return expenseDAO.delete(id);
+			return Future.succeededFuture(true);
 		});
 	}
 }

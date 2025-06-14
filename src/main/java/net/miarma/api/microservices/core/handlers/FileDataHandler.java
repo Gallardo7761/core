@@ -67,7 +67,7 @@ public class FileDataHandler {
                 .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result))
                 .onFailure(err -> JsonUtil.sendJson(ctx, ApiStatus.fromException(err), null, err.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
+            Constants.LOGGER.error(e.getMessage(), e);
             JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, e.getMessage());
         }
     }
@@ -89,7 +89,7 @@ public class FileDataHandler {
         try {
         	Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {
-        	e.printStackTrace();
+            Constants.LOGGER.error(e.getMessage(), e);
 			JsonUtil.sendJson(ctx, ApiStatus.INTERNAL_SERVER_ERROR, null, e.getMessage());
 			return;
         }

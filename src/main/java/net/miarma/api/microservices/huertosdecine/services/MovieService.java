@@ -21,11 +21,10 @@ public class MovieService {
     }
 
     public Future<MovieEntity> getById(Integer id) {
-        return movieDAO.getAll().compose(movies -> {
-            MovieEntity movie = movies.stream()
-                .filter(m -> m.getMovie_id().equals(id))
-                .findFirst()
-                .orElse(null);
+        return movieDAO.getById(id).compose(movie -> {
+            if (movie == null) {
+                return Future.failedFuture(new NotFoundException("Movie not found in the database"));
+            }
             return Future.succeededFuture(movie);
         });
     }
@@ -43,12 +42,12 @@ public class MovieService {
         });
     }
 
-    public Future<MovieEntity> delete(Integer id) {
-        return getById(id).compose(existing -> {
-            if (existing == null) {
+    public Future<Boolean> delete(Integer id) {
+        return movieDAO.delete(id).compose(deleted -> {
+            if (!deleted) {
                 return Future.failedFuture(new NotFoundException("Movie not found in the database"));
             }
-            return movieDAO.delete(id);
+            return Future.succeededFuture(true);
         });
     }
 }

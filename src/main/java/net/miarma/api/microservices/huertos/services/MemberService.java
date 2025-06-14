@@ -55,20 +55,12 @@ public class MemberService {
             if (user.getGlobal_status() != Constants.CoreUserGlobalStatus.ACTIVE) {
             	return Future.failedFuture(new ForbiddenException("User is not active"));
             }
-            
-            return userMetadataDAO.getAll().compose(metadataList -> {
-                UserMetadataEntity metadata = metadataList.stream()
-                    .filter(meta -> meta.getUser_id().equals(user.getUser_id()))
-                    .findFirst()
-                    .orElse(null);
-                
+
+
+            return userMetadataDAO.getById(user.getUser_id()).compose(metadata -> {
                 if (metadata.getStatus() != HuertosUserStatus.ACTIVE) {
 					return Future.failedFuture(new ForbiddenException("User is not active"));
 				}
-
-                if (metadata == null) {
-                    return Future.failedFuture(new NotFoundException("User metadata not found"));
-                }
 
                 MemberEntity member = new MemberEntity(user, metadata);
 
@@ -81,109 +73,87 @@ public class MemberService {
     }
     
     public Future<List<MemberEntity>> getAll() {
-		return memberDAO.getAll().compose(list -> {
-			return Future.succeededFuture(list.stream()
-					.filter(m -> !m.getType().equals(HuertosUserType.DEVELOPER))
-					.toList());
-	        });
+		return memberDAO.getAll().compose(list -> Future.succeededFuture(list.stream()
+                .filter(m -> !m.getType().equals(HuertosUserType.DEVELOPER))
+                .toList()));
 	}
 
     public Future<List<MemberEntity>> getAll(QueryParams params) {
-        return memberDAO.getAll(params).compose(list -> {
-			return Future.succeededFuture(list.stream()
-				.filter(m -> !m.getType().equals(HuertosUserType.DEVELOPER))
-				.toList());
-        });
+        return memberDAO.getAll(params).compose(list -> Future.succeededFuture(list.stream()
+            .filter(m -> !m.getType().equals(HuertosUserType.DEVELOPER))
+            .toList()));
     }
 
     public Future<MemberEntity> getById(Integer id) {
-        return memberDAO.getAll().compose(list -> {
-            MemberEntity member = list.stream()
-                .filter(m -> m.getUser_id().equals(id))
-                .findFirst()
-                .orElse(null);
-            return member != null ?
-                Future.succeededFuture(member) :
-                Future.failedFuture(new NotFoundException("Member with id " + id));
+        return memberDAO.getById(id).compose(member -> {
+            if (member == null) {
+                return Future.failedFuture(new NotFoundException("Member with id " + id));
+            }
+            return Future.succeededFuture(member);
         });
     }
 
     public Future<MemberEntity> getByMemberNumber(Integer memberNumber) {
-        return memberDAO.getAll().compose(list -> {
-            MemberEntity member = list.stream()
-                .filter(m -> m.getMember_number().equals(memberNumber))
-                .findFirst()
-                .orElse(null);
-            return member != null ?
-                Future.succeededFuture(member) :
-                Future.failedFuture(new NotFoundException("Member with number " + memberNumber));
+        return memberDAO.getByMemberNumber(memberNumber).compose(member -> {
+            if (member == null) {
+                return Future.failedFuture(new NotFoundException("Member with member number " + memberNumber));
+            }
+            return Future.succeededFuture(member);
         });
     }
 
     public Future<MemberEntity> getByPlotNumber(Integer plotNumber) {
-        return memberDAO.getAll().compose(list -> {
-            MemberEntity member = list.stream()
-                .filter(m -> m.getPlot_number().equals(plotNumber))
-                .findFirst()
-                .orElse(null);
-            return member != null ?
-                Future.succeededFuture(member) :
-                Future.failedFuture(new NotFoundException("Member with plot number " + plotNumber));
+        return memberDAO.getByPlotNumber(plotNumber).compose(member -> {
+            if (member == null) {
+                return Future.failedFuture(new NotFoundException("Member with plot number " + plotNumber));
+            }
+            return Future.succeededFuture(member);
         });
     }
 
     public Future<MemberEntity> getByEmail(String email) {
-        return memberDAO.getAll().compose(list -> {
-            MemberEntity member = list.stream()
-                .filter(m -> m.getEmail().equalsIgnoreCase(email))
-                .findFirst()
-                .orElse(null);
-            return member != null ?
-                Future.succeededFuture(member) :
-                Future.failedFuture(new NotFoundException("Member with email " + email));
+        return memberDAO.getByEmail(email).compose(member -> {
+            if (member == null) {
+                return Future.failedFuture(new NotFoundException("Member with email " + email));
+            }
+            return Future.succeededFuture(member);
         });
     }
 
     public Future<MemberEntity> getByDni(String dni) {
-        return memberDAO.getAll().compose(list -> {
-            MemberEntity member = list.stream()
-                .filter(m -> m.getDni().equals(dni))
-                .findFirst()
-                .orElse(null);
-            return member != null ?
-                Future.succeededFuture(member) :
-                Future.failedFuture(new NotFoundException("Member with dni " + dni));
+        return memberDAO.getByDni(dni).compose(member -> {
+            if (member == null) {
+                return Future.failedFuture(new NotFoundException("Member with DNI " + dni));
+            }
+            return Future.succeededFuture(member);
         });
     }
 
     public Future<MemberEntity> getByPhone(Integer phone) {
-        return memberDAO.getAll().compose(list -> {
-            MemberEntity member = list.stream()
-                .filter(m -> m.getPhone().equals(phone))
-                .findFirst()
-                .orElse(null);
-            return member != null ?
-                Future.succeededFuture(member) :
-                Future.failedFuture(new NotFoundException("Member with phone " + phone));
+        return memberDAO.getByPhone(phone).compose(member -> {
+            if (member == null) {
+                return Future.failedFuture(new NotFoundException("Member with phone " + phone));
+            }
+            return Future.succeededFuture(member);
         });
     }
 
     public Future<List<MemberEntity>> getWaitlist() {
-        return memberDAO.getAll().map(list ->
-            list.stream()
-                .filter(m -> m.getType().equals(HuertosUserType.WAIT_LIST))
-                .filter(m -> m.getStatus().equals(HuertosUserStatus.ACTIVE))
-                .toList()
-        );
+        return memberDAO.getWaitlist().compose(list -> {
+            if (list.isEmpty()) {
+                return Future.failedFuture(new NotFoundException("No members in the waitlist"));
+            }
+            return Future.succeededFuture(list);
+        });
     }
 
     public Future<Integer> getLastMemberNumber() {
-        return memberDAO.getAll().map(list ->
-            list.stream()
-                .map(MemberEntity::getMember_number)
-                .max(Integer::compareTo)
-                .orElse(0)
-        );
+        return memberDAO.getLastMemberNumber().compose(number -> {
+            if (number == null) {
+                return Future.failedFuture(new NotFoundException("No members found"));
+            }
+            return Future.succeededFuture(number);
+        });
     }
     
     public Future<Boolean> hasCollaborator(String token) {
@@ -196,10 +166,21 @@ public class MemberService {
                 return Future.succeededFuture(false);
             }
 
-            return getAll().map(users -> 
-                users.stream().anyMatch(u -> u.getType() == HuertosUserType.COLLABORATOR
-                	&& u.getPlot_number() != null && u.getPlot_number().equals(plotNumber))
-            );
+            return memberDAO.hasCollaborator(plotNumber).compose(hasCollaborator -> {
+                if (!hasCollaborator) {
+                    return Future.failedFuture(new NotFoundException("User does not have a collaborator"));
+                }
+                return Future.succeededFuture(true);
+            });
+        });
+    }
+
+    public Future<MemberEntity> getCollaborator(Integer plotNumber) {
+        return memberDAO.getCollaborator(plotNumber).compose(collaborator -> {
+            if (collaborator == null) {
+                return Future.failedFuture(new NotFoundException("No collaborator found for plot number " + plotNumber));
+            }
+            return Future.succeededFuture(collaborator);
         });
     }
     
@@ -288,10 +269,8 @@ public class MemberService {
     				member.setPassword(existing.getPassword());
     			}
 
-    			return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> {
-    				return userMetadataDAO.updateWithNulls(UserMetadataEntity.fromMemberEntity(member))
-    						.map(meta -> new MemberEntity(user, meta));
-    			});
+    			return userDAO.update(UserEntity.fromMemberEntity(member)).compose(user -> userMetadataDAO.updateWithNulls(UserMetadataEntity.fromMemberEntity(member))
+                        .map(meta -> new MemberEntity(user, meta)));
     		});
     	});
     }

@@ -12,7 +12,6 @@ import net.miarma.api.microservices.huertos.validators.PreUserValidator;
 
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class PreUserService {
 
 	private final PreUserDAO preUserDAO;
@@ -28,31 +27,19 @@ public class PreUserService {
 	}
 
 	public Future<PreUserEntity> getById(Integer id) {
-		return preUserDAO.getAll().compose(preUsers -> {
-			PreUserEntity preUser = preUsers.stream()
-				.filter(p -> p.getPre_user_id().equals(id))
-				.findFirst()
-				.orElse(null);
-
+		return preUserDAO.getById(id).compose(preUser -> {
 			if (preUser == null) {
 				return Future.failedFuture(new NotFoundException("PreUser with id " + id));
 			}
-
 			return Future.succeededFuture(preUser);
 		});
 	}
 	
 	public Future<PreUserEntity> getByRequestId(Integer requestId) {
-		return preUserDAO.getAll().compose(preUsers -> {
-			PreUserEntity preUser = preUsers.stream()
-				.filter(p -> p.getRequest_id().equals(requestId))
-				.findFirst()
-				.orElse(null);
-
+		return preUserDAO.getByRequestId(requestId).compose(preUser -> {
 			if (preUser == null) {
 				return Future.failedFuture(new NotFoundException("PreUser with request id " + requestId));
 			}
-
 			return Future.succeededFuture(preUser);
 		});
 	}
@@ -77,19 +64,20 @@ public class PreUserService {
 	}
 	
 	public Future<PreUserEntity> update(PreUserEntity preUser) {
-		return getById(preUser.getPre_user_id()).compose(existing -> {
-			return preUserValidator.validate(preUser, true).compose(validation -> {
-				if (!validation.isValid()) {
-				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
-				}
-				return preUserDAO.update(preUser);
-			});
-		});
+		return getById(preUser.getPre_user_id()).compose(existing -> preUserValidator.validate(preUser, true).compose(validation -> {
+            if (!validation.isValid()) {
+                return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+            }
+            return preUserDAO.update(preUser);
+        }));
 	}
 
-	public Future<PreUserEntity> delete(Integer id) {
-		return getById(id).compose(existing -> {
-			return preUserDAO.delete(id);
+	public Future<Boolean> delete(Integer id) {
+		return preUserDAO.delete(id).compose(deleted -> {
+			if (!deleted) {
+				return Future.failedFuture(new NotFoundException("PreUser with id " + id));
+			}
+			return Future.succeededFuture(true);
 		});
 	}
 }

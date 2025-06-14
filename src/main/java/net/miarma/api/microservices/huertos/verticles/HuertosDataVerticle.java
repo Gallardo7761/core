@@ -91,7 +91,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
                 case "getUserPayments" -> incomeService.getUserPayments(body.getInteger("memberNumber"))
                     .onSuccess(payments -> {
                     	String paymentsJson = payments.stream()
-							.map(payment -> Constants.GSON.toJson(payment))
+							.map(Constants.GSON::toJson)
 							.collect(Collectors.joining(",", "[", "]"));
 						message.reply(new JsonArray(paymentsJson));
                     })
@@ -105,7 +105,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
 	                memberService.getWaitlist()
 	                    .onSuccess(list -> {
 	                    	String listJson = list.stream()
-	                    			.map(member -> Constants.GSON.toJson(member))
+	                    			.map(Constants.GSON::toJson)
 	                    			.collect(Collectors.joining(",", "[", "]"));
 	                        message.reply(new JsonArray(listJson));
 	                    })
@@ -133,7 +133,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
 										json.remove("global_role");
 										return json;
 									})
-									.map(member -> Constants.GSON.toJson(member))
+									.map(Constants.GSON::toJson)
 									.collect(Collectors.joining(",", "[", "]"));
 							message.reply(new JsonArray(listJson));
 						})
@@ -153,7 +153,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
                 case "getRequestsWithPreUsers" -> requestService.getRequestsWithPreUsers()
 					.onSuccess(requests -> {
 						String requestsJson = requests.stream()
-								.map(request -> Constants.GSON.toJson(request))
+								.map(Constants.GSON::toJson)
 								.collect(Collectors.joining(",", "[", "]"));
 						message.reply(new JsonArray(requestsJson));
 					})
@@ -180,7 +180,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
                 case "getMyIncomes" -> incomeService.getMyIncomes(body.getString("token"))
 					.onSuccess(incomes -> {
 						String incomesJson = incomes.stream()
-								.map(income -> Constants.GSON.toJson(income))
+								.map(Constants.GSON::toJson)
 								.collect(Collectors.joining(",", "[", "]"));
 						message.reply(new JsonArray(incomesJson));
 						})
@@ -189,7 +189,7 @@ public class HuertosDataVerticle extends AbstractVerticle {
                 case "getMyRequests" -> requestService.getMyRequests(body.getString("token"))
 					.onSuccess(requests -> {
 						String requestsJson = requests.stream()
-								.map(request -> Constants.GSON.toJson(request))
+								.map(Constants.GSON::toJson)
 								.collect(Collectors.joining(",", "[", "]"));
 						message.reply(new JsonArray(requestsJson));
 					})

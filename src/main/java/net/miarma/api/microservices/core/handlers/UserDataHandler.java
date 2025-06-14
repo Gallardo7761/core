@@ -22,9 +22,7 @@ public class UserDataHandler {
     	QueryParams params = QueryParams.from(ctx);
     	
         userService.getAll(params)
-	        .onSuccess(users -> {
-	            JsonUtil.sendJson(ctx, ApiStatus.OK, users);
-	        }).onFailure(err -> {
+	        .onSuccess(users -> JsonUtil.sendJson(ctx, ApiStatus.OK, users)).onFailure(err -> {
 	        	ApiStatus status = ApiStatus.fromException(err);
 	        	JsonUtil.sendJson(ctx, status, null, err.getMessage());
 	        });
@@ -34,9 +32,7 @@ public class UserDataHandler {
         Integer userId = Integer.parseInt(ctx.pathParam("user_id"));
         
         userService.getById(userId)
-	        .onSuccess(user -> {
-	            JsonUtil.sendJson(ctx, ApiStatus.OK, user);
-	        }).onFailure(err -> {
+	        .onSuccess(user -> JsonUtil.sendJson(ctx, ApiStatus.OK, user)).onFailure(err -> {
 	            ApiStatus status = ApiStatus.fromException(err);
 				JsonUtil.sendJson(ctx, status, null, err.getMessage());
 	        });
@@ -46,9 +42,7 @@ public class UserDataHandler {
         UserEntity user = Constants.GSON.fromJson(ctx.body().asString(), UserEntity.class);
         
         userService.register(user)
-	        .onSuccess(result -> {
-	            JsonUtil.sendJson(ctx, ApiStatus.CREATED, result);
-	        }).onFailure(err -> {
+	        .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.CREATED, result)).onFailure(err -> {
 	            ApiStatus status = ApiStatus.fromException(err);
 				JsonUtil.sendJson(ctx, status, null, err.getMessage());
 	        });
@@ -58,9 +52,7 @@ public class UserDataHandler {
         UserEntity user = Constants.GSON.fromJson(ctx.body().asString(), UserEntity.class);
         
         userService.update(user)
-	        .onSuccess(result -> {
-	            JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, result);
-	        }).onFailure(err -> {
+	        .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, result)).onFailure(err -> {
 	            ApiStatus status = ApiStatus.fromException(err);
 				JsonUtil.sendJson(ctx, status, null, err.getMessage());
 	        });
@@ -70,9 +62,7 @@ public class UserDataHandler {
         Integer userId = Integer.parseInt(ctx.pathParam("user_id"));
         
         userService.delete(userId)
-	        .onSuccess(result -> {
-	            JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, result);
-	        }).onFailure(err -> {
+	        .onSuccess(result -> JsonUtil.sendJson(ctx, ApiStatus.NO_CONTENT, result)).onFailure(err -> {
 	            ApiStatus status = ApiStatus.fromException(err);
 				JsonUtil.sendJson(ctx, status, null, err.getMessage());
 	        });

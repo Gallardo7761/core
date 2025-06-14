@@ -1,13 +1,11 @@
 package net.miarma.api.microservices.huertosdecine.services;
 
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.microservices.huertosdecine.dao.VoteDAO;
-import net.miarma.api.microservices.huertosdecine.entities.MovieEntity;
 import net.miarma.api.microservices.huertosdecine.entities.VoteEntity;
 
 import java.util.List;
@@ -28,11 +26,11 @@ public class VoteService {
     }
 
     public Future<List<VoteEntity>> getVotesByMovieId(Integer movieId) {
-        return voteDAO.getAll().compose(list -> {
-           List<VoteEntity> votes = list.stream()
-                .filter(v -> v.getMovie_id().equals(movieId))
-                .toList();
-            return Future.succeededFuture(votes);
+        return voteDAO.getVotesByMovieId(movieId).compose(list -> {
+            if (list.isEmpty()) {
+                return Future.failedFuture(new NotFoundException("No votes found for the specified movie ID"));
+            }
+            return Future.succeededFuture(list);
         });
     }
 
@@ -40,7 +38,7 @@ public class VoteService {
         return voteDAO.upsert(vote);
     }
 
-    public Future<VoteEntity> delete(Integer userId) {
+    public Future<Boolean> delete(Integer userId) {
         return getByUserId(userId).compose(existing -> {
             if (existing == null) {
                 return Future.failedFuture(new NotFoundException("Vote not found in the database"));

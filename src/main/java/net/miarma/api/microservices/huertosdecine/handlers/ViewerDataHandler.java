@@ -11,7 +11,7 @@ import net.miarma.api.microservices.huertosdecine.services.ViewerService;
 import net.miarma.api.util.JsonUtil;
 
 public class ViewerDataHandler {
-    private ViewerService viewerService;
+    private final ViewerService viewerService;
 
     public ViewerDataHandler(Pool pool) {
         this.viewerService = new ViewerService(pool);

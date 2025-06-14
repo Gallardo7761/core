@@ -84,7 +84,7 @@ public class CineDataVerticle extends AbstractVerticle {
                 case "getVotes" -> voteService.getVotesByMovieId(body.getInteger("movie_id"))
                         .onSuccess(votes -> {
                             String votesJson = votes.stream()
-                                    .map(vote -> Constants.GSON.toJson(vote))
+                                    .map(Constants.GSON::toJson)
                                     .collect(Collectors.joining(",", "[", "]"));
                             message.reply(new JsonArray(votesJson));
                         })

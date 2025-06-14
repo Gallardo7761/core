@@ -56,23 +56,17 @@ public class MMCDataVerticle extends AbstractVerticle {
                         .onFailure(EventBusUtil.fail(message));
 				}
 			
-				case "getStatus" -> {
-					playerService.getStatus(body.getInteger("playerId"))
-						.onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
-						.onFailure(EventBusUtil.fail(message));
-				}
+				case "getStatus" -> playerService.getStatus(body.getInteger("playerId"))
+                    .onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
+                    .onFailure(EventBusUtil.fail(message));
 				
-				case "getRole" -> {
-					playerService.getRole(body.getInteger("playerId"))
-						.onSuccess(role -> message.reply(new JsonObject(Constants.GSON.toJson(role))))
-						.onFailure(EventBusUtil.fail(message));
-				}
+				case "getRole" -> playerService.getRole(body.getInteger("playerId"))
+                    .onSuccess(role -> message.reply(new JsonObject(Constants.GSON.toJson(role))))
+                    .onFailure(EventBusUtil.fail(message));
 				
-				case "getAvatar" -> {
-					playerService.getAvatar(body.getInteger("playerId"))
-						.onSuccess(avatar -> message.reply(new JsonObject(Constants.GSON.toJson(avatar))))
-						.onFailure(EventBusUtil.fail(message));
-				}
+				case "getAvatar" -> playerService.getAvatar(body.getInteger("playerId"))
+                    .onSuccess(avatar -> message.reply(new JsonObject(Constants.GSON.toJson(avatar))))
+                    .onFailure(EventBusUtil.fail(message));
 				
 				case "updateStatus" -> {
 					MMCUserStatus status = MMCUserStatus.fromInt(body.getInteger("status"));
@@ -95,17 +89,13 @@ public class MMCDataVerticle extends AbstractVerticle {
 						.onFailure(EventBusUtil.fail(message));
 				}
 				
-				case "playerExists" -> {
-					playerService.playerExists(body.getInteger("playerId"))
-						.onSuccess(exists -> message.reply(new JsonObject(Constants.GSON.toJson(exists))))
-						.onFailure(EventBusUtil.fail(message));
-				}
+				case "playerExists" -> playerService.playerExists(body.getInteger("playerId"))
+                    .onSuccess(exists -> message.reply(new JsonObject(Constants.GSON.toJson(exists))))
+                    .onFailure(EventBusUtil.fail(message));
 				
-				case "getInfo" -> {
-					playerService.getInfo(body.getString("token"))
-						.onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
-						.onFailure(EventBusUtil.fail(message));
-				}
+				case "getInfo" -> playerService.getInfo(body.getString("token"))
+                    .onSuccess(player -> message.reply(new JsonObject(Constants.GSON.toJson(player))))
+                    .onFailure(EventBusUtil.fail(message));
 		
 				default -> EventBusUtil.fail(message).handle(new IllegalArgumentException("Unknown action: " + action));
 			}

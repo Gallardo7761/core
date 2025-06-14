@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 /**
  * Clase utilitaria para construir queries SQL dinámicamente mediante reflexión,
  * usando entidades anotadas con {@link Table}.
- *
+ * <p>
  * Soporta operaciones SELECT, INSERT, UPDATE (con y sin valores nulos), y UPSERT.
  * También permite aplicar filtros desde un mapa o directamente desde un objeto.
- *
+ * <p>
  * ¡Ojo! No ejecuta la query, solo la construye.
  *
  * @author José Manuel Amador Gallardo
@@ -65,6 +65,15 @@ public class QueryBuilder {
             }
         }
         return fieldValue;
+    }
+
+    /**
+     * Escapa los caracteres especiales en una cadena para evitar inyecciones SQL.
+     * @param value the string value to escape
+     * @return the escaped string
+     */
+    private static String escapeSql(String value) {
+        return value.replace("'", "''");
     }
 
     /**
@@ -124,7 +133,7 @@ public class QueryBuilder {
             String value = entry.getValue();
 
             if (!validFields.contains(key)) {
-                Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + key);
+                Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: {}", key);
                 continue;
             }
 
@@ -170,7 +179,7 @@ public class QueryBuilder {
                 if (fieldValue != null) {
                     String key = field.getName();
                     if (!validFields.contains(key)) {
-                        Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: " + key);
+                        Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en WHERE: {}", key);
                         continue;
                     }
                     Object value = extractValue(fieldValue);
@@ -181,7 +190,7 @@ public class QueryBuilder {
                     }
                 }
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+                Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
         qb.query.append(joiner).append(" ");
@@ -215,7 +224,7 @@ public class QueryBuilder {
                 if (fieldValue != null) {
                     Object value = extractValue(fieldValue);
                     if (value instanceof String || value instanceof LocalDateTime) {
-                        values.add("'" + value + "'");
+                        values.add("'" + escapeSql((String) value) + "'");
                     } else {
                         values.add(value.toString());
                     }
@@ -223,7 +232,7 @@ public class QueryBuilder {
                     values.add("NULL");
                 }
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+                Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
         qb.query.append(columns).append(") ");
@@ -273,7 +282,7 @@ public class QueryBuilder {
                 setJoiner.add(fieldName + " = " + (value instanceof String
                 		|| value instanceof LocalDateTime ? "'" + value + "'" : value));
             } catch (Exception e) {
-                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+                Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
 
@@ -327,7 +336,7 @@ public class QueryBuilder {
                     setJoiner.add(fieldName + " = " + (value instanceof String || value instanceof LocalDateTime ? "'" + value + "'" : value));
                 }
             } catch (Exception e) {
-                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+                Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
 
@@ -378,7 +387,7 @@ public class QueryBuilder {
                 }
 
             } catch (Exception e) {
-                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+                Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
 
@@ -420,7 +429,7 @@ public class QueryBuilder {
                     		|| value instanceof LocalDateTime ? "'" + value + "'" : value.toString()));
                 }
             } catch (Exception e) {
-                Constants.LOGGER.error("(REFLECTION) Error reading field: " + e.getMessage());
+                Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
 
@@ -444,15 +453,13 @@ public class QueryBuilder {
                     .anyMatch(f -> f.equals(c));
 
                 if (!isValid) {
-                    Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en ORDER BY: " + c);
+                    Constants.LOGGER.warn("[QueryBuilder] Ignorando campo invalido en ORDER BY: {}", c);
                     return;
                 }
             }
 
             sort = "ORDER BY " + c + " ";
-            order.ifPresent(o -> {
-                sort += o.equalsIgnoreCase("asc") ? "ASC" : "DESC" + " ";
-            });
+            order.ifPresent(o -> sort += o.equalsIgnoreCase("asc") ? "ASC" : "DESC" + " ");
         });
         return this;
     }

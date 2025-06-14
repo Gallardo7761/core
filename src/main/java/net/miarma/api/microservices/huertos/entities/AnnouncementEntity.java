@@ -8,18 +8,18 @@ import net.miarma.api.common.db.AbstractEntity;
 import java.time.LocalDateTime;
 
 @Table("huertos_announces")
-public class AnnounceEntity extends AbstractEntity {
+public class AnnouncementEntity extends AbstractEntity {
 	private Integer announce_id;
 	private String body;
 	private HuertosAnnouncePriority priority;
 	private Integer published_by;
 	private LocalDateTime created_at;
 	
-	public AnnounceEntity() {
+	public AnnouncementEntity() {
 		super();
 	}
 	
-	public AnnounceEntity(Row row) {
+	public AnnouncementEntity(Row row) {
 		super(row);
 	}
 	

@@ -117,32 +117,29 @@ public class UserService {
     }
 
     public Future<UserEntity> getById(Integer id) {
-        return userDAO.getAll().compose(users -> {
-            UserEntity found = users.stream()
-                .filter(user -> user.getUser_id().equals(id))
-                .findFirst()
-                .orElse(null);
-            return Future.succeededFuture(found);
+        return userDAO.getById(id).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(new NotFoundException("User not found in the database"));
+            }
+            return Future.succeededFuture(user);
         });
     }
 
     public Future<UserEntity> getByEmail(String email) {
-        return userDAO.getAll().compose(users -> {
-            UserEntity found = users.stream()
-        		.filter(user -> user.getEmail() != null && user.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
-            return Future.succeededFuture(found);
+        return userDAO.getByEmail(email).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(new NotFoundException("User not found in the database"));
+            }
+            return Future.succeededFuture(user);
         });
     }
 
     public Future<UserEntity> getByUserName(String userName) {
-        return userDAO.getAll().compose(users -> {
-            UserEntity found = users.stream()
-                .filter(user -> user.getUser_name() != null && user.getUser_name().equals(userName))
-                .findFirst()
-                .orElse(null);
-            return Future.succeededFuture(found);
+        return userDAO.getByUserName(userName).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture(new NotFoundException("User not found in the database"));
+            }
+            return Future.succeededFuture(user);
         });
     }
 
@@ -189,12 +186,24 @@ public class UserService {
 		});
     }
 
-    public Future<UserEntity> delete(Integer id) {
-        return getById(id).compose(user -> {
-            if (user == null) {
+    public Future<UserEntity> upsert(UserEntity user) {
+        return userValidator.validate(user).compose(validation -> {
+            if (!validation.isValid()) {
+                return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+            }
+            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+                user.setPassword(PasswordHasher.hash(user.getPassword()));
+            }
+            return userDAO.upsert(user, "user_id", "email", "user_name");
+        });
+    }
+
+    public Future<Boolean> delete(Integer id) {
+        return userDAO.delete(id).compose(deleted -> {
+            if (!deleted) {
                 return Future.failedFuture(new NotFoundException("User not found in the database"));
             }
-            return userDAO.delete(id);
+            return Future.succeededFuture(true);
         });
     }
 }

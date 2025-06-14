@@ -48,7 +48,7 @@ public class MainVerticle extends AbstractVerticle {
 	}
 
 	@Override
-	public void stop(Promise<Void> stopPromise) throws Exception {
+	public void stop(Promise<Void> stopPromise) {
 		vertx.deploymentIDs().forEach(id -> vertx.undeploy(id));
 		stopPromise.complete();
 	}

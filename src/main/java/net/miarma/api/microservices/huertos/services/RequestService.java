@@ -17,9 +17,7 @@ import net.miarma.api.microservices.huertos.entities.ViewRequestsWithPreUsers;
 import net.miarma.api.microservices.huertos.validators.RequestValidator;
 
 import java.util.List;
-import java.util.Objects;
 
-@SuppressWarnings("unused")
 public class RequestService {
 
 	private final RequestDAO requestDAO;
@@ -34,7 +32,6 @@ public class RequestService {
 		this.memberService = new MemberService(pool);
 	}
 
-	
 	public Future<List<RequestEntity>> getAll() {
 		return requestDAO.getAll();
 	}
@@ -44,16 +41,10 @@ public class RequestService {
 	}
 
 	public Future<RequestEntity> getById(Integer id) {
-		return requestDAO.getAll().compose(requests -> {
-			RequestEntity request = requests.stream()
-				.filter(r -> r.getRequest_id().equals(id))
-				.findFirst()
-				.orElse(null);
-
+		return requestDAO.getById(id).compose(request -> {
 			if (request == null) {
 				return Future.failedFuture(new NotFoundException("Request with id " + id));
 			}
-
 			return Future.succeededFuture(request);
 		});
 	}
@@ -63,45 +54,34 @@ public class RequestService {
 	}
 	
 	public Future<ViewRequestsWithPreUsers> getRequestWithPreUserById(Integer id) {
-		return requestDAO.getRequestsWithPreUsers().compose(requests -> {
-			ViewRequestsWithPreUsers request = requests.stream()
-				.filter(r -> r.getRequest_id().equals(id))
-				.findFirst()
-				.orElse(null);
-
+		return requestDAO.getRequestWithPreUserById(id).compose(request -> {
 			if (request == null) {
 				return Future.failedFuture(new NotFoundException("Request with id " + id));
 			}
-
 			return Future.succeededFuture(request);
 		});
 	}
 	
 	public Future<Integer> getRequestCount() {
-		return requestDAO.getAll().compose(requests -> {
-			return Future.succeededFuture(requests.stream()
-				.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
-				.mapToInt(r -> 1)
-				.sum());
-		});
+		return requestDAO.getAll().compose(requests -> Future.succeededFuture(requests.stream()
+            .filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
+            .mapToInt(r -> 1)
+            .sum()));
 	}
 	
 	public Future<List<RequestEntity>> getMyRequests(String token) {
 	    Integer userId = JWTManager.getInstance().getUserId(token);
-	    return requestDAO.getAll().compose(requests -> {
-	        List<RequestEntity> myRequests = requests.stream()
-	            .filter(r -> userId.equals(r.getRequested_by()))
-	            .toList();
-
-	        return Future.succeededFuture(myRequests);
+	    return requestDAO.getByUserId(userId).compose(requests -> {
+			if (requests == null || requests.isEmpty()) {
+	            return Future.failedFuture(new NotFoundException("No requests found for user with id " + userId));
+	        }
+	        return Future.succeededFuture(requests);
 	    });
 	}
 	
 	public Future<Boolean> hasCollaboratorRequest(String token) {
-	    Integer userId = JWTManager.getInstance().getUserId(token);
-	    return getAll().compose(requests -> {
+	    return getMyRequests(token).compose(requests -> {
 	        boolean result = requests.stream()
-	            .filter(r -> Objects.equals(r.getRequested_by(), userId))
 	            .filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
 	            .anyMatch(r -> r.getType() == HuertosRequestType.ADD_COLLABORATOR);
 	        return Future.succeededFuture(result);
@@ -109,13 +89,9 @@ public class RequestService {
 	}
     
 	public Future<Boolean> hasGreenHouseRequest(String token) {
-		Integer userId = JWTManager.getInstance().getUserId(token);
-		return getAll().compose(requests -> {
-			return Future.succeededFuture(requests.stream()
-					.filter(r -> Objects.equals(r.getRequested_by(), userId))
-					.filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
-					.anyMatch(r -> r.getType() == HuertosRequestType.ADD_GREENHOUSE));
-		});
+		return getMyRequests(token).compose(requests -> Future.succeededFuture(requests.stream()
+                .filter(r -> r.getStatus() == HuertosRequestStatus.PENDING)
+                .anyMatch(r -> r.getType() == HuertosRequestType.ADD_GREENHOUSE)));
 	}
 
 	public Future<RequestEntity> create(RequestEntity request) {
@@ -128,19 +104,20 @@ public class RequestService {
 	}
 
 	public Future<RequestEntity> update(RequestEntity request) {
-		return getById(request.getRequest_id()).compose(existing -> {
-			return requestValidator.validate(request).compose(validation -> {
-				if (!validation.isValid()) {
-				    return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
-				}
-				return requestDAO.update(request);
-			});
-		});
+		return getById(request.getRequest_id()).compose(existing -> requestValidator.validate(request).compose(validation -> {
+            if (!validation.isValid()) {
+                return Future.failedFuture(new ValidationException(Constants.GSON.toJson(validation.getErrors())));
+            }
+            return requestDAO.update(request);
+        }));
 	}
 
-	public Future<RequestEntity> delete(Integer id) {
-		return getById(id).compose(existing -> {
-			return requestDAO.delete(id);
+	public Future<Boolean> delete(Integer id) {
+		return requestDAO.delete(id).compose(deleted -> {
+			if (!deleted) {
+				return Future.failedFuture(new NotFoundException("Request with id " + id));
+			}
+			return Future.succeededFuture(true);
 		});
 	}
 	
@@ -149,69 +126,50 @@ public class RequestService {
 	    request.setRequest_id(id);
 	    request.setStatus(HuertosRequestStatus.APPROVED);
 
-	    return requestDAO.update(request).compose(updatedRequest -> {
-	        return getById(id).compose(fullRequest -> {
-	            HuertosRequestType type = fullRequest.getType();
+	    return requestDAO.update(request).compose(updatedRequest -> getById(id).compose(fullRequest -> {
+            HuertosRequestType type = fullRequest.getType();
 
-	            switch (type) {
-	                case ADD_COLLABORATOR:
-	                case REGISTER:
-	                    return preUserService.getByRequestId(id).compose(preUser -> {
-	                        if (preUser == null) {
-	                            return Future.failedFuture("No se encontró preusuario asociado.");
-	                        }
+            return switch (type) {
+                case ADD_COLLABORATOR, REGISTER -> preUserService.getByRequestId(id).compose(preUser -> {
+                    if (preUser == null) {
+                        return Future.failedFuture("PreUser not found for request id " + id);
+                    }
 
-	                        return memberService.createFromPreUser(preUser).compose(createdUser ->
-	                            preUserService.delete(preUser.getPre_user_id()).map(v -> fullRequest)
-	                        );
-	                    });
-	                    
-	                case UNREGISTER:
-	                	return memberService.changeMemberStatus(fullRequest.getRequested_by(), HuertosUserStatus.INACTIVE)
-	                			.map(v -> fullRequest);
-	                	
-	                case REMOVE_COLLABORATOR:
-	                    return memberService.getById(fullRequest.getRequested_by()).compose(requestingMember -> {
-	                    	Integer plotNumber = requestingMember.getPlot_number();
+                    return memberService.createFromPreUser(preUser).compose(createdUser ->
+                            preUserService.delete(preUser.getPre_user_id()).map(v -> fullRequest)
+                    );
+                });
+                case UNREGISTER ->
+                        memberService.changeMemberStatus(fullRequest.getRequested_by(), HuertosUserStatus.INACTIVE)
+                                .map(v -> fullRequest);
+                case REMOVE_COLLABORATOR ->
+                        memberService.getById(fullRequest.getRequested_by()).compose(requestingMember -> {
+                            Integer plotNumber = requestingMember.getPlot_number();
 
-	                        if (plotNumber == null) {
-	                            return Future.failedFuture("El miembro solicitante no tiene parcela asignada.");
-	                        }
+                            return memberService.getCollaborator(plotNumber).compose(collaborator -> {
+                                if (collaborator == null) {
+                                    return Future.failedFuture("No collaborator found for plot number " + plotNumber);
+                                }
 
-	                        return memberService.getAll().compose(members -> {
-	                            return members.stream()
-	                                .filter(m -> m.getPlot_number() != null)
-	                                .filter(m -> m.getPlot_number().equals(plotNumber))
-	                                .filter(m -> m.getType() == HuertosUserType.COLLABORATOR)
-	                                .findFirst()
-	                                .map(collab -> memberService.changeMemberStatus(collab.getUser_id(), HuertosUserStatus.INACTIVE)
-	                                        .map(v -> fullRequest))
-	                                .orElse(Future.failedFuture("No se encontró colaborador para esa parcela."));
-	                        });
-	                    });
-
-	                case ADD_GREENHOUSE:
-	                    return memberService.changeMemberType(fullRequest.getRequested_by(), HuertosUserType.WITH_GREENHOUSE)
-	                            .map(v -> fullRequest);
-
-	                case REMOVE_GREENHOUSE:
-	                    return memberService.changeMemberType(fullRequest.getRequested_by(), HuertosUserType.MEMBER)
-	                            .map(v -> fullRequest);
-
-	                default:
-	                    return Future.succeededFuture(fullRequest);
-	            }
-	        });
-	    });
+                                return memberService.changeMemberStatus(collaborator.getUser_id(), HuertosUserStatus.INACTIVE)
+                                        .map(v -> fullRequest);
+                            });
+                        });
+                case ADD_GREENHOUSE ->
+                        memberService.changeMemberType(fullRequest.getRequested_by(), HuertosUserType.WITH_GREENHOUSE)
+                                .map(v -> fullRequest);
+                case REMOVE_GREENHOUSE ->
+                        memberService.changeMemberType(fullRequest.getRequested_by(), HuertosUserType.MEMBER)
+                                .map(v -> fullRequest);
+            };
+        }));
 	}
 
 	public Future<RequestEntity> rejectRequest(Integer id) {
 		RequestEntity request = new RequestEntity();
 		request.setRequest_id(id);
 		request.setStatus(HuertosRequestStatus.REJECTED);
-		return requestDAO.update(request).compose(updatedRequest -> {
-			return getById(id);
-		});
+		return requestDAO.update(request);
 	}
 	
 }
