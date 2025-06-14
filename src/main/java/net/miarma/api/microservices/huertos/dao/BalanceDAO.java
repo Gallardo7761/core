@@ -38,7 +38,7 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity, Integer> {
         Promise<BalanceEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(BalanceEntity.class)
-                .where(Map.of("id", id))
+                .where(Map.of("id", id.toString()))
                 .build();
 
         db.executeOne(query, BalanceEntity.class,
@@ -121,7 +121,7 @@ public class BalanceDAO implements DataAccessObject<BalanceEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(BalanceEntity.class)
-                .where(Map.of("id", id))
+                .where(Map.of("id", id.toString()))
                 .build();
 
         db.executeOne(query, BalanceEntity.class,

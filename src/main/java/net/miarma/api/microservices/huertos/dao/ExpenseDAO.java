@@ -31,7 +31,7 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity, Integer> {
         Promise<ExpenseEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(ExpenseEntity.class)
-                .where(Map.of("expense_id", id))
+                .where(Map.of("expense_id", id.toString()))
                 .build();
 
         db.executeOne(query, ExpenseEntity.class,
@@ -120,7 +120,7 @@ public class ExpenseDAO implements DataAccessObject<ExpenseEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(ExpenseEntity.class)
-                .where(Map.of("expense_id", id))
+                .where(Map.of("expense_id", id.toString()))
                 .build();
 
         db.executeOne(query, ExpenseEntity.class,

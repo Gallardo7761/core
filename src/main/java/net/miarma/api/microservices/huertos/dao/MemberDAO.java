@@ -33,7 +33,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<MemberEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("user_id", id))
+                .where(Map.of("user_id", id.toString()))
                 .build();
 
         db.executeOne(query, MemberEntity.class,
@@ -64,7 +64,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<MemberEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("member_number", memberNumber))
+                .where(Map.of("member_number", memberNumber.toString()))
                 .build();
 
         db.executeOne(query, MemberEntity.class,
@@ -79,7 +79,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<MemberEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("plot_number", plotNumber))
+                .where(Map.of("plot_number", plotNumber.toString()))
                 .build();
 
         db.executeOne(query, MemberEntity.class,
@@ -124,7 +124,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<MemberEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("phone", phone))
+                .where(Map.of("phone", phone.toString()))
                 .build();
 
         db.executeOne(query, MemberEntity.class,
@@ -139,7 +139,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<List<MemberEntity>> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("type", 0, "status", Constants.HuertosUserStatus.ACTIVE.getValue()))
+                .where(Map.of("type", "0", "status", String.valueOf(Constants.HuertosUserStatus.ACTIVE.getValue())))
                 .build();
 
         db.execute(query, MemberEntity.class,
@@ -170,7 +170,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("plot_number", plotNumber, "type", Constants.HuertosUserType.COLLABORATOR.getValue()))
+                .where(Map.of("plot_number", plotNumber.toString(), "type", String.valueOf(Constants.HuertosUserType.COLLABORATOR.getValue())))
                 .build();
 
         db.executeOne(query, MemberEntity.class,
@@ -185,7 +185,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<MemberEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("plot_number", plotNumber, "type", Constants.HuertosUserType.COLLABORATOR.getValue()))
+                .where(Map.of("plot_number", plotNumber.toString(), "type", String.valueOf(Constants.HuertosUserType.COLLABORATOR.getValue())))
                 .build();
 
         db.executeOne(query, MemberEntity.class,
@@ -221,7 +221,7 @@ public class MemberDAO implements DataAccessObject<MemberEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MemberEntity.class)
-                .where(Map.of("user_id", id))
+                .where(Map.of("user_id", id.toString()))
                 .build();
 
         db.executeOne(query, MemberEntity.class,

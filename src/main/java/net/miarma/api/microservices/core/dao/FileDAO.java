@@ -31,7 +31,7 @@ public class FileDAO implements DataAccessObject<FileEntity, Integer> {
         Promise<FileEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(FileEntity.class)
-                .where(Map.of("file_id", id))
+                .where(Map.of("file_id", id.toString()))
                 .build();
 
         db.executeOne(query, FileEntity.class,
@@ -64,7 +64,7 @@ public class FileDAO implements DataAccessObject<FileEntity, Integer> {
         Promise<List<FileEntity>> promise = Promise.promise();
         String query = QueryBuilder
                 .select(FileEntity.class)
-                .where(Map.of("uploaded_by", userId))
+                .where(Map.of("uploaded_by", userId.toString()))
                 .build();
 
         db.execute(query, FileEntity.class,
@@ -119,7 +119,7 @@ public class FileDAO implements DataAccessObject<FileEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(FileEntity.class)
-                .where(Map.of("file_id", id))
+                .where(Map.of("file_id", id.toString()))
                 .build();
 
         db.executeOne(query, FileEntity.class,

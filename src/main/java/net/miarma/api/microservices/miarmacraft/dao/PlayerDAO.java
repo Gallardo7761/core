@@ -31,7 +31,7 @@ public class PlayerDAO implements DataAccessObject<PlayerEntity, Integer> {
         Promise<PlayerEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(PlayerEntity.class)
-                .where(Map.of("user_id", integer))
+                .where(Map.of("user_id", integer.toString()))
                 .build();
 
         db.executeOne(query, PlayerEntity.class,
@@ -86,7 +86,7 @@ public class PlayerDAO implements DataAccessObject<PlayerEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(PlayerEntity.class)
-                .where(Map.of("user_id", integer))
+                .where(Map.of("user_id", integer.toString()))
                 .build();
 
         db.executeOne(query, PlayerEntity.class,

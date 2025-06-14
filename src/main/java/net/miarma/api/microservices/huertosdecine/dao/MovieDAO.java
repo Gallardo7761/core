@@ -31,7 +31,7 @@ public class MovieDAO implements DataAccessObject<MovieEntity, Integer> {
         Promise<MovieEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MovieEntity.class)
-                .where(Map.of("movie_id", id))
+                .where(Map.of("movie_id", id.toString()))
                 .build();
 
         db.executeOne(query, MovieEntity.class,
@@ -142,7 +142,7 @@ public class MovieDAO implements DataAccessObject<MovieEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(MovieEntity.class)
-                .where( Map.of("movie_id", id))
+                .where( Map.of("movie_id", id.toString()))
                 .build();
 
         db.executeOne(query, MovieEntity.class,

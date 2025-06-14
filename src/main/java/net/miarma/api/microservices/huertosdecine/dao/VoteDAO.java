@@ -31,7 +31,7 @@ public class VoteDAO implements DataAccessObject<VoteEntity, Integer> {
         Promise<VoteEntity> promise = Promise.promise();
         String query = QueryBuilder
             .select(VoteEntity.class)
-            .where(Map.of("movie_id", integer))
+            .where(Map.of("movie_id", integer.toString()))
             .build();
 
         db.executeOne(query, VoteEntity.class,
@@ -64,7 +64,7 @@ public class VoteDAO implements DataAccessObject<VoteEntity, Integer> {
         Promise<List<VoteEntity>> promise = Promise.promise();
         String query = QueryBuilder
             .select(VoteEntity.class)
-            .where(Map.of("movie_id", movieId))
+            .where(Map.of("movie_id", movieId.toString()))
             .build();
 
         db.execute(query, VoteEntity.class,
@@ -171,7 +171,7 @@ public class VoteDAO implements DataAccessObject<VoteEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
             .select(VoteEntity.class)
-            .where(Map.of("movie_id", integer))
+            .where(Map.of("movie_id", integer.toString()))
             .build();
 
         db.executeOne(query, VoteEntity.class,

@@ -32,7 +32,7 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity, Integer> {
         Promise<IncomeEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(IncomeEntity.class)
-                .where(Map.of("income_id", id))
+                .where(Map.of("income_id", id.toString()))
                 .build();
 
         db.executeOne(query, IncomeEntity.class,
@@ -87,7 +87,7 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity, Integer> {
         Promise<List<IncomeEntity>> promise = Promise.promise();
         String query = QueryBuilder
                 .select(IncomeEntity.class)
-                .where(Map.of("member_number", memberNumber))
+                .where(Map.of("member_number", memberNumber.toString()))
                 .build();
 
         db.execute(query, IncomeEntity.class,
@@ -158,7 +158,7 @@ public class IncomeDAO implements DataAccessObject<IncomeEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(IncomeEntity.class)
-                .where(Map.of("income_id", id))
+                .where(Map.of("income_id", id.toString()))
                 .build();
 
         db.executeOne(query, IncomeEntity.class,

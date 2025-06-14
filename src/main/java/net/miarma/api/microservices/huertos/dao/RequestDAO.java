@@ -32,7 +32,7 @@ public class RequestDAO implements DataAccessObject<RequestEntity, Integer> {
         Promise<RequestEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(RequestEntity.class)
-                .where(Map.of("request_id", id))
+                .where(Map.of("request_id", id.toString()))
                 .build();
 
         db.executeOne(query, RequestEntity.class,
@@ -79,7 +79,7 @@ public class RequestDAO implements DataAccessObject<RequestEntity, Integer> {
         Promise<ViewRequestsWithPreUsers> promise = Promise.promise();
         String query = QueryBuilder
                 .select(ViewRequestsWithPreUsers.class)
-                .where(Map.of("request_id", id))
+                .where(Map.of("request_id", id.toString()))
                 .build();
         db.executeOne(query, ViewRequestsWithPreUsers.class,
                 promise::complete,
@@ -92,7 +92,7 @@ public class RequestDAO implements DataAccessObject<RequestEntity, Integer> {
         Promise<List<RequestEntity>> promise = Promise.promise();
         String query = QueryBuilder
                 .select(RequestEntity.class)
-                .where(Map.of("requested_by", userId))
+                .where(Map.of("requested_by", userId.toString()))
                 .build();
 
         db.execute(query, RequestEntity.class,
@@ -163,7 +163,7 @@ public class RequestDAO implements DataAccessObject<RequestEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(RequestEntity.class)
-                .where(Map.of("request_id", id))
+                .where(Map.of("request_id", id.toString()))
                 .build();
 
         db.executeOne(query, RequestEntity.class,

@@ -31,7 +31,7 @@ public class AnnouncementDAO implements DataAccessObject<AnnouncementEntity, Int
         Promise<AnnouncementEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(AnnouncementEntity.class)
-                .where(Map.of("announce_id", id))
+                .where(Map.of("announce_id", id.toString()))
                 .build();
 
         db.executeOne(query, AnnouncementEntity.class,
@@ -120,7 +120,7 @@ public class AnnouncementDAO implements DataAccessObject<AnnouncementEntity, Int
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(AnnouncementEntity.class)
-                .where(Map.of("announce_id", id))
+                .where(Map.of("announce_id", id.toString()))
                 .build();
 
         db.executeOne(query, AnnouncementEntity.class,

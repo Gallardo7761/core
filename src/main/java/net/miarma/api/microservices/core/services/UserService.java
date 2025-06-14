@@ -29,9 +29,14 @@ public class UserService {
     /* AUTHENTICATION */
 
     public Future<JsonObject> login(String emailOrUsername, String plainPassword, boolean keepLoggedIn) {
-    	return getByEmail(emailOrUsername).compose(user -> {
+        return getByEmail(emailOrUsername).compose(user -> {
             if (user == null) {
-                return getByUserName(emailOrUsername);
+                return getByUserName(emailOrUsername).compose(user2 -> {
+                    if (user2 == null) {
+                        return Future.succeededFuture(null);
+                    }
+                    return Future.succeededFuture(user2);
+                });
             }
             return Future.succeededFuture(user);
         }).compose(user -> {
@@ -126,21 +131,11 @@ public class UserService {
     }
 
     public Future<UserEntity> getByEmail(String email) {
-        return userDAO.getByEmail(email).compose(user -> {
-            if (user == null) {
-                return Future.failedFuture(new NotFoundException("User not found in the database"));
-            }
-            return Future.succeededFuture(user);
-        });
+        return userDAO.getByEmail(email);
     }
 
     public Future<UserEntity> getByUserName(String userName) {
-        return userDAO.getByUserName(userName).compose(user -> {
-            if (user == null) {
-                return Future.failedFuture(new NotFoundException("User not found in the database"));
-            }
-            return Future.succeededFuture(user);
-        });
+        return userDAO.getByUserName(userName);
     }
 
     public Future<UserEntity> updateRole(Integer userId, CoreUserRole role) {

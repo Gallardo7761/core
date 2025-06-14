@@ -21,7 +21,7 @@ import java.util.Date;
 public class JWTManager {
 
 	private final ConfigManager config = ConfigManager.getInstance();
-    private final Algorithm algorithm; 
+    private final Algorithm algorithm;
     private final JWTVerifier verifier;
     private static JWTManager instance;
     

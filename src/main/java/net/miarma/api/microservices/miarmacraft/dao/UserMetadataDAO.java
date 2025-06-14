@@ -31,7 +31,7 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity, Int
         Promise<UserMetadataEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(UserMetadataEntity.class)
-                .where(Map.of("user_id", id))
+                .where(Map.of("user_id", id.toString()))
                 .build();
 
         db.executeOne(query, UserMetadataEntity.class,
@@ -111,7 +111,7 @@ public class UserMetadataDAO implements DataAccessObject<UserMetadataEntity, Int
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(UserMetadataEntity.class)
-                .where(Map.of("user_id", integer))
+                .where(Map.of("user_id", integer.toString()))
                 .build();
 
         db.executeOne(query, UserMetadataEntity.class,

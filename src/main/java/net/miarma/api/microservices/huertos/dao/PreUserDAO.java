@@ -31,7 +31,7 @@ public class PreUserDAO implements DataAccessObject<PreUserEntity, Integer> {
         Promise<PreUserEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(PreUserEntity.class)
-                .where(Map.of("pre_user_id", id))
+                .where(Map.of("pre_user_id", id.toString()))
                 .build();
 
         db.executeOne(query, PreUserEntity.class,
@@ -46,7 +46,7 @@ public class PreUserDAO implements DataAccessObject<PreUserEntity, Integer> {
         Promise<PreUserEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(PreUserEntity.class)
-                .where(Map.of("request_id", requestId))
+                .where(Map.of("request_id", requestId.toString()))
                 .build();
 
         db.executeOne(query, PreUserEntity.class,
@@ -135,7 +135,7 @@ public class PreUserDAO implements DataAccessObject<PreUserEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(PreUserEntity.class)
-                .where(Map.of("pre_user_id", id))
+                .where(Map.of("pre_user_id", id.toString()))
                 .build();
 
         db.execute(query, PreUserEntity.class,

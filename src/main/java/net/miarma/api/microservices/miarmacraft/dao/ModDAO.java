@@ -31,7 +31,7 @@ public class ModDAO implements DataAccessObject<ModEntity, Integer> {
         Promise<ModEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(ModEntity.class)
-                .where(Map.of("mod_id", integer))
+                .where(Map.of("mod_id", integer.toString()))
                 .build();
 
         db.executeOne(query, ModEntity.class,
@@ -117,7 +117,7 @@ public class ModDAO implements DataAccessObject<ModEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(ModEntity.class)
-                .where(Map.of("mod_id", id))
+                .where(Map.of("mod_id", id.toString()))
                 .build();
 
         db.executeOne(query, ModEntity.class,

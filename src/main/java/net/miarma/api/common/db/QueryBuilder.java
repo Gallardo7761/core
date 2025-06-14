@@ -169,8 +169,7 @@ public class QueryBuilder {
             ? Arrays.stream(entityClass.getDeclaredFields()).map(Field::getName).collect(Collectors.toSet())
             : Collections.emptySet();
 
-        QueryBuilder qb = new QueryBuilder();
-        qb.query.append("WHERE ");
+        this.query.append("WHERE ");
         StringJoiner joiner = new StringJoiner(" AND ");
         for (Field field : object.getClass().getDeclaredFields()) {
             field.setAccessible(true);
@@ -193,8 +192,8 @@ public class QueryBuilder {
                 Constants.LOGGER.error("(REFLECTION) Error reading field: {}", e.getMessage());
             }
         }
-        qb.query.append(joiner).append(" ");
-        return qb;
+        this.query.append(joiner).append(" ");
+        return this;
     }
 
     /**

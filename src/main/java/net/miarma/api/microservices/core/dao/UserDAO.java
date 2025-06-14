@@ -31,7 +31,7 @@ public class UserDAO implements DataAccessObject<UserEntity, Integer> {
         Promise<UserEntity> promise = Promise.promise();
         String query = QueryBuilder
                 .select(UserEntity.class)
-                .where(Map.of("user_id", id))
+                .where(Map.of("user_id", id.toString()))
                 .build();
 
         db.executeOne(query, UserEntity.class,
@@ -150,7 +150,7 @@ public class UserDAO implements DataAccessObject<UserEntity, Integer> {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(UserEntity.class)
-                .where(Map.of("user_id", id))
+                .where(Map.of("user_id", id.toString()))
                 .build();
 
         db.executeOne(query, UserEntity.class,
