@@ -6,6 +6,13 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Adaptador de tipo para Gson que maneja la serialización y deserialización de LocalDateTime.
+ * Este adaptador utiliza el formato ISO_LOCAL_DATE_TIME para convertir LocalDateTime a String
+ * y viceversa.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class LocalDateTimeAdapter implements JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 

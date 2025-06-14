@@ -4,6 +4,13 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.util.Optional;
 
+/**
+ * Representa los filtros de consulta para una solicitud HTTP.
+ * Esta clase encapsula los parámetros de ordenamiento, límite y desplazamiento
+ * que se pueden aplicar a una consulta.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class QueryFilters {
 
     private Optional<String> sort = Optional.empty();

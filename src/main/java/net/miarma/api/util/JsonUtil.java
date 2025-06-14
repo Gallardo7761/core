@@ -7,6 +7,10 @@ import net.miarma.api.common.Constants;
 import net.miarma.api.common.http.ApiResponse;
 import net.miarma.api.common.http.ApiStatus;
 
+/**
+ * Clase de utilidad para enviar respuestas JSON.
+ * @author José Manuel Amador Gallardo
+ */
 public class JsonUtil {
 	public static <T> void sendJson(RoutingContext ctx, ApiStatus status, T data) {
 	    sendJson(ctx, status, data, status.getDefaultMessage());

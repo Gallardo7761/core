@@ -5,6 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD) // aplica a clases/interfaces
-@Retention(RetentionPolicy.RUNTIME) // disponible en tiempo de ejecución
+/**
+ * Esta anotación se utiliza para indicar que un campo no debe ser incluido en la respuesta de la API.
+ * Se aplica a campos de clases o interfaces y está disponible en tiempo de ejecución.
+ *
+ * @author José Manuel Amador Gallardo
+ */
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface APIDontReturn {}

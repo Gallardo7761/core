@@ -2,6 +2,11 @@ package net.miarma.api.common.http;
 
 import net.miarma.api.common.exceptions.*;
 
+/**
+ * Enum que representa los códigos de estado HTTP utilizados en la API.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public enum ApiStatus {
     OK(200),
     CREATED(201),
@@ -27,7 +32,12 @@ public enum ApiStatus {
     public int getCode() {
         return code;
     }
-    
+
+	/**
+	 * Obtiene el mensaje por defecto asociado al código de estado.
+	 *
+	 * @return El mensaje por defecto.
+	 */
     public String getDefaultMessage() {
     	return switch (this) {
 			case OK -> "OK";
@@ -46,8 +56,13 @@ public enum ApiStatus {
 			case SERVICE_UNAVAILABLE -> "Service Unavailable";
 		};
     }
-    
-    public static ApiStatus fromException(Throwable t) {
+
+	/**
+	 * Crea un ApiStatus a partir de una excepción.
+	 * @param t la excepción que se desea convertir a ApiStatus
+	 * @return ApiStatus correspondiente a la excepción, o INTERNAL_SERVER_ERROR si no se reconoce la excepción
+	 */
+	public static ApiStatus fromException(Throwable t) {
 		if (t instanceof NotFoundException) return ApiStatus.NOT_FOUND;
 		if (t instanceof BadRequestException) return ApiStatus.BAD_REQUEST;
 		if (t instanceof UnauthorizedException) return ApiStatus.UNAUTHORIZED;
@@ -61,6 +76,12 @@ public enum ApiStatus {
 		return ApiStatus.INTERNAL_SERVER_ERROR;
 	}
 
+	/**
+	 * Obtiene el ApiStatus correspondiente al código de estado HTTP.
+	 *
+	 * @param code El código de estado HTTP.
+	 * @return El ApiStatus correspondiente, o null si no se encuentra.
+	 */
 	public static ApiStatus fromCode(int code) {
 		return switch (code) {
 			case 200 -> OK;

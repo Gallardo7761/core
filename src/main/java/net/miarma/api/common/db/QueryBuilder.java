@@ -8,6 +8,17 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Clase utilitaria para construir queries SQL dinámicamente mediante reflexión,
+ * usando entidades anotadas con {@link Table}.
+ *
+ * Soporta operaciones SELECT, INSERT, UPDATE (con y sin valores nulos), y UPSERT.
+ * También permite aplicar filtros desde un mapa o directamente desde un objeto.
+ *
+ * ¡Ojo! No ejecuta la query, solo la construye.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class QueryBuilder {
     private final StringBuilder query;
     private String sort;
@@ -19,6 +30,9 @@ public class QueryBuilder {
         this.query = new StringBuilder();
     }
 
+    /**
+     * Obtiene el nombre de la tabla desde la anotación @Table de la clase dada.
+     */
     private static <T> String getTableName(Class<T> clazz) {
         if (clazz == null) {
             throw new IllegalArgumentException("Class cannot be null");
@@ -31,10 +45,16 @@ public class QueryBuilder {
         throw new IllegalArgumentException("Class does not have @Table annotation");
     }
 
+    /**
+     * Devuelve la consulta SQL construida hasta el momento.
+     */
     public String getQuery() {
         return query.toString();
     }
 
+    /**
+     * Extrae el valor de un campo, manejando enums y devolviendo su valor o nombre.
+     */
     private static Object extractValue(Object fieldValue) {
         if (fieldValue instanceof Enum<?>) {
             try {
@@ -47,6 +67,13 @@ public class QueryBuilder {
         return fieldValue;
     }
 
+    /**
+     * Construye una consulta SELECT para la clase dada, con columnas opcionales.
+     * @param clazz the entity class to query
+     * @param columns optional columns to select; if empty, selects all columns
+     * @return the current QueryBuilder instance
+     * @param <T> the type of the entity class
+     */
     public static <T> QueryBuilder select(Class<T> clazz, String... columns) {
         if (clazz == null) {
             throw new IllegalArgumentException("Class cannot be null");
@@ -74,6 +101,13 @@ public class QueryBuilder {
         return qb;
     }
 
+    /**
+     * Añade una cláusula WHERE a la consulta actual, filtrando por los campos del mapa.
+     * Los valores pueden ser números o cadenas, y se manejan adecuadamente.
+     *
+     * @param filters un mapa de filtros donde la clave es el nombre del campo y el valor es el valor a filtrar
+     * @return el QueryBuilder actual para encadenar más métodos
+     */
     public QueryBuilder where(Map<String, String> filters) {
         if (filters == null || filters.isEmpty()) {
             return this;
@@ -110,6 +144,13 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Añade una cláusula WHERE a la consulta actual, filtrando por los campos del objeto.
+     * Los valores se extraen mediante reflexión y se manejan adecuadamente.
+     *
+     * @param object el objeto del cual se extraerán los campos para filtrar
+     * @return el QueryBuilder actual para encadenar más métodos
+     */
     public <T> QueryBuilder where(T object) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
@@ -147,6 +188,14 @@ public class QueryBuilder {
         return qb;
     }
 
+    /**
+     * Construye una consulta INSERT para el objeto dado, insertando todos sus campos.
+     * Los valores se extraen mediante reflexión y se manejan adecuadamente.
+     *
+     * @param object el objeto a insertar
+     * @return el QueryBuilder actual para encadenar más métodos
+     * @param <T> el tipo del objeto a insertar
+     */
     public static <T> QueryBuilder insert(T object) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
@@ -182,6 +231,15 @@ public class QueryBuilder {
         return qb;
     }
 
+    /**
+     * Construye una consulta UPDATE para el objeto dado, actualizando todos sus campos.
+     * Los valores se extraen mediante reflexión y se manejan adecuadamente.
+     * Requiere que el objeto tenga un campo ID (terminado en _id) para la cláusula WHERE.
+     *
+     * @param object el objeto a actualizar
+     * @return el QueryBuilder actual para encadenar más métodos
+     * @param <T> el tipo del objeto a actualizar
+     */
     public static <T> QueryBuilder update(T object) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
@@ -226,7 +284,15 @@ public class QueryBuilder {
         qb.query.append(setJoiner).append(" WHERE ").append(whereJoiner);
         return qb;
     }
-    
+
+    /**
+     * Construye una consulta UPDATE que establece los campos a NULL si son nulos.
+     * Requiere que el objeto tenga un campo ID (terminado en _id) para la cláusula WHERE.
+     *
+     * @param object el objeto a actualizar
+     * @return el QueryBuilder actual para encadenar más métodos
+     * @param <T> el tipo del objeto a actualizar
+     */
     public static <T> QueryBuilder updateWithNulls(T object) {
         if (object == null) {
             throw new IllegalArgumentException("Object cannot be null");
@@ -255,7 +321,7 @@ public class QueryBuilder {
                 }
 
                 if (fieldValue == null) {
-                    setJoiner.add(fieldName + " = NULL"); // ✅ esto lo borra en la BD
+                    setJoiner.add(fieldName + " = NULL");
                 } else {
                     Object value = extractValue(fieldValue);
                     setJoiner.add(fieldName + " = " + (value instanceof String || value instanceof LocalDateTime ? "'" + value + "'" : value));
@@ -273,6 +339,15 @@ public class QueryBuilder {
         return qb;
     }
 
+    /**
+     * Construye una consulta UPSERT (INSERT o UPDATE) para el objeto dado.
+     * Si hay claves de conflicto, se actualizan los campos excepto las claves duplicadas.
+     *
+     * @param object el objeto a insertar o actualizar
+     * @param conflictKeys las claves que causan conflictos y no deben actualizarse
+     * @return el QueryBuilder actual para encadenar más métodos
+     * @param <T> el tipo del objeto a insertar o actualizar
+     */
     public static <T> QueryBuilder upsert(T object, String... conflictKeys) {
         if (object == null) throw new IllegalArgumentException("Object cannot be null");
 
@@ -319,6 +394,14 @@ public class QueryBuilder {
         return qb;
     }
 
+    /**
+     * Construye una consulta DELETE para el objeto dado, eliminando registros que coincidan con sus campos.
+     * Los valores se extraen mediante reflexión y se manejan adecuadamente.
+     *
+     * @param object el objeto a eliminar
+     * @return el QueryBuilder actual para encadenar más métodos
+     * @param <T> el tipo del objeto a eliminar
+     */
     public static <T> QueryBuilder delete(T object) {
         if (object == null) throw new IllegalArgumentException("Object cannot be null");
 
@@ -345,6 +428,14 @@ public class QueryBuilder {
         return qb;
     }
 
+    /**
+     * Añade una cláusula ORDER BY a la consulta actual, ordenando por la columna y el orden especificados.
+     * Si la columna no es válida, se ignora.
+     *
+     * @param column la columna por la que ordenar
+     * @param order  el orden (ASC o DESC); si no se especifica, se asume ASC
+     * @return el QueryBuilder actual para encadenar más métodos
+     */
     public QueryBuilder orderBy(Optional<String> column, Optional<String> order) {
         column.ifPresent(c -> {
             if (entityClass != null) {
@@ -366,16 +457,36 @@ public class QueryBuilder {
         return this;
     }
 
+    /**
+     * Añade una cláusula LIMIT a la consulta actual, limitando el número de resultados.
+     * Si se especifica un offset, se añade también.
+     *
+     * @param limitParam el número máximo de resultados a devolver; si no se especifica, no se aplica límite
+     * @return el QueryBuilder actual para encadenar más métodos
+     */
     public QueryBuilder limit(Optional<Integer> limitParam) {
         limitParam.ifPresent(param -> limit = "LIMIT " + param + " ");
         return this;
     }
 
+    /**
+     * Añade una cláusula OFFSET a la consulta actual, desplazando el inicio de los resultados.
+     * Si se especifica un offset, se añade también.
+     *
+     * @param offsetParam el número de resultados a omitir antes de empezar a devolver resultados; si no se especifica, no se aplica offset
+     * @return el QueryBuilder actual para encadenar más métodos
+     */
     public QueryBuilder offset(Optional<Integer> offsetParam) {
         offsetParam.ifPresent(param -> limit += "OFFSET " + param + " ");
         return this;
     }
 
+    /**
+     * Construye y devuelve la consulta SQL completa.
+     * Si no se han añadido cláusulas ORDER BY, LIMIT o OFFSET, las omite.
+     *
+     * @return la consulta SQL construida
+     */
     public String build() {
         if (order != null && !order.isEmpty()) {
             query.append(order);

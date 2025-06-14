@@ -6,6 +6,12 @@ import io.vertx.core.json.JsonObject;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * Adaptador de tipo para Gson que maneja la serialización y deserialización de objetos JsonObject.
+ * Este adaptador asegura que los objetos JsonObject se serialicen correctamente sin incluir el mapa interno.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class JsonObjectTypeAdapter implements JsonSerializer<JsonObject>, JsonDeserializer<JsonObject> {
 
     @Override

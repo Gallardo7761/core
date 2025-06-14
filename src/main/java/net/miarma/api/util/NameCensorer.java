@@ -1,5 +1,11 @@
 package net.miarma.api.util;
 
+/**
+ * Clase de utilidad para censurar nombres.
+ * Censura los nombres dejando las primeras 3 letras visibles y el resto con asteriscos.
+ * Si el nombre es muy largo, lo acorta a 16 caracteres y añade "..." al final.
+ * @author José Manuel Amador Gallardo
+ */
 public class NameCensorer {
 
     public static String censor(String nombre) {

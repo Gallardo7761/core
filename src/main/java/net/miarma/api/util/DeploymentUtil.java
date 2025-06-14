@@ -1,5 +1,9 @@
 package net.miarma.api.util;
 
+/**
+ * Clase de utilidad para mensajes de despliegue.
+ * @author José Manuel Amador Gallardo
+ */
 public class DeploymentUtil {
 	
 	public static <T> String successMessage(Class<T> clazz) {

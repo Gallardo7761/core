@@ -5,6 +5,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.vertx.core.json.jackson.DatabindCodec;
 
+/**
+ * Configura el ObjectMapper de Vert.x para manejar correctamente
+ * fechas y tiempos. Esto es necesario para que las fechas se serialicen
+ * y deserialicen correctamente.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class VertxJacksonConfig {
 	@SuppressWarnings("deprecation")
 	public static void configure() {

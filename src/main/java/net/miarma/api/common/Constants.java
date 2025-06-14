@@ -9,6 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
+/**
+ * Clase que contiene constantes y enumeraciones utilizadas en la API de MiarmaCore.
+ * @author José Manuel Amador Gallardo
+ */
 public class Constants {
 	public static final String APP_NAME = "MiarmaCoreAPI";
 	public static final String BASE_PREFIX = "/api";

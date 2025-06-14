@@ -9,6 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Representa los parámetros de consulta para una solicitud HTTP.
+ * Esta clase encapsula los filtros de consulta y los filtros adicionales
+ * que se pueden aplicar a una consulta.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class QueryParams {
 
     private final Map<String, String> filters;

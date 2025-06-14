@@ -6,6 +6,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * Gestión de toda la configuración de la aplicación.
+ * Se encarga de cargar, guardar y proporcionar acceso a las propiedades de configuración.
+ * Proporciona métodos para obtener la URL de la base de datos, directorios de archivos,
+ * y propiedades específicas como host, puerto, etc.
+ * <p>
+ * Esta clase sigue el patron Singleton para asegurar una sola instancia.
+ * @author José Manuel Amador Gallardo
+ */
 public class ConfigManager {
     private static final ConfigManager INSTANCE = new ConfigManager();
     private final File configFile;

@@ -3,6 +3,10 @@ package net.miarma.api.util;
 import io.vertx.ext.web.Router;
 import net.miarma.api.common.Constants;
 
+/**
+ * Clase de utilidad para adjuntar un logger a un router de Vert.x.
+ * @author José Manuel Amador Gallardo
+ */
 public class RouterUtil {
 
     public static void attachLogger(Router router) {

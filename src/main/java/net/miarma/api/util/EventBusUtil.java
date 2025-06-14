@@ -6,6 +6,10 @@ import io.vertx.core.eventbus.ReplyException;
 import io.vertx.ext.web.RoutingContext;
 import net.miarma.api.common.http.ApiStatus;
 
+/**
+ * Clase de utilidad para manejar errores en el EventBus.
+ * @author José Manuel Amador Gallardo
+ */
 public class EventBusUtil {
 	public static <T> Handler<Throwable> fail(Message<T> msg) {
 	    return err -> {

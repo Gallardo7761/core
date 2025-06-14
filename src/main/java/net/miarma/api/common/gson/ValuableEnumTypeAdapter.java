@@ -8,6 +8,12 @@ import net.miarma.api.common.ValuableEnum;
 
 import java.lang.reflect.Type;
 
+/**
+ * Adaptador de tipo para Gson que maneja la serialización de enumeraciones que implementan ValuableEnum.
+ * Este adaptador convierte el valor de la enumeración en un elemento JSON primitivo.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class ValuableEnumTypeAdapter implements JsonSerializer<ValuableEnum> {
 
     @Override

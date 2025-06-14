@@ -12,8 +12,19 @@ import net.miarma.api.microservices.huertosdecine.entities.ViewerEntity;
 import net.miarma.api.microservices.huertosdecine.services.ViewerService;
 import net.miarma.api.util.JsonUtil;
 
+/**
+ * Middleware para verificar la autenticación y autorización de los usuarios.
+ * Este middleware comprueba si el usuario está autenticado mediante un token JWT
+ * y si tiene los permisos necesarios para acceder a ciertos recursos.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class AuthGuard {
-	
+
+	/**
+	 * Middleware para verificar si el usuario está autenticado.
+	 * @return Handler<RoutingContext> que verifica el token JWT en la cabecera de autorización.
+	 */
 	public static Handler<RoutingContext> check() {
 		return ctx -> {
 			String authHeader = ctx.request().getHeader("Authorization");
@@ -29,6 +40,10 @@ public class AuthGuard {
 		};
 	}
 
+	/**
+	 * Middleware para verificar si el usuario es un administrador global.
+	 * @return Handler<RoutingContext> que verifica el token JWT y los permisos de administrador.
+	 */
 	public static Handler<RoutingContext> admin() {
 		return ctx -> {
 			String authHeader = ctx.request().getHeader("Authorization");
@@ -44,7 +59,11 @@ public class AuthGuard {
 		};
 	}
 
-
+	/**
+	 * Middleware para verificar si el usuario es un administrador de huertos.
+	 * @param memberService Servicio para obtener información del miembro.
+	 * @return Handler<RoutingContext> que verifica el token JWT y los permisos de administrador de huertos.
+	 */
 	public static Handler<RoutingContext> huertosAdmin(MemberService memberService) {
 		return ctx -> {
 			String authHeader = ctx.request().getHeader("Authorization");
@@ -78,6 +97,11 @@ public class AuthGuard {
 		};
 	}
 
+	/**
+	 * Middleware para verificar si el usuario es un administrador de cine.
+	 * @param viewerService Servicio para obtener información del espectador.
+	 * @return Handler<RoutingContext> que verifica el token JWT y los permisos de administrador de cine.
+	 */
 	public static Handler<RoutingContext> cineAdmin (ViewerService viewerService) {
 		return ctx -> {
 			String authHeader = ctx.request().getHeader("Authorization");

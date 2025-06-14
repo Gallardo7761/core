@@ -10,6 +10,15 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Clase encargada de generar los secrets necesarios para la autenticación JWT.
+ * Si el secret ya existe en el archivo de configuración, lo devuelve.
+ * Si no, genera un nuevo secret de 64 bytes, lo guarda en el archivo de configuración
+ * y lo devuelve.
+ * <p>
+ * Esta clase sigue el patron Singleton para asegurar una sola instancia.
+ * @author José Manuel Amador Gallardo
+ */
 public class SecretManager {
 
     private static String cachedSecret = null;

@@ -1,6 +1,12 @@
 package net.miarma.api.common.security;
 import org.mindrot.jbcrypt.BCrypt;
 
+/**
+ * Clase de utilidad para el hash de contraseñas.
+ * Utiliza BCrypt para generar y verificar hashes de contraseñas.
+ *
+ * @author José Manuel Amador Gallardo
+ */
 public class PasswordHasher {
 
     private static final int SALT_ROUNDS = 12;
