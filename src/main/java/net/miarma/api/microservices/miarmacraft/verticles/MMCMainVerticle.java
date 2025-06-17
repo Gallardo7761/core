@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.LogAccumulator;
+import net.miarma.api.microservices.huertos.verticles.HuertosLogicVerticle;
 import net.miarma.api.microservices.huertos.verticles.HuertosMainVerticle;
 import net.miarma.api.util.DeploymentUtil;
 
@@ -25,25 +27,31 @@ public class MMCMainVerticle extends AbstractVerticle {
 	private void deployVerticles() {
 		vertx.deployVerticle(new MMCDataVerticle(), result -> {
 			if (result.succeeded()) {
-				Constants.LOGGER.info(DeploymentUtil.successMessage(MMCDataVerticle.class));
-				Constants.LOGGER.info(DeploymentUtil.apiUrlMessage(
-						configManager.getHost(),
-						configManager.getIntProperty("mmc.data.port")
-				));
+				String message = String.join("\n\r  ",
+						DeploymentUtil.successMessage(MMCDataVerticle.class),
+						DeploymentUtil.apiUrlMessage(
+								configManager.getHost(),
+								configManager.getIntProperty("mmc.data.port")
+						)
+				);
+				LogAccumulator.add(message);
 			} else {
-				Constants.LOGGER.error(DeploymentUtil.failMessage(MMCDataVerticle.class, result.cause()));
+				LogAccumulator.add(DeploymentUtil.failMessage(HuertosLogicVerticle.class, result.cause()));
 			}
 		});
 		
 		vertx.deployVerticle(new MMCLogicVerticle(), result -> {
 			if (result.succeeded()) {
-				Constants.LOGGER.info(DeploymentUtil.successMessage(MMCLogicVerticle.class));
-				Constants.LOGGER.info(DeploymentUtil.apiUrlMessage(
-						configManager.getHost(),
-						configManager.getIntProperty("mmc.logic.port")
-				));
+				String message = String.join("\n\r  ",
+						DeploymentUtil.successMessage(MMCLogicVerticle.class),
+						DeploymentUtil.apiUrlMessage(
+								configManager.getHost(),
+								configManager.getIntProperty("mmc.logic.port")
+						)
+				);
+				LogAccumulator.add(message);
 			} else {
-				Constants.LOGGER.error(DeploymentUtil.failMessage(MMCLogicVerticle.class, result.cause()));
+				LogAccumulator.add(DeploymentUtil.failMessage(HuertosLogicVerticle.class, result.cause()));
 			}
 		});
 	}

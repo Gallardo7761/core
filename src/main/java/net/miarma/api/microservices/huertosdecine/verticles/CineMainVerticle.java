@@ -4,6 +4,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.LogAccumulator;
+import net.miarma.api.microservices.huertos.verticles.HuertosLogicVerticle;
 import net.miarma.api.util.DeploymentUtil;
 
 public class CineMainVerticle extends AbstractVerticle {
@@ -24,25 +26,31 @@ public class CineMainVerticle extends AbstractVerticle {
     private void deployVerticles() {
         vertx.deployVerticle(new CineDataVerticle(), result -> {
             if (result.succeeded()) {
-                Constants.LOGGER.info(DeploymentUtil.successMessage(CineDataVerticle.class));
-                Constants.LOGGER.info(DeploymentUtil.apiUrlMessage(
-                        configManager.getHost(),
-                        configManager.getIntProperty("cine.data.port")
-                ));
+                String message = String.join("\n\r  ",
+                        DeploymentUtil.successMessage(CineDataVerticle.class),
+                        DeploymentUtil.apiUrlMessage(
+                                configManager.getHost(),
+                                configManager.getIntProperty("cine.data.port")
+                        )
+                );
+                LogAccumulator.add(message);
             } else {
-                Constants.LOGGER.error(DeploymentUtil.failMessage(CineDataVerticle.class, result.cause()));
+                LogAccumulator.add(DeploymentUtil.failMessage(HuertosLogicVerticle.class, result.cause()));
             }
         });
 
         vertx.deployVerticle(new CineLogicVerticle(), result -> {
             if (result.succeeded()) {
-                Constants.LOGGER.info(DeploymentUtil.successMessage(CineLogicVerticle.class));
-                Constants.LOGGER.info(DeploymentUtil.apiUrlMessage(
-                        configManager.getHost(),
-                        configManager.getIntProperty("cine.logic.port")
-                ));
+                String message = String.join("\n\r  ",
+                        DeploymentUtil.successMessage(CineLogicVerticle.class),
+                        DeploymentUtil.apiUrlMessage(
+                                configManager.getHost(),
+                                configManager.getIntProperty("cine.logic.port")
+                        )
+                );
+                LogAccumulator.add(message);
             } else {
-                Constants.LOGGER.error(DeploymentUtil.failMessage(CineLogicVerticle.class, result.cause()));
+                LogAccumulator.add(DeploymentUtil.failMessage(HuertosLogicVerticle.class, result.cause()));
             }
         });
     }

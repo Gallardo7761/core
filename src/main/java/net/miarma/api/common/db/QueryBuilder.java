@@ -5,6 +5,7 @@ import net.miarma.api.common.annotations.Table;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,9 @@ public class QueryBuilder {
     }
 
     /**
-     * Extrae el valor de un campo, manejando enums y devolviendo su valor o nombre.
+     * Extrae el valor de un campo, manejando enums y tipos especiales.
+     * Si es un Enum y tiene getValue(), lo usa; si no, devuelve el name().
+     * Si es un LocalDateTime, lo convierte a String en formato SQL.
      */
     private static Object extractValue(Object fieldValue) {
         if (fieldValue instanceof Enum<?>) {
@@ -64,6 +67,11 @@ public class QueryBuilder {
                 return ((Enum<?>) fieldValue).name();
             }
         }
+
+        if (fieldValue instanceof LocalDateTime ldt) {
+            return ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+
         return fieldValue;
     }
 

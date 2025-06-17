@@ -1,13 +1,13 @@
 package net.miarma.api;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Launcher;
-import io.vertx.core.Promise;
+import io.vertx.core.*;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.LogAccumulator;
 import net.miarma.api.common.security.SecretManager;
 import net.miarma.api.common.vertx.VertxJacksonConfig;
 import net.miarma.api.microservices.core.verticles.CoreMainVerticle;
+import net.miarma.api.microservices.huertos.verticles.HuertosLogicVerticle;
 import net.miarma.api.microservices.huertos.verticles.HuertosMainVerticle;
 import net.miarma.api.microservices.huertosdecine.verticles.CineMainVerticle;
 import net.miarma.api.microservices.miarmacraft.verticles.MMCMainVerticle;
@@ -40,8 +40,14 @@ public class MainVerticle extends AbstractVerticle {
 	public void start(Promise<Void> startPromise) {
 		try {
 			init();
-			deploy(startPromise);
-			startPromise.complete();
+			deploy()
+				.onSuccess(v -> {
+					vertx.setTimer(300, id -> {
+						LogAccumulator.flushToLogger(Constants.LOGGER);
+						startPromise.complete();
+					});
+				})
+				.onFailure(startPromise::fail);
 		} catch (Exception e) {
 			startPromise.fail(e);
 		}
@@ -52,49 +58,34 @@ public class MainVerticle extends AbstractVerticle {
 		vertx.deploymentIDs().forEach(id -> vertx.undeploy(id));
 		stopPromise.complete();
 	}
-	
-	private void deploy(Promise<Void> startPromise) {
-		vertx.deployVerticle(new CoreMainVerticle(), result -> {
-            if (result.succeeded()) {
-            	Constants.LOGGER.info(
-            			DeploymentUtil.successMessage(CoreMainVerticle.class));
-            } else {
-            	Constants.LOGGER.error(
-            			DeploymentUtil.failMessage(CoreMainVerticle.class, result.cause()));
-            }
-        });
-		
-		vertx.deployVerticle(new HuertosMainVerticle(), result -> {
-			if (result.succeeded()) {
-				Constants.LOGGER.info(
-						DeploymentUtil.successMessage(HuertosMainVerticle.class));
-			} else {
-				Constants.LOGGER.error(
-						DeploymentUtil.failMessage(HuertosMainVerticle.class, result.cause()));
-			}
-		});
-		
-		vertx.deployVerticle(new MMCMainVerticle(), result -> {
-			if (result.succeeded()) {
-				Constants.LOGGER.info(
-						DeploymentUtil.successMessage(MMCMainVerticle.class));
-			} else {
-				Constants.LOGGER.error(
-						DeploymentUtil.failMessage(MMCMainVerticle.class, result.cause()));
-			}
-		});
 
-		vertx.deployVerticle(new CineMainVerticle(), result -> {
-			if (result.succeeded()) {
-				Constants.LOGGER.info(
-						DeploymentUtil.successMessage(CineMainVerticle.class));
-			} else {
-				Constants.LOGGER.error(
-						DeploymentUtil.failMessage(CineMainVerticle.class, result.cause()));
-			}
-		});
+	private Future<Void> deploy() {
+		Promise<Void> promise = Promise.promise();
+
+		Future<String> core = vertx.deployVerticle(new CoreMainVerticle())
+				.onSuccess(id -> LogAccumulator.add(DeploymentUtil.successMessage(CoreMainVerticle.class)))
+				.onFailure(err -> LogAccumulator.add(DeploymentUtil.failMessage(CoreMainVerticle.class, err)));
+
+		Future<String> huertos = vertx.deployVerticle(new HuertosMainVerticle())
+				.onSuccess(id -> LogAccumulator.add(DeploymentUtil.successMessage(HuertosMainVerticle.class)))
+				.onFailure(err -> LogAccumulator.add(DeploymentUtil.failMessage(HuertosMainVerticle.class, err)));
+
+		Future<String> mmc = vertx.deployVerticle(new MMCMainVerticle())
+				.onSuccess(id -> LogAccumulator.add(DeploymentUtil.successMessage(MMCMainVerticle.class)))
+				.onFailure(err -> LogAccumulator.add(DeploymentUtil.failMessage(MMCMainVerticle.class, err)));
+
+		Future<String> cine = vertx.deployVerticle(new CineMainVerticle())
+				.onSuccess(id -> LogAccumulator.add(DeploymentUtil.successMessage(CineMainVerticle.class)))
+				.onFailure(err -> LogAccumulator.add(DeploymentUtil.failMessage(CineMainVerticle.class, err)));
+
+		Future.all(core, huertos, mmc, cine)
+				.onSuccess(res -> promise.complete())
+				.onFailure(promise::fail);
+
+		return promise.future();
 	}
-	
+
+
 	private void initializeDirectories() {        
         File baseDir = new File(this.configManager.getBaseDir());
         if (!baseDir.exists()) {

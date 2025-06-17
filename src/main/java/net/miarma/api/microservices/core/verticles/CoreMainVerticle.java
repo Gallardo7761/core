@@ -6,6 +6,8 @@ import io.vertx.core.Promise;
 import io.vertx.core.ThreadingModel;
 import net.miarma.api.common.ConfigManager;
 import net.miarma.api.common.Constants;
+import net.miarma.api.common.LogAccumulator;
+import net.miarma.api.microservices.huertos.verticles.HuertosLogicVerticle;
 import net.miarma.api.util.DeploymentUtil;
 
 public class CoreMainVerticle extends AbstractVerticle {
@@ -30,31 +32,31 @@ public class CoreMainVerticle extends AbstractVerticle {
 
         vertx.deployVerticle(new CoreDataVerticle(), options, result -> {
             if (result.succeeded()) {
-                Constants.LOGGER.info(
-                		DeploymentUtil.successMessage(CoreDataVerticle.class));
-                Constants.LOGGER.info(
-                		DeploymentUtil.apiUrlMessage(
-                        configManager.getHost(),
-                        configManager.getIntProperty("sso.data.port")
-                ));
+                String message = String.join("\n\r  ",
+                        DeploymentUtil.successMessage(CoreDataVerticle.class),
+                        DeploymentUtil.apiUrlMessage(
+                                configManager.getHost(),
+                                configManager.getIntProperty("sso.data.port")
+                        )
+                );
+                LogAccumulator.add(message);
             } else {
-                Constants.LOGGER.error(
-                		DeploymentUtil.failMessage(CoreDataVerticle.class, result.cause()));
+                LogAccumulator.add(DeploymentUtil.failMessage(HuertosLogicVerticle.class, result.cause()));
             }
         });
 
         vertx.deployVerticle(new CoreLogicVerticle(), options, result -> {
             if (result.succeeded()) {
-                Constants.LOGGER.info(
-                		DeploymentUtil.successMessage(CoreLogicVerticle.class));
-                Constants.LOGGER.info(
-                		DeploymentUtil.apiUrlMessage(
-                        configManager.getHost(),
-                        configManager.getIntProperty("sso.logic.port")
-                ));
+                String message = String.join("\n\r  ",
+                        DeploymentUtil.successMessage(CoreLogicVerticle.class),
+                        DeploymentUtil.apiUrlMessage(
+                                configManager.getHost(),
+                                configManager.getIntProperty("sso.logic.port")
+                        )
+                );
+                LogAccumulator.add(message);
             } else {
-                Constants.LOGGER.error(
-                		DeploymentUtil.failMessage(CoreLogicVerticle.class, result.cause()));
+                LogAccumulator.add(DeploymentUtil.failMessage(HuertosLogicVerticle.class, result.cause()));
             }
         });
     }

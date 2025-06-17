@@ -7,11 +7,11 @@ package net.miarma.api.util;
 public class DeploymentUtil {
 	
 	public static <T> String successMessage(Class<T> clazz) {
-		return String.join(" ", "🟢", clazz.getName(), "deployed successfully");
+		return String.join(" ", "🟢", clazz.getSimpleName(), "deployed successfully");
 	}
 	
 	public static <T> String failMessage(Class<T> clazz, Throwable e) {
-		return String.join(" ", "🔴 Error deploying", clazz.getName()+":", e.getMessage());
+		return String.join(" ", "🔴 Error deploying", clazz.getSimpleName()+":", e.getMessage());
 	}
 	
 	public static String apiUrlMessage(String host, Integer port) {
