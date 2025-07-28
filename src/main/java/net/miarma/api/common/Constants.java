@@ -1,13 +1,20 @@
 package net.miarma.api.common;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.vertx.core.json.JsonObject;
-import net.miarma.api.common.gson.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import io.vertx.core.json.JsonObject;
+import net.miarma.api.common.gson.APIDontReturnExclusionStrategy;
+import net.miarma.api.common.gson.JsonObjectTypeAdapter;
+import net.miarma.api.common.gson.LocalDateTimeAdapter;
+import net.miarma.api.common.gson.ValuableEnumDeserializer;
+import net.miarma.api.common.gson.ValuableEnumTypeAdapter;
 
 /**
  * Clase que contiene constantes y enumeraciones utilizadas en la API de MiarmaCore.
@@ -28,6 +35,9 @@ public class Constants {
     public static final String MMC_EVENT_BUS = "mmc.eventbus";
     public static final String CINE_EVENT_BUS = "cine.eventbus";
 
+    public static final List<String> HUERTOS_ALLOWED_FOLDERS = 
+    		List.of("INBOX", "Drafts", "Sent", "Spam", "Trash");
+    
     public static final Logger LOGGER = LoggerFactory.getLogger(Constants.APP_NAME);
 	
 	public static final Gson GSON = new GsonBuilder()

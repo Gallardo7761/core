@@ -59,4 +59,9 @@ public class HuertosEndpoints {
 	// solicitud + pre-socio -> GET
 	public static final String REQUESTS_WITH_PRE_USERS = Constants.HUERTOS_PREFIX + "/requests-full";
 	public static final String REQUEST_WITH_PRE_USER = Constants.HUERTOS_PREFIX + "/requests-full/:request_id";
+	
+	// mail
+	public static final String SEND_MAIL = Constants.HUERTOS_PREFIX + "/mails/send"; // POST
+	public static final String MAIL = Constants.HUERTOS_PREFIX + "/mails/:folder/:index"; // GET
+	public static final String MAILS = Constants.HUERTOS_PREFIX + "/mails/:folder"; // GET
 }

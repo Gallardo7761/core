@@ -11,6 +11,7 @@ import net.miarma.api.common.middlewares.AuthGuard;
 import net.miarma.api.common.security.SusPather;
 import net.miarma.api.microservices.huertos.handlers.BalanceLogicHandler;
 import net.miarma.api.microservices.huertos.handlers.IncomeLogicHandler;
+import net.miarma.api.microservices.huertos.handlers.MailHandler;
 import net.miarma.api.microservices.huertos.handlers.MemberLogicHandler;
 import net.miarma.api.microservices.huertos.handlers.RequestLogicHandler;
 import net.miarma.api.microservices.huertos.services.MemberService;
@@ -22,6 +23,7 @@ public class HuertosLogicRouter {
 		IncomeLogicHandler hIncomeLogic = new IncomeLogicHandler(vertx);
 		BalanceLogicHandler hBalanceLogic = new BalanceLogicHandler(vertx);
 		RequestLogicHandler hRequestLogic = new RequestLogicHandler(vertx);
+		MailHandler hMail = new MailHandler(vertx, pool);
 		
 		router.route().handler(BodyHandler.create());
 		// teapot :P
@@ -63,5 +65,11 @@ public class HuertosLogicRouter {
 		router.get(HuertosEndpoints.MEMBER_HAS_GREENHOUSE).handler(AuthGuard.check()).handler(hMemberLogic::hasGreenHouse);
 		router.get(HuertosEndpoints.MEMBER_HAS_GREENHOUSE_REQUEST).handler(AuthGuard.check()).handler(hMemberLogic::hasGreenHouseRequest);
 		router.post(HuertosEndpoints.PRE_USER_VALIDATE).handler(hMemberLogic::validatePreUser);
+		
+		router.get(HuertosEndpoints.MAILS).handler(hMail::getFolder);
+		router.get(HuertosEndpoints.MAIL).handler(hMail::getMail);
+		router.post(HuertosEndpoints.SEND_MAIL).handler(hMail::sendMail);
+		
+
 	}
 }

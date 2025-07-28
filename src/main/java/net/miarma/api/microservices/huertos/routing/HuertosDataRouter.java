@@ -79,5 +79,6 @@ public class HuertosDataRouter {
 		router.post(HuertosEndpoints.REQUESTS).handler(hRequestData::create);
 		router.put(HuertosEndpoints.REQUEST).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestData::update);
 		router.delete(HuertosEndpoints.REQUEST).handler(AuthGuard.huertosAdmin(memberService)).handler(hRequestData::delete);
+		
 	}
 }
