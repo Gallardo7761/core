@@ -132,6 +132,7 @@ public class MailHandler {
     
     private void resolveMailCredentials(RoutingContext ctx, Handler<AsyncResult<MailCredentials>> handler) {
         String token = ctx.request().getHeader("Authorization");
+        System.out.println(token);
         
         if (token == null || !token.startsWith("Bearer ")) {
             handler.handle(Future.failedFuture("Missing or invalid Authorization header"));
@@ -139,6 +140,7 @@ public class MailHandler {
         }
 
         int userId = JWTManager.getInstance().extractUserId(token.replace("Bearer ", ""));
+        System.out.println(userId);
         
         memberService.getById(userId).onComplete(ar -> {
             if (ar.failed()) {
@@ -148,6 +150,7 @@ public class MailHandler {
 
             MemberEntity member = ar.result();
             String email = member.getEmail();
+            System.out.println(email);
             
             if (email == null || !email.contains("@")) {
                 handler.handle(Future.failedFuture("Invalid member email"));
@@ -155,7 +158,9 @@ public class MailHandler {
             }
 
             String role = email.split("@")[0];
+            System.out.println(role);
             String password = ConfigManager.getInstance().getStringProperty("smtp.password." + role);
+            System.out.println(password);
 
             if (password == null) {
                 handler.handle(Future.failedFuture("No password found for user"));
