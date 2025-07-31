@@ -7,10 +7,12 @@ import java.util.Properties;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Folder;
 import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.Part;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeUtility;
 import net.miarma.api.common.ConfigManager;
 
@@ -108,7 +110,6 @@ public class ImapReader {
 	    return new Mail(from, toList, subject, content, date, attachments);
 	}
 
-	
 	private static String extractContent(Message message) throws Exception {
 	    Object content = message.getContent();
 	    if (content instanceof String) {

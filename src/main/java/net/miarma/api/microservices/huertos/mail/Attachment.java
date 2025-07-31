@@ -8,6 +8,8 @@ public class Attachment {
 	private String mimeType;
 	private transient byte[] data;
 	
+	public Attachment() {}
+	
 	public Attachment(String filename, String mimeType, byte[] data) {
 		this.filename = filename;
 		this.mimeType = mimeType;

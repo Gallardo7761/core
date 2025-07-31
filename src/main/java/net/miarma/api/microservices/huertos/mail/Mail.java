@@ -11,6 +11,8 @@ public class Mail implements Comparable<Mail> {
 	private LocalDateTime date;
 	private List<Attachment> attachments;
 	
+	public Mail() {}
+	
 	public Mail(String from, List<String> to, String subject, String content, LocalDateTime date,
 			List<Attachment> attachments) {
 		this.from = from;
