@@ -49,9 +49,9 @@ public class ProfileDTO {
 	public boolean getHasGreenHouseRequest() {
 		return hasGreenHouseRequest;
 	}
-	public void setHasGreenHouseRequest(boolean hasGreenHouseRquest) {
-		this.hasGreenHouseRequest = hasGreenHouseRquest;
-	}
+        public void setHasGreenHouseRequest(boolean hasGreenHouseRequest) {
+                this.hasGreenHouseRequest = hasGreenHouseRequest;
+        }
 	
 	
 }
