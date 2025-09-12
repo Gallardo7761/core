@@ -104,17 +104,21 @@ public class PasteDAO implements DataAccessObject<PasteEntity, Long> {
 
     @Override
     public Future<Boolean> exists(Long id) {
+    	throw new UnsupportedOperationException("You cannot check existance on this type by its ID");
+    }
+    
+    public Future<Boolean> existsByKey(String key) {
         Promise<Boolean> promise = Promise.promise();
         String query = QueryBuilder
                 .select(PasteEntity.class)
-                .where(Map.of("paste_id", id.toString()))
+                .where(Map.of("paste_key", key))
                 .build();
 
         db.executeOne(query, PasteEntity.class,
                 result -> promise.complete(result != null),
                 promise::fail
         );
-
         return promise.future();
     }
+
 }

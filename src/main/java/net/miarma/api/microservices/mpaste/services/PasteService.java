@@ -6,6 +6,7 @@ import net.miarma.api.common.exceptions.NotFoundException;
 import net.miarma.api.common.http.QueryParams;
 import net.miarma.api.microservices.mpaste.dao.PasteDAO;
 import net.miarma.api.microservices.mpaste.entities.PasteEntity;
+import net.miarma.api.util.PasteKeyGenerator;
 
 import java.util.List;
 
@@ -39,7 +40,15 @@ public class PasteService {
     }
 
     public Future<PasteEntity> create(PasteEntity paste) {
-        return pasteDAO.insert(paste);
+    	String key = PasteKeyGenerator.generate(6);
+        paste.setPaste_key(key);
+
+        return pasteDAO.existsByKey(key).compose(exists -> {
+            if (exists) {
+                return create(paste); // recursivo, genera otra clave
+            }
+            return pasteDAO.insert(paste);
+        });
     }
 
     public Future<PasteEntity> update(PasteEntity paste) {
@@ -55,7 +64,7 @@ public class PasteService {
         });
     }
 
-    public Future<Boolean> exists(Long id) {
-        return pasteDAO.exists(id);
+    public Future<Boolean> exists(String key) {
+        return pasteDAO.existsByKey(key);
     }
 }
