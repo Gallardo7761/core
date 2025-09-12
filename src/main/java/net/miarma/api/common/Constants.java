@@ -34,7 +34,8 @@ public class Constants {
     public static final String HUERTOS_EVENT_BUS = "huertos.eventbus";
     public static final String MMC_EVENT_BUS = "mmc.eventbus";
     public static final String CINE_EVENT_BUS = "cine.eventbus";
-
+    public static final String MPASTE_EVENT_BUS = "mpaste.eventbus";
+    
     public static final List<String> HUERTOS_ALLOWED_FOLDERS = 
     		List.of("INBOX", "Drafts", "Sent", "Spam", "Trash");
     
