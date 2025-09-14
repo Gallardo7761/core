@@ -17,8 +17,11 @@ public class PasteLogicHandler {
 	
 	public void getByKey(RoutingContext ctx) {
 		String key = ctx.request().getParam("paste_key");
+		String password = ctx.request().getHeader("X-Paste-Password");
 		JsonObject request = new JsonObject()
-			.put("key", key);
+			.put("action", "getByKey")
+			.put("key", key)
+			.put("password", password);
 		
 		vertx.eventBus().request(Constants.MPASTE_EVENT_BUS, request, ar -> {
             if (ar.succeeded()) JsonUtil.sendJson(ctx, ApiStatus.OK, ar.result().body());

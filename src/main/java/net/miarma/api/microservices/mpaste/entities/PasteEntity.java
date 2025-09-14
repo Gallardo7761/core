@@ -3,6 +3,7 @@ package net.miarma.api.microservices.mpaste.entities;
 import java.time.LocalDateTime;
 
 import io.vertx.sqlclient.Row;
+import net.miarma.api.common.annotations.APIDontReturn;
 import net.miarma.api.common.annotations.Table;
 import net.miarma.api.common.db.AbstractEntity;
 
@@ -10,6 +11,7 @@ import net.miarma.api.common.db.AbstractEntity;
 public class PasteEntity extends AbstractEntity {
 	private Long paste_id;
 	private String paste_key;
+	private String title;
 	private String content;
 	private String syntax;
 	private LocalDateTime created_at;
@@ -17,6 +19,8 @@ public class PasteEntity extends AbstractEntity {
 	private Integer views;
 	private Boolean burn_after;
 	private Boolean is_private;
+	@APIDontReturn
+	private String password;
 	private Integer owner_id;
 	
 	public PasteEntity() {
@@ -41,6 +45,14 @@ public class PasteEntity extends AbstractEntity {
 
 	public void setPaste_key(String paste_key) {
 		this.paste_key = paste_key;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getContent() {
@@ -97,6 +109,14 @@ public class PasteEntity extends AbstractEntity {
 
 	public void setIs_private(Boolean is_private) {
 		this.is_private = is_private;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public Integer getOwner_id() {

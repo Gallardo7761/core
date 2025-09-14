@@ -11,6 +11,7 @@ import net.miarma.api.microservices.huertos.verticles.HuertosLogicVerticle;
 import net.miarma.api.microservices.huertos.verticles.HuertosMainVerticle;
 import net.miarma.api.microservices.huertosdecine.verticles.CineMainVerticle;
 import net.miarma.api.microservices.miarmacraft.verticles.MMCMainVerticle;
+import net.miarma.api.microservices.mpaste.verticles.MPasteMainVerticle;
 import net.miarma.api.util.DeploymentUtil;
 import net.miarma.api.util.MessageUtil;
 
@@ -78,8 +79,12 @@ public class MainVerticle extends AbstractVerticle {
 				.onSuccess(id -> LogAccumulator.add(DeploymentUtil.successMessage(CineMainVerticle.class)))
 				.onFailure(err -> LogAccumulator.add(DeploymentUtil.failMessage(CineMainVerticle.class, err)));
 
-		Future.all(core, huertos, mmc, cine)
-				.onSuccess(res -> promise.complete())
+		Future<String> mpaste = vertx.deployVerticle(new MPasteMainVerticle())
+				.onSuccess(id -> LogAccumulator.add(DeploymentUtil.successMessage(MPasteMainVerticle.class)))
+				.onFailure(err -> LogAccumulator.add(DeploymentUtil.failMessage(MPasteMainVerticle.class, err)));
+		
+		Future.all(core, huertos, mmc, cine, mpaste)
+				.onSuccess(_ -> promise.complete())
 				.onFailure(promise::fail);
 
 		return promise.future();

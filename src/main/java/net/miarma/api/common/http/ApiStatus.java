@@ -20,6 +20,7 @@ public enum ApiStatus {
     IM_A_TEAPOT(418),
     UNPROCESSABLE_ENTITY(422),
     UNSUPPORTED_MEDIA_TYPE(415),
+    TOO_MANY_REQUESTS(429),
     INTERNAL_SERVER_ERROR(500),
     SERVICE_UNAVAILABLE(503);
 
@@ -52,6 +53,7 @@ public enum ApiStatus {
 			case IM_A_TEAPOT -> "The server refuses the attempt to brew coffee with a teapot";
 			case UNPROCESSABLE_ENTITY -> "Unprocessable Entity";
 			case UNSUPPORTED_MEDIA_TYPE -> "Unsupported Media Type";
+			case TOO_MANY_REQUESTS -> "Too many requests";
 			case INTERNAL_SERVER_ERROR -> "Internal Server Error";
 			case SERVICE_UNAVAILABLE -> "Service Unavailable";
 		};
@@ -96,6 +98,7 @@ public enum ApiStatus {
 			case 418 -> IM_A_TEAPOT;
 			case 422 -> UNPROCESSABLE_ENTITY;
 			case 415 -> UNSUPPORTED_MEDIA_TYPE;
+			case 429 -> TOO_MANY_REQUESTS;
 			case 500 -> INTERNAL_SERVER_ERROR;
 			case 503 -> SERVICE_UNAVAILABLE;
 			default -> null;

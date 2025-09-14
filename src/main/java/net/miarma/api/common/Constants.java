@@ -28,6 +28,7 @@ public class Constants {
 	public static final String HUERTOS_PREFIX = BASE_PREFIX + "/huertos/v1";
 	public static final String MMC_PREFIX = BASE_PREFIX + "/mmc/v1";
 	public static final String CINE_PREFIX = BASE_PREFIX + "/cine/v1";
+	public static final String MPASTE_PREFIX = BASE_PREFIX + "/mpaste/v1";
 
     public static final String AUTH_EVENT_BUS = "auth.eventbus";
     public static final String CORE_EVENT_BUS = "core.eventbus";
