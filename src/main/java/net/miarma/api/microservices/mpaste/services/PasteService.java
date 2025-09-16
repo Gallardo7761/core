@@ -3,6 +3,7 @@ package net.miarma.api.microservices.mpaste.services;
 import java.util.List;
 
 import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.Constants;
 import net.miarma.api.common.exceptions.NotFoundException;
@@ -58,7 +59,9 @@ public class PasteService {
                 }
             }
             if (Boolean.TRUE.equals(paste.getBurn_after())) {
-                pasteDAO.delete(paste.getPaste_id());
+                Vertx.vertx().setTimer(5000, _ -> {
+                	pasteDAO.delete(paste.getPaste_id());
+                });
             }
             return Future.succeededFuture(paste);
         });

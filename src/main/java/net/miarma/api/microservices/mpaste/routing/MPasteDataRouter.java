@@ -7,7 +7,6 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.sqlclient.Pool;
 import net.miarma.api.common.http.ApiResponse;
 import net.miarma.api.common.http.ApiStatus;
-import net.miarma.api.common.security.JWTManager;
 import net.miarma.api.common.security.SusPather;
 import net.miarma.api.microservices.mpaste.handlers.PasteDataHandler;
 import net.miarma.api.util.RateLimiter;
