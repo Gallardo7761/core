@@ -46,10 +46,17 @@
 	    <version>4.5.13</version>
 	</dependency>
 	
-	<!-- Vert.X Mail Clien -->
+	<!-- Vert.X Mail Client -->
 	<dependency>
 		 <groupId>io.vertx</groupId>
 		 <artifactId>vertx-mail-client</artifactId>
+		 <version>4.5.16</version>
+	</dependency>
+	
+	<!-- Vert.X Redis Client -->
+  	<dependency>
+		 <groupId>io.vertx</groupId>
+		 <artifactId>vertx-redis-client</artifactId>
 		 <version>4.5.16</version>
 	</dependency>
   	
@@ -60,14 +67,14 @@
   	 <version>2.12.1</version>
   	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+	<!-- BCrypt -->
 	<dependency>
 	    <groupId>org.mindrot</groupId>
 	    <artifactId>jbcrypt</artifactId>
 	    <version>0.4</version>
 	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+	<!-- JWT -->
 	<dependency>
 	    <groupId>com.auth0</groupId>
 	    <artifactId>java-jwt</artifactId>
@@ -87,24 +94,25 @@
 	   <version>1.5.13</version>
 	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+	<!-- Jackson -->
 	<dependency>
 	    <groupId>com.fasterxml.jackson.datatype</groupId>
 	    <artifactId>jackson-datatype-jsr310</artifactId>
 	    <version>2.18.3</version>
 	</dependency>
 
-	<!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail -->
+	<!-- Jakarta Mail -->
 	<dependency>
 	    <groupId>com.sun.mail</groupId>
 	    <artifactId>jakarta.mail</artifactId>
 	    <version>2.0.1</version>
 	</dependency>
 		
-	  <dependency>
-		  <groupId>com.github.eduardomcb</groupId>
-		  <artifactId>discord-webhook</artifactId>
-		  <version>1.0.0</version>
+	<!-- Discord Webhook -->
+  	<dependency>
+  		<groupId>com.github.eduardomcb</groupId>
+	  	<artifactId>discord-webhook</artifactId>
+	  	<version>1.0.0</version>
   	</dependency>
 	
   </dependencies>

@@ -26,7 +26,7 @@ public class ScreenshotHandler {
 		}
 		
 		String encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8);
-	    String microserviceUrl = "http://localhost:7000/screenshot?url=" + encodedUrl;
+	    String microserviceUrl = "http://screenshoter:7000/screenshot?url=" + encodedUrl;
 	    
 	    webClient.getAbs(microserviceUrl)
         .send(ar -> {

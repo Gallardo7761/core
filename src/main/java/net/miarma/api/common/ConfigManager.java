@@ -58,38 +58,47 @@ public class ConfigManager {
     }
     
     public String getHomeDir() {
-    	return getOS() == OSType.WINDOWS ? 
+        if (isDocker()) {
+            return "/data/";
+        }
+        return getOS() == OSType.WINDOWS ? 
                 "C:/Users/" + System.getProperty("user.name") + "/" :
                 System.getProperty("user.home").contains("root") ? "/root/" : 
                 "/home/" + System.getProperty("user.name") + "/";
     }
-    
+
     public String getBaseDir() {
-		return getHomeDir() + 
-				(getOS() == OSType.WINDOWS ? ".miarmacoreapi/" :
-					getOS() == OSType.LINUX ? ".config/miarmacoreapi/" :
-				".contaminus/");
-	}
-    
+        if (isDocker()) {
+            return getHomeDir() + ".config/";
+        }
+        return getHomeDir() + (getOS() == OSType.WINDOWS ? ".miarmacoreapi/" :
+                getOS() == OSType.LINUX ? ".config/miarmacoreapi/" :
+                ".contaminus/");
+    }
+
     public String getFilesDir(String context) {
-    			return config.getProperty("files.dir") != null ?
-						config.getProperty("files.dir") :
-						(getOS() == OSType.WINDOWS ?
-							System.getProperty("user.home") + "\\" + "Documents\\" + context + "\\" :
-							getOS() == OSType.LINUX ?
-								"/var/www/files/" + context + "/" :
-									null);
+        if (config.getProperty("files.dir") != null) {
+            return config.getProperty("files.dir");
+        }
+        if (isDocker()) {
+            return "/files/" + context + "/";
+        }
+        return getOS() == OSType.WINDOWS ?
+                System.getProperty("user.home") + "\\" + "Documents\\" + context + "\\" :
+                "/var/www/files/" + context + "/";
     }
-    
+
     public String getModsDir() {
-    	return getFilesDir("miarmacraft") + "mods/";
+        return getFilesDir("miarmacraft") + "mods/";
     }
-    
+
     public String getWebRoot() {
-		return config.getProperty("web.root") != null ? 
-				config.getProperty("web.root") : 
-				getBaseDir() + "webroot/";
-	}
+        if (config.getProperty("web.root") != null) {
+            return config.getProperty("web.root");
+        }
+        return getBaseDir() + "webroot/";
+    }
+
 
     public static OSType getOS() {
         String os = System.getProperty("os.name").toLowerCase();
@@ -100,6 +109,10 @@ public class ConfigManager {
         } else {
             return OSType.INVALID_OS;
         }
+    }
+    
+    public static boolean isDocker() {
+    	return Boolean.parseBoolean(System.getenv("RUNNING_IN_DOCKER"));
     }
     
     public String getStringProperty(String key) {
